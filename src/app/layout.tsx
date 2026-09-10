@@ -16,8 +16,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: 'THY — Bespoke luxury, tailored locally.',
-  description: 'Connecting you directly with artisan tailors.',
+  title: 'THY — Bespoke Indian wear, tailored locally.',
+  description: 'Connecting you directly with Indian artisans and tailors.',
 };
 
 export default function RootLayout({
