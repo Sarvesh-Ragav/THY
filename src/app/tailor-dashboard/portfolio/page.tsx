@@ -51,25 +51,24 @@ export default function PortfolioPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-thy-ink">Portfolio & Design Showcase</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-thy-ink">Portfolio & Design Showcase</h1>
           <p className="text-sm text-thy-muted">Upload and showcase your best stitching work to potential customers.</p>
         </div>
         <Link 
           href="/tailor-dashboard" 
-          className="text-sm font-semibold text-thy-brand hover:underline"
+          className="text-sm font-semibold text-thy-brand hover:underline self-start"
         >
           ← Back to Dashboard
         </Link>
       </div>
 
-      {/* Action Bar */}
-      <div className="flex justify-between items-center bg-thy-surface p-4 rounded-2xl border border-thy-ink/10 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-thy-surface p-4 rounded-2xl border border-thy-ink/10 shadow-sm">
         <span className="text-sm font-semibold text-thy-ink">Total Showcase Items: {items.length}</span>
         <button
           onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-thy-brand text-white rounded-xl text-xs font-semibold hover:bg-thy-brand-hover transition-colors"
+          className="px-4 py-3 sm:py-2 bg-thy-brand text-white rounded-xl text-xs font-semibold hover:bg-thy-brand-hover transition-colors min-h-11 w-full sm:w-auto"
         >
           + Add New Work
         </button>
@@ -106,8 +105,8 @@ export default function PortfolioPage() {
 
       {/* Add Work Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-thy-surface rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+          <div className="bg-thy-surface rounded-t-2xl sm:rounded-2xl p-5 sm:p-6 w-full max-w-md shadow-xl space-y-4 max-h-[90dvh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]">
             <div className="flex justify-between items-center border-b pb-3">
               <h2 className="font-bold text-thy-ink text-lg">Add New Portfolio Image</h2>
               <button onClick={() => setShowModal(false)} className="text-thy-subtle font-bold">✕</button>

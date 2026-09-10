@@ -29,9 +29,9 @@ export default function TailorDashboardOverview() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-thy-surface p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-thy-surface p-5 sm:p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-thy-ink">Welcome back, {firstName}!</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-thy-ink">Welcome back, {firstName}!</h1>
           <p className="text-thy-muted text-sm">Manage your tailoring orders and grow your business with THY.</p>
         </div>
 
@@ -43,9 +43,9 @@ export default function TailorDashboardOverview() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-thy-surface p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col justify-between">
+        <div className="bg-thy-surface p-5 sm:p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col justify-between">
           <div>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center gap-3 mb-4">
               <h2 className="font-bold text-thy-ink">New Order Requests</h2>
               <span className="bg-thy-mist text-thy-brand font-bold px-3 py-1 rounded-full text-xs">
                 {pendingCount} Pending
@@ -61,12 +61,12 @@ export default function TailorDashboardOverview() {
           </Link>
         </div>
 
-        <div className="bg-thy-surface p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col justify-between">
+        <div className="bg-thy-surface p-5 sm:p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col justify-between">
           <div>
             <h2 className="font-bold text-thy-ink mb-2">Your Availability</h2>
             <p className="text-sm text-thy-muted mb-4">Toggle whether you are taking on new customer orders right now.</p>
           </div>
-          <div className="flex items-center justify-between pt-2 border-t border-thy-ink/10">
+          <div className="flex items-center justify-between gap-3 pt-2 border-t border-thy-ink/10">
             <Link href="/tailor-dashboard/availability" className="text-sm font-semibold text-thy-brand hover:underline">
               Status: {receivingOrders ? 'Available' : 'Unavailable'}
             </Link>
@@ -82,7 +82,7 @@ export default function TailorDashboardOverview() {
           </div>
         </div>
 
-        <div className="bg-thy-surface p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col justify-between">
+        <div className="bg-thy-surface p-5 sm:p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col justify-between">
           <div>
             <h2 className="font-bold text-thy-ink mb-2">Active Orders Overview</h2>
             <p className="text-sm text-thy-muted mb-4">

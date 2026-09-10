@@ -43,14 +43,14 @@ export default function NewOrderRequestsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-thy-ink">New Order Requests</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-thy-ink">New Order Requests</h1>
           <p className="text-sm text-thy-muted">Review incoming customer requirements and submit tailored price quotes.</p>
         </div>
         <Link
           href="/tailor-dashboard"
-          className="text-sm font-semibold text-thy-brand hover:underline"
+          className="text-sm font-semibold text-thy-brand hover:underline self-start"
         >
           ← Back to Dashboard
         </Link>
@@ -58,9 +58,9 @@ export default function NewOrderRequestsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {session.requests.map((req) => (
-          <div key={req.id} className="bg-thy-surface p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col justify-between space-y-4">
+          <div key={req.id} className="bg-thy-surface p-5 sm:p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col justify-between space-y-4">
             <div>
-              <div className="flex justify-between items-start mb-2">
+              <div className="flex justify-between items-start gap-3 mb-2">
                 <div>
                   <span className="text-xs font-semibold text-thy-subtle">{req.id}</span>
                   <h3 className="text-lg font-bold text-thy-ink">{req.garmentType}</h3>
@@ -102,9 +102,9 @@ export default function NewOrderRequestsPage() {
       </div>
 
       {selectedRequest && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-thy-surface rounded-2xl p-6 w-full max-w-lg shadow-xl space-y-5">
-            <div className="flex justify-between items-center border-b pb-3">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+          <div className="bg-thy-surface rounded-t-2xl sm:rounded-2xl p-5 sm:p-6 w-full max-w-lg shadow-xl space-y-5 max-h-[90dvh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+            <div className="flex justify-between items-center border-b pb-3 gap-3">
               <h2 className="font-bold text-thy-ink text-lg">Provide Quotation - {selectedRequest.id}</h2>
               <button
                 onClick={() => setSelectedRequest(null)}
@@ -156,17 +156,17 @@ export default function NewOrderRequestsPage() {
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-3 border-t">
                 <button
                   type="button"
                   onClick={() => setSelectedRequest(null)}
-                  className="px-4 py-2 border rounded-xl text-xs font-semibold text-thy-muted hover:bg-thy-mist"
+                  className="px-4 py-3 sm:py-2 border rounded-xl text-xs font-semibold text-thy-muted hover:bg-thy-mist min-h-11"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-thy-brand text-white rounded-xl text-xs font-semibold hover:bg-thy-brand-hover"
+                  className="px-4 py-3 sm:py-2 bg-thy-brand text-white rounded-xl text-xs font-semibold hover:bg-thy-brand-hover min-h-11"
                 >
                   Submit Quotation
                 </button>

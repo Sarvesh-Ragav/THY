@@ -64,7 +64,7 @@ export function HeroCarousel() {
         />
       ))}
       <div className="absolute inset-0 bg-gradient-to-t from-thy-deep/75 via-thy-deep/20 to-thy-deep/30 pointer-events-none" />
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-1">
         {HERO_VIDEOS.map((video, videoIndex) => (
           <button
             key={video.id}
@@ -74,8 +74,10 @@ export function HeroCarousel() {
               event.stopPropagation();
               setIndex(videoIndex);
             }}
-            className={`h-1.5 w-8 ${videoIndex === index ? 'bg-thy-brand' : 'bg-thy-canvas/40'}`}
-          />
+            className="h-11 px-1.5 flex items-center"
+          >
+            <span className={`h-1.5 w-8 ${videoIndex === index ? 'bg-thy-brand' : 'bg-thy-canvas/40'}`} />
+          </button>
         ))}
       </div>
     </div>

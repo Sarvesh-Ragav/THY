@@ -2,14 +2,19 @@
 
 import React from 'react';
 import { CustomerNavbar } from '@/components/customer/CustomerNavbar';
+import { CustomerBottomNav } from '@/components/customer/CustomerBottomNav';
 import { CustomerErrorProvider } from '@/components/customer/CustomerErrorProvider';
 
 export function CustomerShell({ children }: { children: React.ReactNode }) {
   return (
     <CustomerErrorProvider>
-      <div className="min-h-screen bg-thy-bg text-thy-ink" style={{ fontFamily: 'var(--font-outfit), sans-serif' }}>
+      <div
+        className="min-h-dvh bg-thy-bg text-thy-ink pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0"
+        style={{ fontFamily: 'var(--font-outfit), sans-serif' }}
+      >
         <CustomerNavbar />
         {children}
+        <CustomerBottomNav />
       </div>
     </CustomerErrorProvider>
   );

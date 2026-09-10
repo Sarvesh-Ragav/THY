@@ -35,6 +35,7 @@ export default function ChatPage() {
   const [conversations, setConversations] = useState(initialConversations);
   const [activeChatId, setActiveChatId] = useState('C-1');
   const [inputMessage, setInputMessage] = useState('');
+  const [mobileShowChat, setMobileShowChat] = useState(false);
 
   const activeChat = conversations.find((c) => c.id === activeChatId);
 
@@ -66,25 +67,22 @@ export default function ChatPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-thy-ink">Customer Communication</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-thy-ink">Customer Communication</h1>
           <p className="text-sm text-thy-muted">Discuss custom fitting requirements and order progress in real time.</p>
         </div>
         <Link 
           href="/tailor-dashboard" 
-          className="text-sm font-semibold text-thy-brand hover:underline"
+          className="text-sm font-semibold text-thy-brand hover:underline self-start"
         >
           ← Back to Dashboard
         </Link>
       </div>
 
-      {/* Chat Window Container */}
-      <div className="bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-sm grid grid-cols-1 md:grid-cols-3 min-h-[500px] overflow-hidden">
+      <div className="bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-sm grid grid-cols-1 md:grid-cols-3 min-h-[min(70dvh,560px)] overflow-hidden">
         
-        {/* Left Sidebar: Conversations List */}
-        <div className="border-r border-thy-ink/10 flex flex-col">
+        <div className={`${mobileShowChat ? 'hidden md:flex' : 'flex'} border-r border-thy-ink/10 flex-col`}>
           <div className="p-4 border-b border-thy-ink/10 bg-thy-mist/50">
             <h2 className="font-bold text-thy-ink text-sm">Recent Conversations</h2>
           </div>
@@ -92,14 +90,17 @@ export default function ChatPage() {
             {conversations.map((chat) => (
               <button
                 key={chat.id}
-                onClick={() => setActiveChatId(chat.id)}
-                className={`w-full text-left p-4 flex flex-col gap-1 transition-colors ${
+                onClick={() => {
+                  setActiveChatId(chat.id);
+                  setMobileShowChat(true);
+                }}
+                className={`w-full text-left p-4 flex flex-col gap-1 transition-colors min-h-11 ${
                   activeChatId === chat.id ? 'bg-thy-mist' : 'hover:bg-thy-mist'
                 }`}
               >
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-thy-ink text-sm">{chat.customerName}</span>
-                  <span className="text-[10px] text-thy-subtle">{chat.time}</span>
+                <div className="flex justify-between items-center gap-2">
+                  <span className="font-bold text-thy-ink text-sm truncate">{chat.customerName}</span>
+                  <span className="text-[10px] text-thy-subtle shrink-0">{chat.time}</span>
                 </div>
                 <div className="text-xs font-semibold text-thy-brand">{chat.orderId}</div>
                 <p className="text-xs text-thy-muted truncate">{chat.lastMessage}</p>
@@ -108,18 +109,22 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Right Pane: Active Chat Section */}
         {activeChat ? (
-          <div className="md:col-span-2 flex flex-col justify-between bg-thy-mist/40">
-            {/* Active Contact Bar */}
-            <div className="p-4 bg-thy-surface border-b border-thy-ink/10 flex justify-between items-center">
+          <div className={`${mobileShowChat ? 'flex' : 'hidden md:flex'} md:col-span-2 flex-col justify-between bg-thy-mist/40 min-h-[min(70dvh,560px)]`}>
+            <div className="p-4 bg-thy-surface border-b border-thy-ink/10 flex items-center gap-3">
+              <button
+                type="button"
+                className="md:hidden text-sm font-semibold text-thy-brand min-h-11"
+                onClick={() => setMobileShowChat(false)}
+              >
+                ← Chats
+              </button>
               <div>
                 <h3 className="font-bold text-thy-ink text-sm">{activeChat.customerName}</h3>
                 <span className="text-xs text-thy-muted">Ref: {activeChat.orderId}</span>
               </div>
             </div>
 
-            {/* Message Stream */}
             <div className="p-4 space-y-3 flex-1 overflow-y-auto">
               {activeChat.messages.map((msg, idx) => (
                 <div
@@ -127,7 +132,7 @@ export default function ChatPage() {
                   className={`flex ${msg.sender === 'tailor' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[75%] p-3 rounded-2xl text-xs space-y-1 ${
+                    className={`max-w-[85%] sm:max-w-[75%] p-3 rounded-2xl text-xs space-y-1 ${
                       msg.sender === 'tailor'
                         ? 'bg-thy-brand text-white rounded-br-none'
                         : 'bg-thy-surface border border-thy-ink/10 text-thy-ink rounded-bl-none shadow-sm'
@@ -146,25 +151,24 @@ export default function ChatPage() {
               ))}
             </div>
 
-            {/* Input Form */}
             <form onSubmit={handleSendMessage} className="p-3 bg-thy-surface border-t border-thy-ink/10 flex gap-2">
               <input
                 type="text"
                 placeholder="Type your response..."
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                className="flex-1 px-4 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-thy-brand"
+                className="flex-1 min-w-0 px-4 py-3 border rounded-xl text-base sm:text-xs focus:outline-none focus:ring-2 focus:ring-thy-brand"
               />
               <button
                 type="submit"
-                className="px-5 py-2 bg-thy-brand text-white font-semibold rounded-xl text-xs hover:bg-thy-brand-hover transition-colors"
+                className="px-5 py-3 bg-thy-brand text-white font-semibold rounded-xl text-xs hover:bg-thy-brand-hover transition-colors min-h-11 shrink-0"
               >
                 Send
               </button>
             </form>
           </div>
         ) : (
-          <div className="md:col-span-2 flex items-center justify-center text-thy-subtle text-xs">
+          <div className="hidden md:flex md:col-span-2 items-center justify-center text-thy-subtle text-xs">
             Select a conversation to start chatting.
           </div>
         )}

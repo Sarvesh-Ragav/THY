@@ -91,6 +91,13 @@ export interface TailorActiveOrder {
 export interface CustomerDesignSave {
   id: string;
   title: string;
+  categoryId?: string;
+  garment?: string;
+  fabric?: string;
+  treatments?: string[];
+  fabricImage?: string;
+  favorite?: boolean;
+  createdAt?: string;
 }
 
 export interface CustomerOrderSave {

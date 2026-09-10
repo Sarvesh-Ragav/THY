@@ -11,10 +11,10 @@ export default async function CategoryResultsPage({ params }: { params: Promise<
 
   return (
     <CustomerPage title={category.title}>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {designs.map((design) => (
           <div key={design.id} className="thy-card overflow-hidden">
-            <img src={design.image} alt="" className="h-40 w-full object-cover" />
+            <img src={design.image} alt="" className="h-32 sm:h-40 w-full object-cover" />
             <p className="p-3 text-sm">{design.title}</p>
           </div>
         ))}

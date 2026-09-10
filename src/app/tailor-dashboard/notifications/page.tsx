@@ -44,14 +44,14 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-thy-ink">Notifications & Alerts</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-thy-ink">Notifications & Alerts</h1>
           <p className="text-sm text-thy-muted">Stay informed about order changes, customer updates, and system alerts.</p>
         </div>
         <Link 
           href="/tailor-dashboard" 
-          className="text-sm font-semibold text-thy-brand hover:underline"
+          className="text-sm font-semibold text-thy-brand hover:underline self-start"
         >
           ← Back to Dashboard
         </Link>
@@ -76,7 +76,7 @@ export default function NotificationsPage() {
           notifications.map((item) => (
             <div
               key={item.id}
-              className={`p-4 rounded-2xl border transition-colors flex justify-between items-start gap-4 ${
+              className={`p-4 rounded-2xl border transition-colors flex justify-between items-start gap-3 ${
                 item.unread 
                   ? 'bg-thy-surface border-thy-brand/30 shadow-sm' 
                   : 'bg-thy-mist/70 border-thy-ink/10'
@@ -89,7 +89,7 @@ export default function NotificationsPage() {
                   {item.type === 'system' && '🔔'}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="text-sm font-bold text-thy-ink">{item.title}</h3>
                     {item.unread && (
                       <span className="w-2 h-2 rounded-full bg-thy-brand"></span>

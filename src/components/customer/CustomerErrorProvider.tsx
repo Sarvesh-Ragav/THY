@@ -44,8 +44,8 @@ export function CustomerErrorProvider({ children }: { children: React.ReactNode 
     <ErrorContext.Provider value={value}>
       {children}
       {error && (
-        <div className="fixed inset-0 z-[80] bg-thy-deep/40 flex items-center justify-center p-4">
-          <div className="w-full max-w-sm bg-thy-surface p-6 text-thy-ink border border-thy-ink/10">
+        <div className="fixed inset-0 z-[80] bg-thy-deep/40 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="w-full max-w-sm bg-thy-surface p-6 text-thy-ink border border-thy-ink/10 rounded-t-2xl sm:rounded-none pb-[max(1.5rem,env(safe-area-inset-bottom))]">
             <p className="text-[11px] uppercase tracking-[0.22em] text-thy-subtle">
               {error === 'network' ? 'Network failure' : 'General failure'}
             </p>

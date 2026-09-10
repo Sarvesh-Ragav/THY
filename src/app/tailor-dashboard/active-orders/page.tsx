@@ -21,14 +21,14 @@ export default function ActiveOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-thy-ink">Active Orders</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-thy-ink">Active Orders</h1>
           <p className="text-sm text-thy-muted">Track and manage current tailoring jobs from cutting to final delivery.</p>
         </div>
         <Link
           href="/tailor-dashboard"
-          className="text-sm font-semibold text-thy-brand hover:underline"
+          className="text-sm font-semibold text-thy-brand hover:underline self-start"
         >
           ← Back to Dashboard
         </Link>
@@ -36,9 +36,9 @@ export default function ActiveOrdersPage() {
 
       <div className="space-y-4">
         {session.orders.map((order) => (
-          <div key={order.id} className="bg-thy-surface p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col md:flex-row justify-between md:items-center gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-3">
+          <div key={order.id} className="bg-thy-surface p-5 sm:p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <div className="space-y-1 min-w-0">
+              <div className="flex items-center gap-3 flex-wrap">
                 <span className="text-xs font-bold text-thy-subtle">{order.id}</span>
                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
                   order.status === 'In Progress'
@@ -59,10 +59,10 @@ export default function ActiveOrdersPage() {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
               <button
                 onClick={() => setSelectedOrder(order)}
-                className="px-4 py-2 bg-thy-mist text-thy-ink rounded-xl text-xs font-semibold hover:bg-thy-mist transition-colors"
+                className="px-4 py-3 sm:py-2 bg-thy-mist text-thy-ink rounded-xl text-xs font-semibold hover:bg-thy-mist transition-colors min-h-11"
               >
                 View Details
               </button>
@@ -70,7 +70,7 @@ export default function ActiveOrdersPage() {
               <select
                 value={order.status}
                 onChange={(e) => handleUpdateStatus(order.id, e.target.value as OrderStatus)}
-                className="px-3 py-2 border rounded-xl text-xs font-semibold text-thy-ink focus:outline-none focus:ring-2 focus:ring-thy-brand"
+                className="px-3 py-3 sm:py-2 border rounded-xl text-xs font-semibold text-thy-ink focus:outline-none focus:ring-2 focus:ring-thy-brand min-h-11"
               >
                 <option value="In Progress">In Progress</option>
                 <option value="Fitting Scheduled">Fitting Scheduled</option>
@@ -82,8 +82,8 @@ export default function ActiveOrdersPage() {
       </div>
 
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-thy-surface rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+          <div className="bg-thy-surface rounded-t-2xl sm:rounded-2xl p-5 sm:p-6 w-full max-w-md shadow-xl space-y-4 max-h-[90dvh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]">
             <div className="flex justify-between items-center border-b pb-3">
               <h2 className="font-bold text-thy-ink text-lg">Order Details - {selectedOrder.id}</h2>
               <button

@@ -17,19 +17,19 @@ export function CustomerHome() {
 
   return (
     <>
-      <section className="relative min-h-[78vh] overflow-hidden">
+      <section className="relative min-h-[68dvh] sm:min-h-[74dvh] md:min-h-[78vh] overflow-hidden">
         <HeroCarousel />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[78vh] flex items-end pb-16 pointer-events-none">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[68dvh] sm:min-h-[74dvh] md:min-h-[78vh] flex items-end pb-14 sm:pb-16 pointer-events-none">
           <div className="max-w-xl text-thy-canvas pointer-events-auto">
-            <h1 className="text-[clamp(3rem,6.5vw,6.4rem)] leading-[0.9]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+            <h1 className="text-[clamp(2.4rem,12vw,6.4rem)] leading-[0.9]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
               Stitch Your Desire
             </h1>
-            <p className="mt-4 text-sm md:text-base tracking-[0.04em] text-thy-canvas/90">
+            <p className="mt-3 sm:mt-4 text-sm md:text-base tracking-[0.04em] text-thy-canvas/90">
               Your Fabric. Your Style. Your Tailor.
             </p>
             <Link
               href="/stitch-your-outfit"
-              className="hero-leather-btn inline-flex mt-8 px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em]"
+              className="hero-leather-btn inline-flex items-center justify-center mt-6 sm:mt-8 w-full sm:w-auto px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em]"
             >
               Stitch Your Outfit
             </Link>
@@ -37,15 +37,15 @@ export function CustomerHome() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-12 md:space-y-16">
         <div>
-          <h2 className="text-3xl md:text-4xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Find Your Perfect Tailor
           </h2>
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {TAILORS.map((tailor) => (
               <Link key={tailor.id} href={`/tailors/${tailor.id}`} className="thy-card overflow-hidden hover:border-thy-brand/40 transition-colors">
-                <img src={tailor.image} alt="" className="h-40 w-full object-cover" />
+                <img src={tailor.image} alt="" className="h-36 sm:h-40 w-full object-cover" />
                 <div className="p-4">
                   <h3 className="text-xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{tailor.name}</h3>
                   <p className="text-sm text-thy-muted">{tailor.specialty}</p>
@@ -56,13 +56,13 @@ export function CustomerHome() {
         </div>
 
         <div>
-          <h2 className="text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Picked Just for You
           </h2>
-          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="mt-5 sm:mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {picked.map((design) => (
               <Link key={design.id} href={`/categories/${design.categoryId}`} className="thy-card overflow-hidden hover:border-thy-brand/40 transition-colors">
-                <img src={design.image} alt="" className="h-40 w-full object-cover" />
+                <img src={design.image} alt="" className="h-32 sm:h-40 w-full object-cover" />
                 <p className="p-3 text-sm">{design.title}</p>
               </Link>
             ))}
@@ -70,22 +70,22 @@ export function CustomerHome() {
         </div>
 
         <div>
-          <h2 className="text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Find Your Style
           </h2>
-          <div className="mt-6">
+          <div className="mt-5 sm:mt-6">
             <CategoryGrid />
           </div>
         </div>
 
         <div>
-          <h2 className="text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Trending Now
           </h2>
-          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="mt-5 sm:mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {trending.map((design) => (
               <Link key={design.id} href="/explore" className="thy-card overflow-hidden hover:border-thy-brand/40 transition-colors">
-                <img src={design.image} alt="" className="h-40 w-full object-cover" />
+                <img src={design.image} alt="" className="h-32 sm:h-40 w-full object-cover" />
                 <p className="p-3 text-sm">{design.title}</p>
               </Link>
             ))}
@@ -95,8 +95,8 @@ export function CustomerHome() {
           </Link>
         </div>
 
-        <div className="thy-card p-6">
-          <h2 className="text-3xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+        <div className="thy-card p-5 sm:p-6">
+          <h2 className="text-2xl sm:text-3xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Continue Your Style Journey
           </h2>
           {activity ? (
@@ -111,7 +111,7 @@ export function CustomerHome() {
               <p className="text-sm text-thy-subtle mt-1">Start your style journey with THY.</p>
               <Link
                 href="/stitch-your-outfit"
-                className="hero-leather-btn inline-flex mt-5 px-6 py-3 text-[11px] uppercase tracking-[0.18em]"
+                className="hero-leather-btn inline-flex items-center justify-center mt-5 w-full sm:w-auto px-6 py-3 text-[11px] uppercase tracking-[0.18em]"
               >
                 Stitch Your Outfit
               </Link>

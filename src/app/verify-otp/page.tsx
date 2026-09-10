@@ -11,7 +11,7 @@ export default function VerifyOtpPage() {
   const { session, completeAuthentication } = useTailorSession();
 
   return (
-    <main className="min-h-screen bg-thy-bg flex items-center justify-center p-4">
+    <main className="min-h-dvh bg-thy-bg flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
       <ThyOtpVerificationForm
         identifier={session.identifier}
         onVerifyOtp={async () => {

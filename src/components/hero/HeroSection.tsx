@@ -44,17 +44,17 @@ export function HeroSection() {
   return (
     <div
       ref={rootRef}
-      className="hero-root relative h-screen overflow-hidden bg-thy-bg text-thy-ink"
+      className="hero-root relative h-dvh overflow-hidden bg-thy-bg text-thy-ink"
       style={{ fontFamily: 'var(--font-outfit), sans-serif' }}
     >
-      <section ref={heroRef} className="relative h-screen overflow-hidden">
-        <header className="hero-nav relative z-40 flex items-center justify-between px-6 md:px-12 lg:px-16 h-16 md:h-20">
+      <section ref={heroRef} className="relative h-dvh overflow-hidden">
+        <header className="hero-nav relative z-40 flex items-center justify-between gap-3 px-4 sm:px-6 md:px-12 lg:px-16 h-14 md:h-20 pt-[env(safe-area-inset-top)]">
           <div className="hidden md:block w-24" />
-          <nav className="flex items-center gap-6 md:gap-10 mx-auto">
+          <nav className="flex items-center gap-3 sm:gap-6 md:gap-10 mx-auto overflow-x-auto thy-scroll-x max-w-[65%] sm:max-w-none">
             {NAV_LINKS.map((item) => (
               <span
                 key={item.label}
-                className="text-[10px] md:text-[11px] font-medium uppercase tracking-[0.28em] text-thy-muted"
+                className="text-[9px] sm:text-[10px] md:text-[11px] font-medium uppercase tracking-[0.16em] sm:tracking-[0.28em] text-thy-muted whitespace-nowrap"
               >
                 {item.label}
               </span>
@@ -62,14 +62,14 @@ export function HeroSection() {
           </nav>
           <Link
             href={loginHref}
-            className="text-[10px] md:text-[11px] font-medium uppercase tracking-[0.28em] text-thy-muted hover:text-thy-ink transition-colors shrink-0"
+            className="text-[9px] sm:text-[10px] md:text-[11px] font-medium uppercase tracking-[0.16em] sm:tracking-[0.28em] text-thy-muted hover:text-thy-ink transition-colors shrink-0 min-h-11 inline-flex items-center"
           >
             {loginLabel}
           </Link>
         </header>
 
-        <div className="relative z-10 flex h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] flex-col md:flex-row">
-          <div className="relative h-[42vh] md:h-auto md:w-[52%] overflow-hidden bg-thy-mist">
+        <div className="relative z-10 flex h-[calc(100dvh-3.5rem-env(safe-area-inset-top))] md:h-[calc(100dvh-5rem-env(safe-area-inset-top))] flex-col md:flex-row">
+          <div className="relative h-[36vh] sm:h-[42vh] md:h-auto md:w-[52%] overflow-hidden bg-thy-mist">
             <img
               src="/hero/hero-couple.png"
               alt="Couple in bespoke Indian wear walking a sunlit street"
@@ -78,7 +78,7 @@ export function HeroSection() {
             <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-thy-bg/80 to-transparent pointer-events-none hidden md:block" />
           </div>
 
-          <div className="relative flex-1 md:w-[48%] px-6 md:px-10 lg:px-14 pt-6 md:pt-4 pb-28">
+          <div className="relative flex-1 md:w-[48%] px-4 sm:px-6 md:px-10 lg:px-14 pt-5 md:pt-4 pb-28">
             <div className="hero-vellum pointer-events-none absolute inset-0 opacity-50" />
             <div className="hero-headline-shift relative max-w-xl">
               <h1
@@ -99,10 +99,10 @@ export function HeroSection() {
               </div>
             </div>
 
-            <div className="hero-cta-row mt-8 md:mt-12 flex flex-col sm:flex-row sm:items-center gap-6">
+            <div className="hero-cta-row mt-6 md:mt-12 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
               <Link
                 href="/signup"
-                className="hero-leather-btn inline-flex items-center justify-center px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em]"
+                className="hero-leather-btn inline-flex items-center justify-center w-full sm:w-auto px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em]"
               >
                 Design Your Perfect Fit
               </Link>
@@ -118,26 +118,26 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div className="hero-thumbs pointer-events-none absolute bottom-0 left-[8%] right-6 md:left-[42%] md:right-10 z-30 flex gap-3 md:gap-4">
+        <div className="hero-thumbs pointer-events-none absolute bottom-0 left-4 right-4 sm:left-[8%] sm:right-6 md:left-[42%] md:right-10 z-30 flex gap-2 sm:gap-3 md:gap-4 pb-[env(safe-area-inset-bottom)]">
           <div className="hero-thumb-1 w-[30%] md:w-[31%]">
             <img
               src="/hero/fabric-beige.png"
               alt="Indian silk brocade stack"
-              className="hero-thumb-1-float h-24 md:h-36 w-full object-cover"
+              className="hero-thumb-1-float h-20 sm:h-24 md:h-36 w-full object-cover"
             />
           </div>
           <div className="hero-thumb-2 w-[30%] md:w-[31%]">
             <img
               src="/hero/fabric-olive.png"
               alt="Olive bandhgala detail"
-              className="hero-thumb-2-float h-24 md:h-36 w-full object-cover"
+              className="hero-thumb-2-float h-20 sm:h-24 md:h-36 w-full object-cover"
             />
           </div>
           <div className="hero-thumb-3 w-[30%] md:w-[31%]">
             <img
               src="/hero/fabric-charcoal.png"
               alt="Gold zari saree border"
-              className="hero-thumb-3-float h-24 md:h-36 w-full object-cover"
+              className="hero-thumb-3-float h-20 sm:h-24 md:h-36 w-full object-cover"
             />
           </div>
         </div>
