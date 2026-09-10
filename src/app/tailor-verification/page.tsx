@@ -1,63 +1,65 @@
-"use client";
+import React from 'react';
 
-import React from "react";
-import Link from "next/link";
-import { Clock, ShieldCheck, ArrowRight, Scissors } from "lucide-react";
-
-export default function TailorVerificationPage() {
+export default function TailorVerification() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 md:p-8">
+      {/* Main Container */}
+      <div className="w-full max-w-md md:max-w-2xl bg-white rounded-2xl shadow-md p-6 md:p-10">
         
-        {/* Brand Teal Header Banner */}
-        <div className="bg-[#00c49f] p-8 text-white text-center flex flex-col items-center">
-          <Scissors className="h-10 w-10 mb-2" />
-          <h1 className="text-2xl font-bold tracking-wide">THY</h1>
-          <p className="text-xs text-teal-100 mt-0.5">Tailoring, connected.</p>
-        </div>
-
-        {/* Card Content */}
-        <div className="p-8 text-center">
-          
-          <h2 className="text-xl font-bold text-gray-900">Registration Submitted!</h2>
-          <p className="text-xs text-gray-500 mt-2 leading-relaxed">
-            Your profile details have been successfully saved and sent for verification.
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            Tailor Verification
+          </h1>
+          <p className="text-sm md:text-base text-gray-600 mt-2">
+            Upload your verification documents to complete setup
           </p>
-
-          {/* Verification Status Card */}
-          <div className="mt-6 bg-slate-50 rounded-xl p-4 border border-slate-100 text-left space-y-3.5">
-            <div className="flex items-start gap-3">
-              <Clock className="h-5 w-5 text-amber-500 mt-0.5 shrink-0" />
-              <div>
-                <p className="text-xs font-semibold text-gray-700">Estimated Time</p>
-                <p className="text-xs text-gray-500">Verification usually takes 24 – 48 hours.</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <ShieldCheck className="h-5 w-5 text-[#00c49f] mt-0.5 shrink-0" />
-              <div>
-                <p className="text-xs font-semibold text-gray-700">What happens next?</p>
-                <p className="text-xs text-gray-500">
-                  Our team will review your business details and services. You’ll receive an SMS/email notification once approved.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Button */}
-          <div className="mt-8">
-            <Link
-              href="/"
-              className="w-full inline-flex items-center justify-center gap-2 bg-[#00c49f] hover:bg-[#00b08f] text-white font-bold py-3 px-4 rounded-lg shadow-sm transition duration-200 text-sm"
-            >
-              Back to Home
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
         </div>
 
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Government ID Type
+            </label>
+            <select className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white">
+              <option>Aadhaar Card</option>
+              <option>PAN Card</option>
+              <option>Voter ID</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              ID Number
+            </label>
+            <input 
+              type="text" 
+              placeholder="Enter ID number" 
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" 
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Upload Document Photo
+            </label>
+            <input 
+              type="file" 
+              className="w-full p-2 border border-gray-300 rounded-lg text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-[#00c9b7] hover:file:bg-teal-100" 
+            />
+          </div>
+
+          <div className="md:col-span-2 mt-4">
+            <button 
+              type="submit" 
+              className="w-full py-3 bg-[#00c9b7] hover:bg-[#00b5a4] text-white font-semibold rounded-lg transition-colors"
+            >
+              Submit Verification
+            </button>
+          </div>
+
+        </form>
       </div>
     </div>
   );
