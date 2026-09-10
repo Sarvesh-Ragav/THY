@@ -38,9 +38,9 @@ export function CustomerNavbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#2C2418]/10 bg-[#F3EEE4]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-thy-ink/10 bg-thy-bg/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-[4.5rem] flex items-center gap-3">
-        <Link href="/" className="text-2xl tracking-[0.16em] text-[#2C2418] shrink-0" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+        <Link href="/" className="text-2xl tracking-[0.16em] text-thy-deep shrink-0" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
           THY
         </Link>
 
@@ -51,7 +51,7 @@ export function CustomerNavbar() {
               type="button"
               onClick={() => goAuthPath(item.href)}
               className={`text-[11px] uppercase tracking-[0.18em] ${
-                pathname === item.href ? 'text-[#2C2418] font-semibold' : 'text-[#5C5146] hover:text-[#2C2418]'
+                pathname === item.href ? 'text-thy-brand font-semibold' : 'text-thy-muted hover:text-thy-ink'
               }`}
             >
               {item.label}
@@ -60,7 +60,7 @@ export function CustomerNavbar() {
         </nav>
 
         <form
-          className="hidden md:flex items-center ml-auto flex-1 max-w-sm border border-[#2C2418]/15 bg-white/60 px-3 py-2"
+          className="hidden md:flex items-center ml-auto flex-1 max-w-sm border border-thy-ink/15 bg-thy-surface/80 px-3 py-2"
           onSubmit={(event) => {
             event.preventDefault();
             router.push(`/search?q=${encodeURIComponent(query)}`);
@@ -70,7 +70,7 @@ export function CustomerNavbar() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search designs, styles or tailors..."
-            className="w-full bg-transparent text-sm outline-none placeholder:text-[#8A7D70]"
+            className="w-full bg-transparent text-sm outline-none placeholder:text-thy-subtle"
           />
         </form>
 
@@ -79,17 +79,17 @@ export function CustomerNavbar() {
             <button
               type="button"
               onClick={() => setLocationOpen((open) => !open)}
-              className="text-[11px] uppercase tracking-[0.14em] text-[#5C5146]"
+              className="text-[11px] uppercase tracking-[0.14em] text-thy-muted"
             >
               {session.selectedLocation || 'Set location'}
             </button>
             {locationOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-[#F3EEE4] border border-[#2C2418]/10 shadow-lg p-2 z-50">
+              <div className="absolute right-0 mt-2 w-44 bg-thy-surface border border-thy-ink/10 shadow-lg p-2 z-50">
                 {CITIES.map((city) => (
                   <button
                     key={city}
                     type="button"
-                    className="block w-full text-left px-2 py-2 text-sm hover:bg-white/70"
+                    className="block w-full text-left px-2 py-2 text-sm text-thy-ink hover:bg-thy-mist"
                     onClick={() => {
                       updateSession({ selectedLocation: city });
                       setLocationOpen(false);
@@ -105,7 +105,7 @@ export function CustomerNavbar() {
           <button
             type="button"
             onClick={() => goAuthPath('/notifications')}
-            className="text-[11px] uppercase tracking-[0.14em] text-[#5C5146]"
+            className="text-[11px] uppercase tracking-[0.14em] text-thy-muted"
           >
             Notifications
           </button>
@@ -120,25 +120,25 @@ export function CustomerNavbar() {
                 }
                 setProfileOpen((open) => !open);
               }}
-              className="text-[11px] uppercase tracking-[0.14em] text-[#5C5146]"
+              className="text-[11px] uppercase tracking-[0.14em] text-thy-muted"
             >
               Profile
             </button>
             {profileOpen && loggedIn && (
-              <div className="absolute right-0 mt-2 w-52 bg-[#F3EEE4] border border-[#2C2418]/10 shadow-lg py-2 z-50">
+              <div className="absolute right-0 mt-2 w-52 bg-thy-surface border border-thy-ink/10 shadow-lg py-2 z-50">
                 {PROFILE_MENU.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setProfileOpen(false)}
-                    className="block px-4 py-2 text-sm text-[#5C5146] hover:bg-white/70"
+                    className="block px-4 py-2 text-sm text-thy-muted hover:bg-thy-mist hover:text-thy-ink"
                   >
                     {item.label}
                   </Link>
                 ))}
                 <button
                   type="button"
-                  className="block w-full text-left px-4 py-2 text-sm text-[#5C5146] hover:bg-white/70"
+                  className="block w-full text-left px-4 py-2 text-sm text-thy-muted hover:bg-thy-mist hover:text-thy-ink"
                   onClick={() => {
                     logout();
                     setProfileOpen(false);
@@ -151,19 +151,19 @@ export function CustomerNavbar() {
             )}
           </div>
 
-          <button type="button" className="lg:hidden text-[11px] uppercase tracking-[0.16em]" onClick={() => setMenuOpen((open) => !open)}>
+          <button type="button" className="lg:hidden text-[11px] uppercase tracking-[0.16em] text-thy-ink" onClick={() => setMenuOpen((open) => !open)}>
             Menu
           </button>
         </div>
       </div>
 
       {menuOpen && (
-        <div className="lg:hidden border-t border-[#2C2418]/10 px-4 py-3 space-y-2">
+        <div className="lg:hidden border-t border-thy-ink/10 px-4 py-3 space-y-2 bg-thy-bg">
           {MAIN_NAV.map((item) => (
             <button
               key={item.href}
               type="button"
-              className="block text-[11px] uppercase tracking-[0.18em] text-[#5C5146]"
+              className="block text-[11px] uppercase tracking-[0.18em] text-thy-muted"
               onClick={() => {
                 setMenuOpen(false);
                 goAuthPath(item.href);
@@ -183,7 +183,7 @@ export function CustomerNavbar() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search designs, styles or tailors..."
-              className="w-full mt-2 border border-[#2C2418]/15 px-3 py-2 text-sm bg-white/70 outline-none"
+              className="w-full mt-2 border border-thy-ink/15 px-3 py-2 text-sm bg-thy-surface outline-none"
             />
           </form>
         </div>

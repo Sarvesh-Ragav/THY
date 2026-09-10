@@ -8,7 +8,7 @@ export default function SettingsPage() {
   return (
     <RequireCustomerAuth>
       <CustomerPage title="Settings">
-        <p className="text-sm text-[#5C5146]">Account settings.</p>
+        <p className="text-sm text-thy-muted">Account settings.</p>
       </CustomerPage>
     </RequireCustomerAuth>
   );

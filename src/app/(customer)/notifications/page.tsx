@@ -11,9 +11,9 @@ export default function NotificationsPage() {
       <CustomerPage title="Notifications">
         <ul className="space-y-3">
           {NOTIFICATION_STATES.map((item) => (
-            <li key={item.id} className="border border-[#2C2418]/10 bg-white/40 p-4">
+            <li key={item.id} className="border border-thy-ink/10 bg-thy-surface/80 p-4">
               <p className="text-sm font-medium">{item.type}</p>
-              <p className="text-sm text-[#5C5146] mt-1">{item.detail}</p>
+              <p className="text-sm text-thy-muted mt-1">{item.detail}</p>
             </li>
           ))}
         </ul>

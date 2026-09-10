@@ -19,13 +19,13 @@ function MyOrdersContent() {
   return (
     <CustomerPage title="My Orders">
       {session.customerOrders.length === 0 ? (
-        <p className="text-sm text-[#5C5146]">No orders yet.</p>
+        <p className="text-sm text-thy-muted">No orders yet.</p>
       ) : (
         <ul className="space-y-3">
           {session.customerOrders.map((order) => (
-            <li key={order.id} className="border border-[#2C2418]/10 bg-white/40 p-4">
+            <li key={order.id} className="border border-thy-ink/10 bg-thy-surface/80 p-4">
               <p>{order.title}</p>
-              <p className="text-sm text-[#8A7D70]">{order.status}</p>
+              <p className="text-sm text-thy-subtle">{order.status}</p>
             </li>
           ))}
         </ul>

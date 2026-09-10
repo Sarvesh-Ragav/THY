@@ -10,7 +10,7 @@ export default function ExplorePage() {
     <CustomerPage title="Explore">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {trending.map((design) => (
-          <Link key={design.id} href={`/categories/${design.categoryId}`} className="overflow-hidden border border-[#2C2418]/10">
+          <Link key={design.id} href={`/categories/${design.categoryId}`} className="thy-card overflow-hidden hover:border-thy-brand/40 transition-colors">
             <img src={design.image} alt="" className="h-40 w-full object-cover" />
             <p className="p-3 text-sm">{design.title}</p>
           </Link>

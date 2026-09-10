@@ -44,7 +44,7 @@ export function HeroSection() {
   return (
     <div
       ref={rootRef}
-      className="hero-root relative h-screen overflow-hidden bg-[#F3EEE4] text-[#2C2418]"
+      className="hero-root relative h-screen overflow-hidden bg-thy-bg text-thy-ink"
       style={{ fontFamily: 'var(--font-outfit), sans-serif' }}
     >
       <section ref={heroRef} className="relative h-screen overflow-hidden">
@@ -54,7 +54,7 @@ export function HeroSection() {
             {NAV_LINKS.map((item) => (
               <span
                 key={item.label}
-                className="text-[10px] md:text-[11px] font-medium uppercase tracking-[0.28em] text-[#5C5146]"
+                className="text-[10px] md:text-[11px] font-medium uppercase tracking-[0.28em] text-thy-muted"
               >
                 {item.label}
               </span>
@@ -62,27 +62,27 @@ export function HeroSection() {
           </nav>
           <Link
             href={loginHref}
-            className="text-[10px] md:text-[11px] font-medium uppercase tracking-[0.28em] text-[#5C5146] hover:text-[#2C2418] transition-colors shrink-0"
+            className="text-[10px] md:text-[11px] font-medium uppercase tracking-[0.28em] text-thy-muted hover:text-thy-ink transition-colors shrink-0"
           >
             {loginLabel}
           </Link>
         </header>
 
         <div className="relative z-10 flex h-[calc(100vh-4rem)] md:h-[calc(100vh-5rem)] flex-col md:flex-row">
-          <div className="relative h-[42vh] md:h-auto md:w-[52%] overflow-hidden bg-[#d9cbb8]">
+          <div className="relative h-[42vh] md:h-auto md:w-[52%] overflow-hidden bg-thy-mist">
             <img
               src="/hero/hero-couple.png"
               alt="Couple in bespoke Indian wear walking a sunlit street"
               className="hero-couple absolute inset-0 h-full w-full object-cover object-[center_20%]"
             />
-            <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#F3EEE4]/80 to-transparent pointer-events-none hidden md:block" />
+            <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-thy-bg/80 to-transparent pointer-events-none hidden md:block" />
           </div>
 
           <div className="relative flex-1 md:w-[48%] px-6 md:px-10 lg:px-14 pt-6 md:pt-4 pb-28">
             <div className="hero-vellum pointer-events-none absolute inset-0 opacity-50" />
             <div className="hero-headline-shift relative max-w-xl">
               <h1
-                className="hero-headline text-[clamp(2.5rem,5.8vw,6.1rem)] leading-[0.9] tracking-[-0.03em] text-[#2C2418]"
+                className="hero-headline text-[clamp(2.5rem,5.8vw,6.1rem)] leading-[0.9] tracking-[-0.03em] text-thy-ink"
                 style={{ fontFamily: 'var(--font-cormorant), serif' }}
               >
                 BESPOKE
@@ -94,20 +94,20 @@ export function HeroSection() {
                 LOCALLY.
               </h1>
 
-              <div className="hero-progress absolute top-2 -right-2 md:-right-8 h-[58%] w-px bg-[#C4A15A]">
-                <div className="hero-progress-fill absolute inset-0 origin-top bg-[#C4A15A] w-[2px] -ml-[0.5px]" />
+              <div className="hero-progress absolute top-2 -right-2 md:-right-8 h-[58%] w-px bg-thy-brand">
+                <div className="hero-progress-fill absolute inset-0 origin-top bg-thy-brand w-[2px] -ml-[0.5px]" />
               </div>
             </div>
 
             <div className="hero-cta-row mt-8 md:mt-12 flex flex-col sm:flex-row sm:items-center gap-6">
               <Link
                 href="/signup"
-                className="hero-leather-btn inline-flex items-center justify-center px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#2C2418] shadow-[0_10px_24px_rgba(90,70,32,0.22)]"
+                className="hero-leather-btn inline-flex items-center justify-center px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em]"
               >
                 Design Your Perfect Fit
               </Link>
-              <div className="hidden sm:block h-12 w-px bg-[#2C2418]/25" />
-              <p className="hero-copy text-[11px] leading-relaxed uppercase tracking-[0.18em] text-[#5C5146] max-w-[13rem]">
+              <div className="hidden sm:block h-12 w-px bg-thy-ink/20" />
+              <p className="hero-copy text-[11px] leading-relaxed uppercase tracking-[0.18em] text-thy-muted max-w-[13rem]">
                 Connecting you
                 <br />
                 directly with Indian

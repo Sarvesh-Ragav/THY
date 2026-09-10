@@ -89,34 +89,34 @@ export default function CustomerPreferences() {
 
   if (!isReady) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-sm text-gray-500">Loading...</p>
+      <div className="min-h-screen bg-thy-bg flex items-center justify-center">
+        <p className="text-sm text-thy-muted">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 md:p-8">
-      <div className="w-full max-w-md md:max-w-2xl bg-white rounded-2xl shadow-md p-6 md:p-10">
+    <div className="min-h-screen bg-thy-bg flex items-center justify-center p-4 md:p-8">
+      <div className="w-full max-w-md md:max-w-2xl bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.08)] p-6 md:p-10">
         <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold text-thy-ink">
             Stitching Preferences
           </h1>
-          <p className="text-sm md:text-base text-gray-600 mt-2">
+          <p className="text-sm md:text-base text-thy-muted mt-2">
             Help tailors understand what you usually need
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="shoppingFor">
+            <label className="block text-sm font-medium text-thy-ink mb-1" htmlFor="shoppingFor">
               Who is this account for?
             </label>
             <select
               id="shoppingFor"
               value={shoppingFor}
               onChange={(e) => setShoppingFor(e.target.value as CustomerShoppingFor)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+              className="thy-input"
             >
               {CUSTOMER_SHOPPING_FOR.map((option) => (
                 <option key={option}>{option}</option>
@@ -125,14 +125,14 @@ export default function CustomerPreferences() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="contactMethod">
+            <label className="block text-sm font-medium text-thy-ink mb-1" htmlFor="contactMethod">
               Preferred contact
             </label>
             <select
               id="contactMethod"
               value={contactMethod}
               onChange={(e) => setContactMethod(e.target.value as CustomerContactMethod)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+              className="thy-input"
             >
               {CUSTOMER_CONTACT_METHODS.map((option) => (
                 <option key={option}>{option}</option>
@@ -141,7 +141,7 @@ export default function CustomerPreferences() {
           </div>
 
           <div className="md:col-span-2">
-            <p className="block text-sm font-medium text-gray-700 mb-2">Services you need</p>
+            <p className="block text-sm font-medium text-thy-ink mb-2">Services you need</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {CUSTOMER_SERVICES.map((service) => {
                 const active = services.includes(service);
@@ -152,8 +152,8 @@ export default function CustomerPreferences() {
                     onClick={() => toggleService(service)}
                     className={`p-3 rounded-xl border text-sm transition-all ${
                       active
-                        ? 'border-[#00c9b7] bg-teal-50 text-[#00c9b7] font-bold'
-                        : 'border-gray-200 bg-gray-50 text-gray-500 font-medium'
+                        ? 'border-thy-brand bg-thy-mist text-thy-brand font-bold'
+                        : 'border-thy-ink/10 bg-thy-bg text-thy-muted font-medium'
                     }`}
                   >
                     {service}
@@ -164,7 +164,7 @@ export default function CustomerPreferences() {
           </div>
 
           <div className="md:col-span-2">
-            <p className="block text-sm font-medium text-gray-700 mb-2">Typical garments</p>
+            <p className="block text-sm font-medium text-thy-ink mb-2">Typical garments</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {CUSTOMER_GARMENT_TYPES.map((garment) => {
                 const active = garmentTypes.includes(garment);
@@ -175,8 +175,8 @@ export default function CustomerPreferences() {
                     onClick={() => toggleGarment(garment)}
                     className={`p-3 rounded-xl border text-sm transition-all ${
                       active
-                        ? 'border-[#00c9b7] bg-teal-50 text-[#00c9b7] font-bold'
-                        : 'border-gray-200 bg-gray-50 text-gray-500 font-medium'
+                        ? 'border-thy-brand bg-thy-mist text-thy-brand font-bold'
+                        : 'border-thy-ink/10 bg-thy-bg text-thy-muted font-medium'
                     }`}
                   >
                     {garment}
@@ -193,7 +193,7 @@ export default function CustomerPreferences() {
           <div className="md:col-span-2 mt-4">
             <button
               type="submit"
-              className="w-full py-3 bg-[#00c9b7] hover:bg-[#00b5a4] text-white font-semibold rounded-lg transition-colors"
+              className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors"
             >
               Create Customer Account
             </button>

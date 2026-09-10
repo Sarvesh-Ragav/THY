@@ -53,23 +53,23 @@ export default function PortfolioPage() {
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Portfolio & Design Showcase</h1>
-          <p className="text-sm text-gray-600">Upload and showcase your best stitching work to potential customers.</p>
+          <h1 className="text-2xl font-bold text-thy-ink">Portfolio & Design Showcase</h1>
+          <p className="text-sm text-thy-muted">Upload and showcase your best stitching work to potential customers.</p>
         </div>
         <Link 
           href="/tailor-dashboard" 
-          className="text-sm font-semibold text-[#00c9b7] hover:underline"
+          className="text-sm font-semibold text-thy-brand hover:underline"
         >
           ← Back to Dashboard
         </Link>
       </div>
 
       {/* Action Bar */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-        <span className="text-sm font-semibold text-gray-700">Total Showcase Items: {items.length}</span>
+      <div className="flex justify-between items-center bg-thy-surface p-4 rounded-2xl border border-thy-ink/10 shadow-sm">
+        <span className="text-sm font-semibold text-thy-ink">Total Showcase Items: {items.length}</span>
         <button
           onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-[#00c9b7] text-white rounded-xl text-xs font-semibold hover:bg-[#00b5a4] transition-colors"
+          className="px-4 py-2 bg-thy-brand text-white rounded-xl text-xs font-semibold hover:bg-thy-brand-hover transition-colors"
         >
           + Add New Work
         </button>
@@ -78,8 +78,8 @@ export default function PortfolioPage() {
       {/* Portfolio Items Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {items.map((item) => (
-          <div key={item.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm group">
-            <div className="h-48 bg-gray-200 overflow-hidden relative">
+          <div key={item.id} className="bg-thy-surface rounded-2xl overflow-hidden border border-thy-ink/10 shadow-sm group">
+            <div className="h-48 bg-thy-mist overflow-hidden relative">
               <img 
                 src={item.imageUrl} 
                 alt={item.title} 
@@ -91,7 +91,7 @@ export default function PortfolioPage() {
             </div>
             <div className="p-4 flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-gray-900 text-sm">{item.title}</h3>
+                <h3 className="font-bold text-thy-ink text-sm">{item.title}</h3>
               </div>
               <button
                 onClick={() => handleDelete(item.id)}
@@ -107,31 +107,31 @@ export default function PortfolioPage() {
       {/* Add Work Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+          <div className="bg-thy-surface rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
             <div className="flex justify-between items-center border-b pb-3">
-              <h2 className="font-bold text-gray-900 text-lg">Add New Portfolio Image</h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 font-bold">✕</button>
+              <h2 className="font-bold text-thy-ink text-lg">Add New Portfolio Image</h2>
+              <button onClick={() => setShowModal(false)} className="text-thy-subtle font-bold">✕</button>
             </div>
 
             <form onSubmit={handleAddItem} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Garment Title</label>
+                <label className="block text-xs font-semibold text-thy-ink mb-1">Garment Title</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Silk Velvet Blouse"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
+                  className="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-thy-brand"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Category</label>
+                <label className="block text-xs font-semibold text-thy-ink mb-1">Category</label>
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
+                  className="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-thy-brand"
                 >
                   <option value="Bridalwear">Bridalwear</option>
                   <option value="Ethnic Men">Ethnic Men</option>
@@ -144,13 +144,13 @@ export default function PortfolioPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border rounded-xl text-xs font-semibold text-gray-600"
+                  className="px-4 py-2 border rounded-xl text-xs font-semibold text-thy-muted"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#00c9b7] text-white rounded-xl text-xs font-semibold hover:bg-[#00b5a4]"
+                  className="px-4 py-2 bg-thy-brand text-white rounded-xl text-xs font-semibold hover:bg-thy-brand-hover"
                 >
                   Save Image
                 </button>

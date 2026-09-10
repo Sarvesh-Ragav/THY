@@ -24,7 +24,7 @@ export function RequireCustomerAuth({ children }: { children: React.ReactNode })
   if (!allowed) {
     return (
       <main className="max-w-7xl mx-auto px-4 py-16">
-        <p className="text-sm text-[#8A7D70]">Loading...</p>
+        <p className="text-sm text-thy-subtle">Loading...</p>
       </main>
     );
   }

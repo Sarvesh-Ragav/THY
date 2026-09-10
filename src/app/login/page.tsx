@@ -35,14 +35,14 @@ export default function LoginPage() {
 
   if (!isReady || session.isAuthenticated) {
     return (
-      <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <p className="text-sm text-gray-500">Loading...</p>
+      <main className="min-h-screen bg-thy-bg flex items-center justify-center p-4">
+        <p className="text-sm text-thy-muted">Loading...</p>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <main className="min-h-screen bg-thy-bg flex items-center justify-center p-4">
       {view === 'login' && (
         <ThyLoginForm
           initialIdentifier={session.identifier}

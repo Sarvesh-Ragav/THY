@@ -8,7 +8,7 @@ export default function MyMeasurementsPage() {
   return (
     <RequireCustomerAuth>
       <CustomerPage title="My Measurements">
-        <p className="text-sm text-[#5C5146]">No measurements saved yet.</p>
+        <p className="text-sm text-thy-muted">No measurements saved yet.</p>
       </CustomerPage>
     </RequireCustomerAuth>
   );

@@ -19,11 +19,11 @@ function MyDesignsContent() {
   return (
     <CustomerPage title="My Designs">
       {session.customerDesigns.length === 0 ? (
-        <p className="text-sm text-[#5C5146]">No saved designs yet.</p>
+        <p className="text-sm text-thy-muted">No saved designs yet.</p>
       ) : (
         <ul className="space-y-3">
           {session.customerDesigns.map((design) => (
-            <li key={design.id} className="border border-[#2C2418]/10 bg-white/40 p-4">
+            <li key={design.id} className="border border-thy-ink/10 bg-thy-surface/80 p-4">
               {design.title}
             </li>
           ))}

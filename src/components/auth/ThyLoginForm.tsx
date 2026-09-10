@@ -89,25 +89,25 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 transition-all duration-300">
+    <div className="w-full max-w-sm mx-auto bg-thy-surface overflow-hidden border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.12)]">
       {/* 1. Header Section */}
-      <div className="bg-[#00c9b7] px-6 py-10 text-center flex flex-col items-center justify-center relative select-none">
+      <div className="thy-auth-header px-6 py-10 text-center flex flex-col items-center justify-center relative select-none">
         <ThyLogo size={52} className="mb-2" />
-        <h1 className="text-3xl font-extrabold text-white tracking-wider font-sans">THY</h1>
-        <p className="text-teal-50 text-sm font-medium opacity-90 mt-1">Tailoring, connected.</p>
+        <h1 className="text-3xl tracking-[0.2em] text-white" style={{ fontFamily: 'var(--font-cormorant), serif' }}>THY</h1>
+        <p className="text-thy-canvas text-sm font-medium opacity-90 mt-1">Tailoring, connected.</p>
       </div>
 
       {/* 2. Body Section */}
-      <div className="p-6 sm:p-8 bg-white">
+      <div className="p-6 sm:p-8 bg-thy-surface">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Welcome back</h2>
-          <p className="text-sm text-gray-500 mt-1">Log in to continue to THY</p>
+          <h2 className="text-2xl font-bold text-thy-ink tracking-tight">Welcome back</h2>
+          <p className="text-sm text-thy-muted mt-1">Log in to continue to THY</p>
         </div>
 
         {/* Success Alert Banner (Conditional) */}
         {successMessage && (
-          <div className="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-medium rounded-xl flex items-center gap-2 animate-fadeIn">
-            <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mb-5 p-3.5 bg-thy-mist border border-thy-brand/25 text-thy-deep text-xs font-medium rounded-xl flex items-center gap-2 animate-fadeIn">
+            <svg className="w-4 h-4 text-thy-brand shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
             </svg>
             <span>{successMessage}</span>
@@ -118,7 +118,7 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
           <div>
             <label
               htmlFor="identifier"
-              className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wide"
+              className="block text-xs font-semibold text-thy-ink mb-1.5 uppercase tracking-wide"
             >
               Mobile number or email
             </label>
@@ -132,10 +132,10 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
               autoComplete="username"
               inputMode="text"
               disabled={isSubmitting || isLoading}
-              className={`w-full px-4 py-3 text-sm text-gray-900 bg-white border rounded-xl placeholder:text-gray-400 transition-all duration-200 focus:outline-none ${
+              className={`w-full px-4 py-3 text-sm text-thy-ink bg-thy-surface border rounded-xl placeholder:text-thy-subtle transition-all duration-200 focus:outline-none ${
                 errorMessage
                   ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                  : 'border-gray-300 focus:border-[#00c9b7] focus:ring-1 focus:ring-[#00c9b7]'
+                  : 'border-thy-ink/15 focus:border-thy-brand focus:ring-1 focus:ring-thy-brand'
               }`}
             />
 
@@ -148,7 +148,7 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
                 <span>{errorMessage}</span>
               </p>
             ) : (
-              <p className="text-xs text-gray-400 mt-1.5 leading-normal">
+              <p className="text-xs text-thy-subtle mt-1.5 leading-normal">
                 Use the mobile number or email linked to your THY account
               </p>
             )}
@@ -158,7 +158,7 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
           <button
             type="submit"
             disabled={isSubmitting || isLoading}
-            className="w-full bg-[#00c9b7] hover:bg-[#00b5a4] active:bg-[#009e8f] text-white font-bold py-3 px-4 rounded-xl shadow-sm transition duration-200 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+            className="w-full bg-thy-brand hover:bg-thy-brand-hover active:bg-thy-brand-active text-white font-bold py-3 px-4 rounded-xl shadow-sm transition duration-200 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed mt-2"
           >
             {isSubmitting || isLoading ? (
               <>
@@ -177,9 +177,9 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
         {/* 3. Divider Line */}
         <div className="relative my-6 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200"></div>
+            <div className="w-full border-t border-thy-ink/10"></div>
           </div>
-          <div className="relative bg-white px-3 text-xs uppercase font-medium text-gray-400 tracking-wider">
+          <div className="relative bg-thy-surface px-3 text-xs uppercase font-medium text-thy-subtle tracking-wider">
             OR
           </div>
         </div>
@@ -188,26 +188,26 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
         <button
           type="button"
           onClick={onGoogleSignIn}
-          className="w-full border border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition-colors duration-200 cursor-pointer active:scale-[0.99] shadow-2xs"
+          className="w-full border border-thy-ink/15 hover:border-thy-ink/25 bg-thy-surface hover:bg-thy-mist text-thy-ink font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition-colors duration-200 cursor-pointer active:scale-[0.99]"
         >
           <GoogleIcon size={18} />
-          <span className="text-sm text-gray-800 font-semibold">Continue with Google</span>
+          <span className="text-sm text-thy-ink font-semibold">Continue with Google</span>
         </button>
 
         {/* Navigation Link */}
         <div className="text-center mt-6">
-          <p className="text-sm text-gray-600 font-medium">
+          <p className="text-sm text-thy-muted font-medium">
             New to THY?{' '}
             {onNavigateSignUp ? (
               <button
                 type="button"
                 onClick={onNavigateSignUp}
-                className="text-[#00c9b7] font-semibold hover:underline cursor-pointer"
+                className="text-thy-brand font-semibold hover:underline cursor-pointer"
               >
                 Sign Up
               </button>
             ) : (
-              <Link href="/signup" className="text-[#00c9b7] font-semibold hover:underline">
+              <Link href="/signup" className="text-thy-brand font-semibold hover:underline">
                 Sign Up
               </Link>
             )}
@@ -215,13 +215,13 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
         </div>
 
         {/* Footer Disclaimer */}
-        <p className="text-[11px] text-gray-400 text-center leading-relaxed mt-6 px-2">
+        <p className="text-[11px] text-thy-subtle text-center leading-relaxed mt-6 px-2">
           By continuing, you agree to THY&apos;s{' '}
-          <Link href="/terms" className="hover:underline text-gray-500">
+          <Link href="/terms" className="hover:underline text-thy-muted">
             Terms
           </Link>{' '}
           &amp;{' '}
-          <Link href="/privacy" className="hover:underline text-gray-500">
+          <Link href="/privacy" className="hover:underline text-thy-muted">
             Privacy Policy
           </Link>
           .

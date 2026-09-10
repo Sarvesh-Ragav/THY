@@ -7,7 +7,7 @@ import { CustomerErrorProvider } from '@/components/customer/CustomerErrorProvid
 export function CustomerShell({ children }: { children: React.ReactNode }) {
   return (
     <CustomerErrorProvider>
-      <div className="min-h-screen bg-[#F3EEE4] text-[#2C2418]" style={{ fontFamily: 'var(--font-outfit), sans-serif' }}>
+      <div className="min-h-screen bg-thy-bg text-thy-ink" style={{ fontFamily: 'var(--font-outfit), sans-serif' }}>
         <CustomerNavbar />
         {children}
       </div>

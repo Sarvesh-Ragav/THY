@@ -19,7 +19,7 @@ function ProfileContent() {
 
   return (
     <CustomerPage title="My Profile">
-      <div className="max-w-lg border border-[#2C2418]/10 bg-white/40 p-5 space-y-2 text-sm text-[#5C5146]">
+      <div className="max-w-lg border border-thy-ink/10 bg-thy-surface/80 p-5 space-y-2 text-sm text-thy-muted">
         <p>{profile?.fullName}</p>
         <p>{profile?.phone}</p>
         <p>{profile?.email}</p>

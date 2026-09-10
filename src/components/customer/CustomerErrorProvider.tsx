@@ -44,9 +44,9 @@ export function CustomerErrorProvider({ children }: { children: React.ReactNode 
     <ErrorContext.Provider value={value}>
       {children}
       {error && (
-        <div className="fixed inset-0 z-[80] bg-[#2C2418]/40 flex items-center justify-center p-4">
-          <div className="w-full max-w-sm bg-[#F3EEE4] p-6 text-[#2C2418]">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-[#8A7D70]">
+        <div className="fixed inset-0 z-[80] bg-thy-deep/40 flex items-center justify-center p-4">
+          <div className="w-full max-w-sm bg-thy-surface p-6 text-thy-ink border border-thy-ink/10">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-thy-subtle">
               {error === 'network' ? 'Network failure' : 'General failure'}
             </p>
             <h2 className="mt-2 text-2xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
@@ -55,7 +55,7 @@ export function CustomerErrorProvider({ children }: { children: React.ReactNode 
             <button
               type="button"
               onClick={retry}
-              className="mt-6 hero-leather-btn px-5 py-2.5 text-[11px] uppercase tracking-[0.18em] text-[#2C2418]"
+              className="mt-6 hero-leather-btn px-5 py-2.5 text-[11px] uppercase tracking-[0.18em]"
             >
               Retry
             </button>

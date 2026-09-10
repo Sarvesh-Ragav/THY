@@ -70,34 +70,34 @@ export default function TailorVerification() {
 
   if (!isReady) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-sm text-gray-500">Loading...</p>
+      <div className="min-h-screen bg-thy-bg flex items-center justify-center">
+        <p className="text-sm text-thy-muted">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 md:p-8">
-      <div className="w-full max-w-md md:max-w-2xl bg-white rounded-2xl shadow-md p-6 md:p-10">
+    <div className="min-h-screen bg-thy-bg flex items-center justify-center p-4 md:p-8">
+      <div className="w-full max-w-md md:max-w-2xl bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.08)] p-6 md:p-10">
         <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold text-thy-ink">
             Tailor Verification
           </h1>
-          <p className="text-sm md:text-base text-gray-600 mt-2">
+          <p className="text-sm md:text-base text-thy-muted mt-2">
             Upload your verification documents to complete setup
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="idType">
+            <label className="block text-sm font-medium text-thy-ink mb-1" htmlFor="idType">
               Government ID Type
             </label>
             <select
               id="idType"
               value={idType}
               onChange={(e) => setIdType(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
+              className="thy-input"
             >
               <option>Aadhaar Card</option>
               <option>PAN Card</option>
@@ -106,7 +106,7 @@ export default function TailorVerification() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="idNumber">
+            <label className="block text-sm font-medium text-thy-ink mb-1" htmlFor="idNumber">
               ID Number
             </label>
             <input
@@ -115,12 +115,12 @@ export default function TailorVerification() {
               value={idNumber}
               onChange={(e) => setIdNumber(e.target.value)}
               placeholder="Enter ID number"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="thy-input"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="document">
+            <label className="block text-sm font-medium text-thy-ink mb-1" htmlFor="document">
               Upload Document Photo
             </label>
             <input
@@ -128,10 +128,10 @@ export default function TailorVerification() {
               type="file"
               accept="image/*,.pdf"
               onChange={(e) => setDocumentName(e.target.files?.[0]?.name ?? '')}
-              className="w-full p-2 border border-gray-300 rounded-lg text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-[#00c9b7] hover:file:bg-teal-100"
+              className="w-full p-2 border border-thy-ink/15 rounded-lg text-sm text-thy-muted file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-thy-mist file:text-thy-brand hover:file:bg-thy-mist"
             />
             {documentName && (
-              <p className="text-xs text-gray-500 mt-2">Selected: {documentName}</p>
+              <p className="text-xs text-thy-muted mt-2">Selected: {documentName}</p>
             )}
           </div>
 
@@ -142,7 +142,7 @@ export default function TailorVerification() {
           <div className="md:col-span-2 mt-4">
             <button
               type="submit"
-              className="w-full py-3 bg-[#00c9b7] hover:bg-[#00b5a4] text-white font-semibold rounded-lg transition-colors"
+              className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors"
             >
               Submit Verification
             </button>

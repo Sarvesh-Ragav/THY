@@ -31,16 +31,16 @@ export function HeroCarousel() {
 
   if (!available) {
     return (
-      <div className="absolute inset-0 bg-[#e6dccb]">
-        <img src="/hero/fabric-beige.png" alt="" className="h-full w-full object-cover opacity-70" />
-        <div className="absolute inset-0 bg-[#2C2418]/35" />
+      <div className="absolute inset-0 bg-thy-mist">
+        <img src="/hero/fabric-olive.png" alt="" className="h-full w-full object-cover opacity-70" />
+        <div className="absolute inset-0 bg-thy-deep/40" />
       </div>
     );
   }
 
   return (
     <div
-      className="absolute inset-0 bg-[#2C2418] cursor-pointer"
+      className="absolute inset-0 bg-thy-deep cursor-pointer"
       onClick={goNext}
       onTouchStart={(event) => {
         startX.current = event.touches[0].clientX;
@@ -63,7 +63,7 @@ export function HeroCarousel() {
           }`}
         />
       ))}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#2C2418]/70 via-[#2C2418]/20 to-[#2C2418]/25 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-thy-deep/75 via-thy-deep/20 to-thy-deep/30 pointer-events-none" />
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         {HERO_VIDEOS.map((video, videoIndex) => (
           <button
@@ -74,7 +74,7 @@ export function HeroCarousel() {
               event.stopPropagation();
               setIndex(videoIndex);
             }}
-            className={`h-1.5 w-8 ${videoIndex === index ? 'bg-[#C4A15A]' : 'bg-[#F3EEE4]/40'}`}
+            className={`h-1.5 w-8 ${videoIndex === index ? 'bg-thy-brand' : 'bg-thy-canvas/40'}`}
           />
         ))}
       </div>

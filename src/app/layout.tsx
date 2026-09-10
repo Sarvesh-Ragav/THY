@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${cormorant.variable} ${outfit.variable}`}>
-      <body className="antialiased bg-[#F3EEE4] min-h-screen">
+      <body className="antialiased bg-thy-bg text-thy-ink min-h-screen">
         <TailorSessionProvider>{children}</TailorSessionProvider>
       </body>
     </html>
