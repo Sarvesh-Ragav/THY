@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import {
+  getPostAuthPath,
   hasSubmittedVerification,
   hasTailorProfile,
 } from '@/lib/tailor-session';
@@ -30,6 +31,11 @@ export default function DashboardLayout({
 
     if (!session.isAuthenticated) {
       router.replace('/');
+      return;
+    }
+
+    if (session.role === 'customer') {
+      router.replace(getPostAuthPath(session));
       return;
     }
 

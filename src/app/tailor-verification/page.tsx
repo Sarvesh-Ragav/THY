@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
-import { hasTailorProfile, isTailorOnboardingComplete } from '@/lib/tailor-session';
+import { getPostAuthPath, hasTailorProfile, isTailorOnboardingComplete } from '@/lib/tailor-session';
 
 export default function TailorVerification() {
   const router = useRouter();
@@ -15,6 +15,11 @@ export default function TailorVerification() {
 
   useEffect(() => {
     if (!isReady) return;
+
+    if (session.role === 'customer') {
+      router.replace(getPostAuthPath(session));
+      return;
+    }
 
     if (!hasTailorProfile(session)) {
       router.replace('/tailor-registration');

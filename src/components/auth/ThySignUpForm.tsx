@@ -17,25 +17,24 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
 }) => {
   const router = useRouter();
   const { updateSession } = useTailorSession();
-  const [selectedRole, setSelectedRole] = useState<'customer' | 'tailor' | null>('tailor');
-  const [notice, setNotice] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<'customer' | 'tailor' | null>('customer');
 
   const handleRoleClick = (role: 'customer' | 'tailor') => {
     setSelectedRole(role);
-    setNotice(null);
     if (onSelectRole) {
       onSelectRole(role);
     }
   };
 
   const handleContinue = () => {
-    if (selectedRole === 'customer') {
-      setNotice('Customer sign up is coming soon. Choose Tailor to continue.');
+    if (selectedRole === 'tailor') {
+      updateSession({ role: 'tailor' });
+      router.push('/tailor-registration');
       return;
     }
 
-    updateSession({ role: 'tailor' });
-    router.push('/tailor-registration');
+    updateSession({ role: 'customer' });
+    router.push('/customer-registration');
   };
 
   return (
@@ -86,12 +85,6 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
             </span>
           </button>
         </div>
-
-        {notice && (
-          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-4">
-            {notice}
-          </p>
-        )}
 
         <button
           type="button"

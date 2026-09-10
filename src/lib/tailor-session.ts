@@ -23,6 +23,31 @@ export interface TailorProfile {
   shopAddress: string;
 }
 
+export const CUSTOMER_SERVICES = ['Stitching', 'Alterations', 'Custom outfits'] as const;
+export const CUSTOMER_GARMENT_TYPES = ['Ethnic wear', 'Western wear', 'Formal wear', 'Kids wear'] as const;
+export const CUSTOMER_SHOPPING_FOR = ['Myself', 'Family', 'Both'] as const;
+export const CUSTOMER_CONTACT_METHODS = ['Phone', 'WhatsApp', 'Email'] as const;
+
+export type CustomerService = (typeof CUSTOMER_SERVICES)[number];
+export type CustomerGarmentType = (typeof CUSTOMER_GARMENT_TYPES)[number];
+export type CustomerShoppingFor = (typeof CUSTOMER_SHOPPING_FOR)[number];
+export type CustomerContactMethod = (typeof CUSTOMER_CONTACT_METHODS)[number];
+
+export interface CustomerProfile {
+  fullName: string;
+  phone: string;
+  email: string;
+  city: string;
+  address: string;
+}
+
+export interface CustomerPreferences {
+  shoppingFor: CustomerShoppingFor;
+  contactMethod: CustomerContactMethod;
+  services: CustomerService[];
+  garmentTypes: CustomerGarmentType[];
+}
+
 export interface TailorVerification {
   idType: string;
   idNumber: string;
@@ -69,6 +94,8 @@ export interface TailorSession {
   isAuthenticated: boolean;
   profile: TailorProfile | null;
   verification: TailorVerification | null;
+  customerProfile: CustomerProfile | null;
+  customerPreferences: CustomerPreferences | null;
   availability: TailorAvailability;
   requests: TailorOrderRequest[];
   orders: TailorActiveOrder[];
@@ -141,6 +168,8 @@ export function createDefaultSession(): TailorSession {
     isAuthenticated: false,
     profile: null,
     verification: null,
+    customerProfile: null,
+    customerPreferences: null,
     availability: {
       ...DEFAULT_AVAILABILITY,
       workingDays: { ...DEFAULT_WORKING_DAYS },
@@ -162,7 +191,41 @@ export function isTailorOnboardingComplete(session: TailorSession): boolean {
   return hasTailorProfile(session) && hasSubmittedVerification(session);
 }
 
+export function hasCustomerProfile(session: TailorSession): boolean {
+  return Boolean(
+    session.customerProfile?.fullName &&
+    session.customerProfile.phone &&
+    session.customerProfile.email &&
+    session.customerProfile.city &&
+    session.customerProfile.address
+  );
+}
+
+export function hasCustomerPreferences(session: TailorSession): boolean {
+  return Boolean(
+    session.customerPreferences?.shoppingFor &&
+    session.customerPreferences.contactMethod &&
+    session.customerPreferences.services.length
+  );
+}
+
+export function isCustomerOnboardingComplete(session: TailorSession): boolean {
+  return hasCustomerProfile(session) && hasCustomerPreferences(session);
+}
+
+export function getCustomerFirstName(session: TailorSession): string {
+  const fullName = session.customerProfile?.fullName?.trim();
+  if (!fullName) return 'there';
+  return fullName.split(/\s+/)[0];
+}
+
 export function getPostAuthPath(session: TailorSession): string {
+  if (session.role === 'customer') {
+    if (!hasCustomerProfile(session)) return '/customer-registration';
+    if (!hasCustomerPreferences(session)) return '/customer-preferences';
+    return '/customer-account';
+  }
+
   if (!hasTailorProfile(session)) return '/tailor-registration';
   if (!hasSubmittedVerification(session)) return '/tailor-verification';
   return '/tailor-dashboard';
@@ -210,6 +273,8 @@ export function loadTailorSession(): TailorSession {
       orders: Array.isArray(parsed.orders) ? parsed.orders : fallback.orders,
       profile: parsed.profile ?? null,
       verification: parsed.verification ?? null,
+      customerProfile: parsed.customerProfile ?? null,
+      customerPreferences: parsed.customerPreferences ?? null,
     };
   } catch {
     return fallback;

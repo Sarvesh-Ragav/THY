@@ -3,43 +3,48 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
-import { getPostAuthPath, isTailorOnboardingComplete } from '@/lib/tailor-session';
+import { getPostAuthPath, isCustomerOnboardingComplete } from '@/lib/tailor-session';
 
-export default function TailorRegistration() {
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export default function CustomerRegistration() {
   const router = useRouter();
   const { session, isReady, updateSession } = useTailorSession();
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [shopName, setShopName] = useState('');
-  const [yearsOfExperience, setYearsOfExperience] = useState('');
-  const [shopAddress, setShopAddress] = useState('');
+  const [email, setEmail] = useState('');
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isReady) return;
 
-    if (session.role === 'customer') {
+    if (session.role === 'tailor') {
       router.replace(getPostAuthPath(session));
       return;
     }
 
-    if (session.isAuthenticated && isTailorOnboardingComplete(session)) {
-      router.replace('/tailor-dashboard');
+    if (session.isAuthenticated && isCustomerOnboardingComplete(session)) {
+      router.replace('/customer-account');
       return;
     }
 
-    if (session.profile) {
-      setFullName(session.profile.fullName);
-      setPhone(session.profile.phone);
-      setShopName(session.profile.shopName);
-      setYearsOfExperience(session.profile.yearsOfExperience);
-      setShopAddress(session.profile.shopAddress);
+    if (session.customerProfile) {
+      setFullName(session.customerProfile.fullName);
+      setPhone(session.customerProfile.phone);
+      setEmail(session.customerProfile.email);
+      setCity(session.customerProfile.city);
+      setAddress(session.customerProfile.address);
       return;
     }
 
-    const digits = session.identifier.replace(/\D/g, '');
+    const trimmed = session.identifier.trim();
+    const digits = trimmed.replace(/\D/g, '');
     if (digits.length === 10) {
       setPhone(digits);
+    } else if (EMAIL_REGEX.test(trimmed)) {
+      setEmail(trimmed);
     }
     // Prefill once after session hydrates so typing is not reset.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,12 +55,12 @@ export default function TailorRegistration() {
 
     const trimmedName = fullName.trim();
     const trimmedPhone = phone.replace(/\D/g, '');
-    const trimmedShop = shopName.trim();
-    const trimmedExperience = yearsOfExperience.trim();
-    const trimmedAddress = shopAddress.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedCity = city.trim();
+    const trimmedAddress = address.trim();
 
-    if (!trimmedName || !trimmedPhone || !trimmedShop || !trimmedExperience || !trimmedAddress) {
-      setErrorMessage('Please fill in all registration details to continue.');
+    if (!trimmedName || !trimmedPhone || !trimmedEmail || !trimmedCity || !trimmedAddress) {
+      setErrorMessage('Please fill in all details to create your customer account.');
       return;
     }
 
@@ -64,20 +69,20 @@ export default function TailorRegistration() {
       return;
     }
 
-    if (Number(trimmedExperience) < 0) {
-      setErrorMessage('Years of experience cannot be negative.');
+    if (!EMAIL_REGEX.test(trimmedEmail)) {
+      setErrorMessage('Please enter a valid email address.');
       return;
     }
 
     const next = updateSession({
-      role: 'tailor',
+      role: 'customer',
       identifier: session.identifier || trimmedPhone,
-      profile: {
+      customerProfile: {
         fullName: trimmedName,
         phone: trimmedPhone,
-        shopName: trimmedShop,
-        yearsOfExperience: trimmedExperience,
-        shopAddress: trimmedAddress,
+        email: trimmedEmail,
+        city: trimmedCity,
+        address: trimmedAddress,
       },
     });
 
@@ -97,10 +102,10 @@ export default function TailorRegistration() {
       <div className="w-full max-w-md md:max-w-3xl bg-white rounded-2xl shadow-md p-6 md:p-10">
         <div className="text-center mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-            Tailor Registration
+            Customer Registration
           </h1>
           <p className="text-sm md:text-base text-gray-600 mt-2">
-            Fill in your details to get started
+            Tell us where to reach you and deliver your outfits
           </p>
         </div>
 
@@ -134,44 +139,43 @@ export default function TailorRegistration() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="shopName">
-              Shop Name
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">
+              Email Address
             </label>
             <input
-              id="shopName"
-              type="text"
-              value={shopName}
-              onChange={(e) => setShopName(e.target.value)}
-              placeholder="Enter shop name"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="yearsOfExperience">
-              Years of Experience
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="city">
+              City
             </label>
             <input
-              id="yearsOfExperience"
-              type="number"
-              min="0"
-              value={yearsOfExperience}
-              onChange={(e) => setYearsOfExperience(e.target.value)}
-              placeholder="e.g. 5"
+              id="city"
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="e.g. Chennai"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="shopAddress">
-              Shop Address
+            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="address">
+              Delivery Address
             </label>
             <textarea
-              id="shopAddress"
+              id="address"
               rows={3}
-              value={shopAddress}
-              onChange={(e) => setShopAddress(e.target.value)}
-              placeholder="Enter complete shop address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter the address where outfits should be picked up or delivered"
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
