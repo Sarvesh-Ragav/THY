@@ -2,58 +2,40 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-
-// Mock active orders matching HLD workflow specifications
-const initialActiveOrders = [
-  {
-    id: 'ORD-8091',
-    customerName: 'Priya Verma',
-    garmentType: 'Embroidered Lehenga Choli',
-    status: 'In Progress', // 'In Progress' | 'Fitting Scheduled' | 'Ready to Stitch/Deliver'
-    expectedCompletion: '2026-09-18',
-    fabricDetails: 'Velvet & Raw Silk',
-    measurements: 'Standard Size M (Customized Waist)',
-  },
-  {
-    id: 'ORD-8095',
-    customerName: 'Vikram Mehta',
-    garmentType: 'Tuxedo Jacket & Trousers',
-    status: 'Fitting Scheduled',
-    expectedCompletion: '2026-09-14',
-    fabricDetails: 'Italian Wool',
-    measurements: 'Custom Fitted',
-  },
-];
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { OrderStatus, TailorActiveOrder } from '@/lib/tailor-session';
 
 export default function ActiveOrdersPage() {
-  const [orders, setOrders] = useState(initialActiveOrders);
-  const [selectedOrder, setSelectedOrder] = useState<typeof initialActiveOrders[0] | null>(null);
+  const { session, updateSession } = useTailorSession();
+  const [selectedOrder, setSelectedOrder] = useState<TailorActiveOrder | null>(null);
 
-  const handleUpdateStatus = (orderId: string, newStatus: string) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+  const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
+    const nextOrders = session.orders.map((order) =>
+      order.id === orderId ? { ...order, status: newStatus } : order
+    );
+    updateSession({ orders: nextOrders });
+    setSelectedOrder((current) =>
+      current?.id === orderId ? { ...current, status: newStatus } : current
     );
   };
 
   return (
     <div className="space-y-6">
-      {/* Top Header & Navigation */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Active Orders</h1>
           <p className="text-sm text-gray-600">Track and manage current tailoring jobs from cutting to final delivery.</p>
         </div>
-        <Link 
-          href="/tailor-dashboard" 
+        <Link
+          href="/tailor-dashboard"
           className="text-sm font-semibold text-[#00c9b7] hover:underline"
         >
           ← Back to Dashboard
         </Link>
       </div>
 
-      {/* Active Orders List */}
       <div className="space-y-4">
-        {orders.map((order) => (
+        {session.orders.map((order) => (
           <div key={order.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
@@ -84,10 +66,10 @@ export default function ActiveOrdersPage() {
               >
                 View Details
               </button>
-              
+
               <select
                 value={order.status}
-                onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
+                onChange={(e) => handleUpdateStatus(order.id, e.target.value as OrderStatus)}
                 className="px-3 py-2 border rounded-xl text-xs font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
               >
                 <option value="In Progress">In Progress</option>
@@ -99,13 +81,12 @@ export default function ActiveOrdersPage() {
         ))}
       </div>
 
-      {/* Order Details Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
             <div className="flex justify-between items-center border-b pb-3">
               <h2 className="font-bold text-gray-900 text-lg">Order Details - {selectedOrder.id}</h2>
-              <button 
+              <button
                 onClick={() => setSelectedOrder(null)}
                 className="text-gray-400 hover:text-gray-600 font-bold text-lg"
               >

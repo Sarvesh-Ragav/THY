@@ -2,74 +2,62 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-
-// Mock request data matching the HLD flowchart
-const initialRequests = [
-  {
-    id: 'REQ-101',
-    customerName: 'Ananya Sharma',
-    garmentType: 'Custom Designer Anarkali',
-    fabricProvided: 'Yes (Silk & Net)',
-    measurements: 'Bust: 34", Waist: 28", Length: 52"',
-    requirements: 'Double inner lining, subtle gold piping on neck.',
-    status: 'Pending Quotation', // 'Pending Quotation' | 'Quotation Submitted'
-  },
-  {
-    id: 'REQ-102',
-    customerName: 'Rohan Gupta',
-    garmentType: '3-Piece Slim Fit Suit',
-    fabricProvided: 'No (Tailor to source Raymond Wool)',
-    measurements: 'Chest: 40", Waist: 32", Shoulder: 18"',
-    requirements: 'Satin lapel, double vent back, tapered trousers.',
-    status: 'Pending Quotation',
-  },
-];
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { TailorOrderRequest } from '@/lib/tailor-session';
 
 export default function NewOrderRequestsPage() {
-  const [requests, setRequests] = useState(initialRequests);
-  const [selectedRequest, setSelectedRequest] = useState<typeof initialRequests[0] | null>(null);
+  const { session, updateSession } = useTailorSession();
+  const [selectedRequest, setSelectedRequest] = useState<TailorOrderRequest | null>(null);
   const [quotePrice, setQuotePrice] = useState('');
   const [estimatedDays, setEstimatedDays] = useState('');
   const [notes, setNotes] = useState('');
 
-  const handleOpenQuoteModal = (req: typeof initialRequests[0]) => {
+  const handleOpenQuoteModal = (req: TailorOrderRequest) => {
     setSelectedRequest(req);
-    setQuotePrice('');
-    setEstimatedDays('');
-    setNotes('');
+    setQuotePrice(req.quote?.price ?? '');
+    setEstimatedDays(req.quote?.estimatedDays ?? '');
+    setNotes(req.quote?.notes ?? '');
   };
 
   const handleSubmitQuote = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRequest) return;
 
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.id === selectedRequest.id ? { ...r, status: 'Quotation Submitted' } : r
-      )
-    );
+    updateSession({
+      requests: session.requests.map((request) =>
+        request.id === selectedRequest.id
+          ? {
+              ...request,
+              status: 'Quotation Submitted',
+              quote: {
+                price: quotePrice,
+                estimatedDays,
+                notes,
+              },
+            }
+          : request
+      ),
+    });
     setSelectedRequest(null);
   };
 
   return (
     <div className="space-y-6">
-      {/* Top Navigation / Breadcrumb */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">New Order Requests</h1>
           <p className="text-sm text-gray-600">Review incoming customer requirements and submit tailored price quotes.</p>
         </div>
-        <Link 
-          href="/tailor-dashboard" 
+        <Link
+          href="/tailor-dashboard"
           className="text-sm font-semibold text-[#00c9b7] hover:underline"
         >
           ← Back to Dashboard
         </Link>
       </div>
 
-      {/* Requests List Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {requests.map((req) => (
+        {session.requests.map((req) => (
           <div key={req.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between space-y-4">
             <div>
               <div className="flex justify-between items-start mb-2">
@@ -79,8 +67,8 @@ export default function NewOrderRequestsPage() {
                   <p className="text-sm text-gray-600">Customer: <span className="font-medium text-gray-800">{req.customerName}</span></p>
                 </div>
                 <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                  req.status === 'Pending Quotation' 
-                    ? 'bg-amber-50 text-amber-700 border border-amber-200' 
+                  req.status === 'Pending Quotation'
+                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
                     : 'bg-green-50 text-green-700 border border-green-200'
                 }`}>
                   {req.status}
@@ -91,6 +79,9 @@ export default function NewOrderRequestsPage() {
                 <p><strong>Fabric Info:</strong> {req.fabricProvided}</p>
                 <p><strong>Measurements:</strong> {req.measurements}</p>
                 <p><strong>Special Notes:</strong> {req.requirements}</p>
+                {req.quote && (
+                  <p><strong>Quoted:</strong> ₹{req.quote.price} · {req.quote.estimatedDays} days</p>
+                )}
               </div>
             </div>
 
@@ -110,13 +101,12 @@ export default function NewOrderRequestsPage() {
         ))}
       </div>
 
-      {/* Quotation Submission Modal */}
       {selectedRequest && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl space-y-5">
             <div className="flex justify-between items-center border-b pb-3">
               <h2 className="font-bold text-gray-900 text-lg">Provide Quotation - {selectedRequest.id}</h2>
-              <button 
+              <button
                 onClick={() => setSelectedRequest(null)}
                 className="text-gray-400 hover:text-gray-600 font-bold text-lg"
               >

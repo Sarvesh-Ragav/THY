@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ThyLogo } from './ThyLogo';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 
 export interface ThySignUpFormProps {
   onSelectRole?: (role: 'customer' | 'tailor') => void;
@@ -13,13 +15,27 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
   onSelectRole,
   onNavigateLogin,
 }) => {
+  const router = useRouter();
+  const { updateSession } = useTailorSession();
   const [selectedRole, setSelectedRole] = useState<'customer' | 'tailor' | null>('tailor');
+  const [notice, setNotice] = useState<string | null>(null);
 
   const handleRoleClick = (role: 'customer' | 'tailor') => {
     setSelectedRole(role);
+    setNotice(null);
     if (onSelectRole) {
       onSelectRole(role);
     }
+  };
+
+  const handleContinue = () => {
+    if (selectedRole === 'customer') {
+      setNotice('Customer sign up is coming soon. Choose Tailor to continue.');
+      return;
+    }
+
+    updateSession({ role: 'tailor' });
+    router.push('/tailor-registration');
   };
 
   return (
@@ -70,6 +86,20 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
             </span>
           </button>
         </div>
+
+        {notice && (
+          <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-4">
+            {notice}
+          </p>
+        )}
+
+        <button
+          type="button"
+          onClick={handleContinue}
+          className="w-full bg-[#00c9b7] hover:bg-[#00b5a4] active:bg-[#009e8f] text-white font-bold py-3 px-4 rounded-xl shadow-sm transition duration-200 cursor-pointer active:scale-[0.99] mb-6"
+        >
+          Continue
+        </button>
 
         {/* Footer Link */}
         <div className="text-center">
