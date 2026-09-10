@@ -17,7 +17,7 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: 'THY — Bespoke Indian wear, tailored locally.',
-  description: 'Connecting you directly with Indian artisans and tailors.',
+  description: 'Find artisan tailors for sarees, salwars, sherwanis and lehengas.',
 };
 
 export default function RootLayout({

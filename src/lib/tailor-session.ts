@@ -223,7 +223,7 @@ export function getPostAuthPath(session: TailorSession): string {
   if (session.role === 'customer') {
     if (!hasCustomerProfile(session)) return '/customer-registration';
     if (!hasCustomerPreferences(session)) return '/customer-preferences';
-    return '/customer-account';
+    return '/';
   }
 
   if (!hasTailorProfile(session)) return '/tailor-registration';
