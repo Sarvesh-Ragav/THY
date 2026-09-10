@@ -1,0 +1,164 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+
+// Mock catalog images matching the HLD design
+const initialPortfolioItems = [
+  {
+    id: 1,
+    title: 'Bridal Silk Lehenga',
+    category: 'Bridalwear',
+    imageUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=500&auto=format&fit=crop',
+  },
+  {
+    id: 2,
+    title: 'Custom Velvet Sherwani',
+    category: 'Ethnic Men',
+    imageUrl: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500&auto=format&fit=crop',
+  },
+  {
+    id: 3,
+    title: 'Hand-embroidered Suit',
+    category: 'Formalwear',
+    imageUrl: 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=500&auto=format&fit=crop',
+  },
+];
+
+export default function PortfolioPage() {
+  const [items, setItems] = useState(initialPortfolioItems);
+  const [showModal, setShowModal] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newCategory, setNewCategory] = useState('Bridalwear');
+
+  const handleAddItem = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newItem = {
+      id: Date.now(),
+      title: newTitle,
+      category: newCategory,
+      imageUrl: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=500&auto=format&fit=crop',
+    };
+    setItems([newItem, ...items]);
+    setNewTitle('');
+    setShowModal(false);
+  };
+
+  const handleDelete = (id: number) => {
+    setItems(items.filter((item) => item.id !== id));
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Portfolio & Design Showcase</h1>
+          <p className="text-sm text-gray-600">Upload and showcase your best stitching work to potential customers.</p>
+        </div>
+        <Link 
+          href="/tailor-dashboard" 
+          className="text-sm font-semibold text-[#00c9b7] hover:underline"
+        >
+          ← Back to Dashboard
+        </Link>
+      </div>
+
+      {/* Action Bar */}
+      <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+        <span className="text-sm font-semibold text-gray-700">Total Showcase Items: {items.length}</span>
+        <button
+          onClick={() => setShowModal(true)}
+          className="px-4 py-2 bg-[#00c9b7] text-white rounded-xl text-xs font-semibold hover:bg-[#00b5a4] transition-colors"
+        >
+          + Add New Work
+        </button>
+      </div>
+
+      {/* Portfolio Items Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {items.map((item) => (
+          <div key={item.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm group">
+            <div className="h-48 bg-gray-200 overflow-hidden relative">
+              <img 
+                src={item.imageUrl} 
+                alt={item.title} 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <span className="absolute top-3 left-3 bg-black/60 text-white text-[10px] px-2.5 py-1 rounded-full backdrop-blur-sm font-medium">
+                {item.category}
+              </span>
+            </div>
+            <div className="p-4 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-gray-900 text-sm">{item.title}</h3>
+              </div>
+              <button
+                onClick={() => handleDelete(item.id)}
+                className="text-red-500 hover:text-red-700 text-xs font-semibold"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Add Work Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+            <div className="flex justify-between items-center border-b pb-3">
+              <h2 className="font-bold text-gray-900 text-lg">Add New Portfolio Image</h2>
+              <button onClick={() => setShowModal(false)} className="text-gray-400 font-bold">✕</button>
+            </div>
+
+            <form onSubmit={handleAddItem} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Garment Title</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Silk Velvet Blouse"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Category</label>
+                <select
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
+                >
+                  <option value="Bridalwear">Bridalwear</option>
+                  <option value="Ethnic Men">Ethnic Men</option>
+                  <option value="Formalwear">Formalwear</option>
+                  <option value="Casual & Alterations">Casual & Alterations</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 border rounded-xl text-xs font-semibold text-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-[#00c9b7] text-white rounded-xl text-xs font-semibold hover:bg-[#00b5a4]"
+                >
+                  Save Image
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
