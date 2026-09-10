@@ -26,7 +26,7 @@ export default function CustomerRegistration() {
     }
 
     if (session.isAuthenticated && isCustomerOnboardingComplete(session)) {
-      router.replace('/customer-account');
+      router.replace('/');
       return;
     }
 

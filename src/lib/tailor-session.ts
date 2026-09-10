@@ -88,6 +88,17 @@ export interface TailorActiveOrder {
   measurements: string;
 }
 
+export interface CustomerDesignSave {
+  id: string;
+  title: string;
+}
+
+export interface CustomerOrderSave {
+  id: string;
+  title: string;
+  status: string;
+}
+
 export interface TailorSession {
   identifier: string;
   role: UserRole | null;
@@ -96,6 +107,9 @@ export interface TailorSession {
   verification: TailorVerification | null;
   customerProfile: CustomerProfile | null;
   customerPreferences: CustomerPreferences | null;
+  selectedLocation: string | null;
+  customerDesigns: CustomerDesignSave[];
+  customerOrders: CustomerOrderSave[];
   availability: TailorAvailability;
   requests: TailorOrderRequest[];
   orders: TailorActiveOrder[];
@@ -170,6 +184,9 @@ export function createDefaultSession(): TailorSession {
     verification: null,
     customerProfile: null,
     customerPreferences: null,
+    selectedLocation: null,
+    customerDesigns: [],
+    customerOrders: [],
     availability: {
       ...DEFAULT_AVAILABILITY,
       workingDays: { ...DEFAULT_WORKING_DAYS },
@@ -211,6 +228,10 @@ export function hasCustomerPreferences(session: TailorSession): boolean {
 
 export function isCustomerOnboardingComplete(session: TailorSession): boolean {
   return hasCustomerProfile(session) && hasCustomerPreferences(session);
+}
+
+export function hasCustomerActivity(session: TailorSession): boolean {
+  return session.customerDesigns.length > 0 || session.customerOrders.length > 0;
 }
 
 export function getCustomerFirstName(session: TailorSession): string {
@@ -275,6 +296,9 @@ export function loadTailorSession(): TailorSession {
       verification: parsed.verification ?? null,
       customerProfile: parsed.customerProfile ?? null,
       customerPreferences: parsed.customerPreferences ?? null,
+      selectedLocation: parsed.selectedLocation ?? null,
+      customerDesigns: Array.isArray(parsed.customerDesigns) ? parsed.customerDesigns : [],
+      customerOrders: Array.isArray(parsed.customerOrders) ? parsed.customerOrders : [],
     };
   } catch {
     return fallback;

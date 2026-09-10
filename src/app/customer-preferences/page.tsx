@@ -39,7 +39,7 @@ export default function CustomerPreferences() {
     }
 
     if (session.isAuthenticated && isCustomerOnboardingComplete(session)) {
-      router.replace('/customer-account');
+      router.replace('/');
       return;
     }
 
@@ -84,7 +84,7 @@ export default function CustomerPreferences() {
       },
     });
 
-    router.push('/customer-account');
+    router.push('/');
   };
 
   if (!isReady) {
