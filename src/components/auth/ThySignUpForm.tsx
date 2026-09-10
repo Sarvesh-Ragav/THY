@@ -107,7 +107,7 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
                 Log in
               </button>
             ) : (
-              <Link href="/" className="text-[#00c9b7] font-semibold hover:underline">
+              <Link href="/login" className="text-[#00c9b7] font-semibold hover:underline">
                 Log in
               </Link>
             )}

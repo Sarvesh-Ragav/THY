@@ -1,10 +1,23 @@
 import type { Metadata } from 'next';
+import { Cormorant_Garamond, Outfit } from 'next/font/google';
 import "./globals.css";
 import { TailorSessionProvider } from '@/components/providers/TailorSessionProvider';
 
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+  variable: '--font-cormorant',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-outfit',
+});
+
 export const metadata: Metadata = {
-  title: 'THY - Tailoring, connected.',
-  description: 'Log in to your THY account to access tailoring services and smart management.',
+  title: 'THY — Bespoke luxury, tailored locally.',
+  description: 'Connecting you directly with artisan tailors.',
 };
 
 export default function RootLayout({
@@ -13,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="antialiased bg-gray-100 min-h-screen">
+    <html lang="en" suppressHydrationWarning className={`${cormorant.variable} ${outfit.variable}`}>
+      <body className="antialiased bg-[#F3EEE4] min-h-screen">
         <TailorSessionProvider>{children}</TailorSessionProvider>
       </body>
     </html>
