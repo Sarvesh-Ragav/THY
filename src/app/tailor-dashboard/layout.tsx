@@ -1,129 +1,72 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useTailorSession } from '@/components/providers/TailorSessionProvider';
-import {
-  getPostAuthPath,
-  hasSubmittedVerification,
-  hasTailorProfile,
-} from '@/lib/tailor-session';
+import { usePathname } from 'next/navigation';
 
-const NAV_LINKS = [
-  { href: '/tailor-dashboard', label: 'Dashboard' },
-  { href: '/tailor-dashboard/new-requests', label: 'New Requests' },
-  { href: '/tailor-dashboard/active-orders', label: 'Active Orders' },
-  { href: '/tailor-dashboard/availability', label: 'Availability' },
-];
-
-export default function DashboardLayout({
+export default function TailorDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { session, isReady, logout } = useTailorSession();
 
-  useEffect(() => {
-    if (!isReady) return;
-
-    if (!session.isAuthenticated) {
-      router.replace('/');
-      return;
-    }
-
-    if (session.role === 'customer') {
-      router.replace(getPostAuthPath(session));
-      return;
-    }
-
-    if (!hasTailorProfile(session)) {
-      router.replace('/tailor-registration');
-      return;
-    }
-
-    if (!hasSubmittedVerification(session)) {
-      router.replace('/tailor-verification');
-    }
-  }, [isReady, session, router]);
-
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
-
-  const isActive = (href: string) => {
-    if (href === '/tailor-dashboard') {
-      return pathname === href;
-    }
-    return pathname === href || pathname.startsWith(`${href}/`);
-  };
-
-  if (!isReady || !session.isAuthenticated || !hasTailorProfile(session) || !hasSubmittedVerification(session)) {
-    return (
-      <div className="min-h-dvh bg-thy-bg flex items-center justify-center px-4">
-        <p className="text-sm text-thy-muted">Loading studio...</p>
-      </div>
-    );
-  }
+  const navLinks = [
+    { name: 'Dashboard', href: '/tailor-dashboard' },
+    { name: 'New Requests', href: '/tailor-dashboard/new-requests' },
+    { name: 'Active Orders', href: '/tailor-dashboard/active-orders' },
+    { name: 'Availability', href: '/tailor-dashboard/availability' },
+    { name: 'Chat', href: '/tailor-dashboard/chat' },
+    { name: 'Notifications', href: '/tailor-dashboard/notifications' },
+    { name: 'Portfolio', href: '/tailor-dashboard/portfolio' },
+    { name: 'Earnings & Reports', href: '/tailor-dashboard/earnings' },
+  ];
 
   return (
-    <div className="min-h-dvh bg-thy-bg flex flex-col">
-      <header className="bg-thy-surface/90 backdrop-blur-md border-b border-thy-ink/10 sticky top-0 z-50 pt-[env(safe-area-inset-top)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14 sm:h-16 gap-3">
-            <Link href="/tailor-dashboard" className="flex items-center gap-2 min-w-0">
-              <span className="text-xl sm:text-2xl tracking-[0.12em] text-thy-brand shrink-0" style={{ fontFamily: 'var(--font-cormorant), serif' }}>THY</span>
-              <span className="text-[10px] sm:text-xs bg-thy-mist text-thy-muted px-2 py-1 font-medium truncate max-w-[9rem] sm:max-w-[16rem]">
-                {session.profile?.shopName || 'Tailor Studio'}
-              </span>
+    <div className="min-h-screen bg-gray-50/50">
+      {/* Unified Global Header */}
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          {/* Logo Branding */}
+          <div className="flex items-center gap-3">
+            <Link href="/tailor-dashboard" className="text-xl font-black tracking-wider text-[#00c9b7]">
+              THY
             </Link>
+            <span className="bg-teal-50 text-[#00c9b7] text-[10px] font-bold px-2 py-0.5 rounded-md">
+              kavs thy
+            </span>
+          </div>
 
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-thy-muted">
-              {NAV_LINKS.map((link) => (
+          {/* Single Main Navigation Bar */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={isActive(link.href) ? 'text-thy-brand font-semibold' : 'hover:text-thy-ink'}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    isActive
+                      ? 'bg-teal-50 text-[#00c9b7]'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
                 >
-                  {link.label}
+                  {link.name}
                 </Link>
-              ))}
-            </nav>
-
-            <div className="flex items-center gap-3 sm:gap-4 text-thy-muted shrink-0">
-              <span className="hidden sm:inline text-sm font-medium text-thy-ink truncate max-w-[10rem]">
-                {session.profile?.fullName}
-              </span>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="text-sm font-semibold text-thy-muted hover:text-thy-brand min-h-11"
-              >
-                Log out
-              </button>
-            </div>
-          </div>
-
-          <nav className="md:hidden thy-scroll-x flex items-center gap-4 pb-3 text-sm font-medium text-thy-muted">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`whitespace-nowrap min-h-11 inline-flex items-center ${isActive(link.href) ? 'text-thy-brand font-semibold' : ''}`}
-              >
-                {link.label}
-              </Link>
-            ))}
+              );
+            })}
           </nav>
+
+          {/* User Profile Controls */}
+          <div className="flex items-center gap-3 text-xs font-semibold text-gray-700">
+            <span>kavs</span>
+            <button className="text-gray-400 hover:text-red-500 font-normal">Log out</button>
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-        {children}
-      </main>
+      {/* Main Page Content */}
+      <main className="max-w-7xl mx-auto p-6">{children}</main>
     </div>
   );
 }
