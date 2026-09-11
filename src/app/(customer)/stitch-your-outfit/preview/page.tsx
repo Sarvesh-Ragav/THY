@@ -11,6 +11,7 @@ import {
   getStudioGarment,
   type FabricTreatment,
 } from '@/lib/design-studio';
+import { patchStudioDraft, readFileAsDataUrl, readStudioDraft } from '@/lib/studio-draft';
 import { isCustomerOnboardingComplete } from '@/lib/tailor-session';
 import { GarmentVisualization } from '@/components/studio/GarmentVisualization';
 import { StudioStepper } from '@/components/studio/StudioStepper';
@@ -54,9 +55,10 @@ function DesignPreviewContent() {
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    setTreatments(preset.treatments);
-    setFabricImage(preset.fabricImage);
-    setFabricLabel(preset.fabric);
+    const draft = readStudioDraft(preset.categoryId);
+    setTreatments(draft?.treatments?.length ? draft.treatments : preset.treatments);
+    setFabricImage(draft?.fabricImage || preset.fabricImage);
+    setFabricLabel(draft?.fabricLabel || preset.fabric);
     setFavorite(false);
     setSaved(false);
     setEditing(false);
@@ -74,11 +76,13 @@ function DesignPreviewContent() {
 
   const toggleTreatment = (treatment: FabricTreatment) => {
     if (!editing) return;
-    setTreatments((current) =>
-      current.includes(treatment)
+    setTreatments((current) => {
+      const next = current.includes(treatment)
         ? current.filter((item) => item !== treatment)
-        : [...current, treatment],
-    );
+        : [...current, treatment];
+      persistDraft({ treatments: next });
+      return next;
+    });
     setSaved(false);
     regenerate();
   };
@@ -91,17 +95,33 @@ function DesignPreviewContent() {
     next();
   };
 
-  const onFabricUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setFabricImage((previous) => {
-      if (previous.startsWith('blob:')) URL.revokeObjectURL(previous);
-      return url;
+  const persistDraft = (next?: {
+    fabricImage?: string;
+    fabricLabel?: string;
+    treatments?: FabricTreatment[];
+  }) => {
+    patchStudioDraft(preset.categoryId, {
+      fabricImage: next?.fabricImage ?? fabricImage,
+      fabricLabel: next?.fabricLabel ?? fabricLabel,
+      treatments: next?.treatments ?? treatments,
     });
+  };
+
+  const onFabricUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    const url = await readFileAsDataUrl(file);
+    setFabricImage(url);
     setFabricLabel(file.name);
     setSaved(false);
+    persistDraft({ fabricImage: url, fabricLabel: file.name });
     regenerate();
+  };
+
+  const continueToTryOn = () => {
+    persistDraft();
+    router.push(`/stitch-your-outfit/try-on${query}`);
   };
 
   const saveDesign = () => {
@@ -306,12 +326,13 @@ function DesignPreviewContent() {
           {message && <p className="text-xs text-thy-muted">{message}</p>}
 
           <div className="mt-auto pt-1 space-y-2">
-            <Link
-              href={`/stitch-your-outfit/try-on${query}`}
+            <button
+              type="button"
+              onClick={continueToTryOn}
               className="hero-leather-btn inline-flex w-full items-center justify-center min-h-12 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-center"
             >
               Continue to try-on
-            </Link>
+            </button>
             <p className="text-[10px] uppercase tracking-[0.14em] text-thy-subtle text-center">
               Try-on · Measurements · Tailor · Estimate · Cart
             </p>
