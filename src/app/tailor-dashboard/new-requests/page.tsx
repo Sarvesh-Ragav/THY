@@ -2,173 +2,264 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useTailorSession } from '@/components/providers/TailorSessionProvider';
-import { TailorOrderRequest } from '@/lib/tailor-session';
 
-export default function NewOrderRequestsPage() {
-  const { session, updateSession } = useTailorSession();
-  const [selectedRequest, setSelectedRequest] = useState<TailorOrderRequest | null>(null);
-  const [quotePrice, setQuotePrice] = useState('');
-  const [estimatedDays, setEstimatedDays] = useState('');
-  const [notes, setNotes] = useState('');
+interface NewRequest {
+  id: string;
+  customerName: string;
+  garmentType: string;
+  category: string;
+  requestDate: string;
+  fabricProvided: boolean;
+  fabricDetails: string;
+  measurements: string;
+  budgetEstimate: string;
+  designPreview: string;
+  notes: string;
+  status: 'Pending Review' | 'Quoted' | 'Rejected';
+}
 
-  const handleOpenQuoteModal = (req: TailorOrderRequest) => {
-    setSelectedRequest(req);
-    setQuotePrice(req.quote?.price ?? '');
-    setEstimatedDays(req.quote?.estimatedDays ?? '');
-    setNotes(req.quote?.notes ?? '');
+const initialRequests: NewRequest[] = [
+  {
+    id: 'REQ-1042',
+    customerName: 'Aarav Sharma',
+    garmentType: 'Sherwani with Safa',
+    category: 'Bridalwear',
+    requestDate: '2026-09-10',
+    fabricProvided: true,
+    fabricDetails: 'Silk Brocade provided by customer',
+    measurements: 'Chest: 38", Waist: 32", Shoulder: 17.5", Length: 44"',
+    budgetEstimate: '₹10,000 - ₹14,000',
+    designPreview: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&auto=format&fit=crop',
+    notes: 'Needs heavy embroidery on collar and cuffs for wedding on Oct 5.',
+    status: 'Pending Review',
+  },
+  {
+    id: 'REQ-1045',
+    customerName: 'Ananya Iyer',
+    garmentType: 'Indo-Western Crop Top & Skirt',
+    category: 'Ethnicwear',
+    requestDate: '2026-09-11',
+    fabricProvided: false,
+    fabricDetails: 'Tailor to source organza & satin',
+    measurements: 'Bust: 34", Waist: 28", Skirt Length: 40"',
+    budgetEstimate: '₹6,000 - ₹8,000',
+    designPreview: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=400&auto=format&fit=crop',
+    notes: 'Pastel shade preference. Needs delivery before Sept 25.',
+    status: 'Pending Review',
+  },
+];
+
+export default function NewRequestsPage() {
+  const [requests, setRequests] = useState<NewRequest[]>(initialRequests);
+  const [selectedRequest, setSelectedRequest] = useState<NewRequest | null>(null);
+  
+  // Quotation form states
+  const [quotedAmount, setQuotedAmount] = useState<string>('');
+  const [estimatedDays, setEstimatedDays] = useState<string>('');
+  const [quoteNotes, setQuoteNotes] = useState<string>('');
+
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleSubmitQuote = (e: React.FormEvent) => {
+  const handleSendQuotation = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRequest) return;
+    if (!selectedRequest || !quotedAmount || !estimatedDays) return;
 
-    updateSession({
-      requests: session.requests.map((request) =>
-        request.id === selectedRequest.id
-          ? {
-              ...request,
-              status: 'Quotation Submitted',
-              quote: {
-                price: quotePrice,
-                estimatedDays,
-                notes,
-              },
-            }
-          : request
-      ),
-    });
-    setSelectedRequest(null);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setRequests((prev) =>
+        prev.map((req) =>
+          req.id === selectedRequest.id ? { ...req, status: 'Quoted' } : req
+        )
+      );
+      showToast(`Quotation sent to ${selectedRequest.customerName} (₹${quotedAmount})`);
+      setSelectedRequest(null);
+      setQuotedAmount('');
+      setEstimatedDays('');
+      setQuoteNotes('');
+    }, 400);
+  };
+
+  const handleRejectRequest = (requestId: string) => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setRequests((prev) => prev.filter((r) => r.id !== requestId));
+      setSelectedRequest(null);
+      showToast(`Request ${requestId} has been declined.`);
+    }, 400);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-thy-ink">New Order Requests</h1>
-          <p className="text-sm text-thy-muted">Review incoming customer requirements and submit tailored price quotes.</p>
+          <h1 className="text-2xl font-bold text-gray-900">New Order Requests</h1>
+          <p className="text-xs text-gray-600">Review incoming customer custom tailoring requests and send price quotations.</p>
         </div>
-        <Link
-          href="/tailor-dashboard"
-          className="text-sm font-semibold text-thy-brand hover:underline self-start"
-        >
+        <Link href="/tailor-dashboard" className="text-sm font-semibold text-[#00c9b7] hover:underline">
           ← Back to Dashboard
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {session.requests.map((req) => (
-          <div key={req.id} className="bg-thy-surface p-5 sm:p-6 rounded-2xl shadow-sm border border-thy-ink/10 flex flex-col justify-between space-y-4">
-            <div>
-              <div className="flex justify-between items-start gap-3 mb-2">
-                <div>
-                  <span className="text-xs font-semibold text-thy-subtle">{req.id}</span>
-                  <h3 className="text-lg font-bold text-thy-ink">{req.garmentType}</h3>
-                  <p className="text-sm text-thy-muted">Customer: <span className="font-medium text-thy-ink">{req.customerName}</span></p>
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="bg-teal-50 border border-[#00c9b7] text-teal-800 px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between animate-fade-in">
+          <span>{toastMessage}</span>
+          <button onClick={() => setToastMessage(null)} className="text-teal-600 font-bold">✕</button>
+        </div>
+      )}
+
+      {/* Loading Indicator */}
+      {isLoading && (
+        <div className="py-6 text-center text-xs text-[#00c9b7] font-semibold animate-pulse">
+          ⏳ Processing quotation update...
+        </div>
+      )}
+
+      {/* Requests List */}
+      {!isLoading && requests.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4">
+          {requests.map((req) => (
+            <div
+              key={req.id}
+              className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-gray-200 transition-all"
+            >
+              <div className="flex items-center gap-4">
+                <img
+                  src={req.designPreview}
+                  alt={req.garmentType}
+                  className="w-16 h-16 rounded-xl object-cover border border-gray-100"
+                />
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-400">{req.id}</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        req.status === 'Quoted'
+                          ? 'bg-teal-50 text-teal-700 border border-teal-200'
+                          : 'bg-amber-50 text-amber-700 border border-amber-200'
+                      }`}
+                    >
+                      {req.status}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold text-gray-900">{req.garmentType}</h3>
+                  <p className="text-xs text-gray-600">
+                    Customer: <span className="font-semibold text-gray-800">{req.customerName}</span> | Estimated Budget: <span className="font-semibold text-gray-800">{req.budgetEstimate}</span>
+                  </p>
+                  <p className="text-[11px] text-gray-500">Requested on: {req.requestDate}</p>
                 </div>
-                <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                  req.status === 'Pending Quotation'
-                    ? 'bg-thy-mist text-thy-brand border border-thy-brand/25'
-                    : 'bg-thy-mist text-thy-deep border border-thy-brand/25'
-                }`}>
-                  {req.status}
-                </span>
               </div>
 
-              <div className="space-y-2 pt-3 border-t border-thy-ink/10 text-xs text-thy-muted">
-                <p><strong>Fabric Info:</strong> {req.fabricProvided}</p>
-                <p><strong>Measurements:</strong> {req.measurements}</p>
-                <p><strong>Special Notes:</strong> {req.requirements}</p>
-                {req.quote && (
-                  <p><strong>Quoted:</strong> ₹{req.quote.price} · {req.quote.estimatedDays} days</p>
-                )}
+              <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+                <button
+                  onClick={() => handleRejectRequest(req.id)}
+                  className="px-3 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-red-50 hover:text-red-600 transition-colors"
+                >
+                  Decline
+                </button>
+                <button
+                  onClick={() => setSelectedRequest(req)}
+                  className="px-4 py-2 bg-[#00c9b7] text-white rounded-xl text-xs font-semibold hover:bg-[#00b5a4] transition-colors"
+                >
+                  {req.status === 'Quoted' ? 'View Sent Quote' : 'Create Quotation'}
+                </button>
               </div>
             </div>
-
-            {req.status === 'Pending Quotation' ? (
-              <button
-                onClick={() => handleOpenQuoteModal(req)}
-                className="w-full py-2.5 bg-thy-brand text-white font-semibold rounded-xl text-sm hover:bg-thy-brand-hover transition-colors"
-              >
-                Review & Provide Quotation
-              </button>
-            ) : (
-              <div className="w-full py-2 bg-thy-mist text-thy-muted text-center font-medium rounded-xl text-xs">
-                Quotation Sent – Awaiting Customer Response
-              </div>
-            )}
+          ))}
+        </div>
+      ) : (
+        !isLoading && (
+          <div className="bg-white p-12 rounded-2xl border border-gray-100 text-center space-y-2">
+            <div className="text-3xl">📋</div>
+            <h3 className="text-base font-bold text-gray-800">No new request inquiries</h3>
+            <p className="text-xs text-gray-500 max-w-sm mx-auto">
+              New customer tailoring requests will show up here for price quotes.
+            </p>
           </div>
-        ))}
-      </div>
+        )
+      )}
 
+      {/* CREATE QUOTATION MODAL */}
       {selectedRequest && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-          <div className="bg-thy-surface rounded-t-2xl sm:rounded-2xl p-5 sm:p-6 w-full max-w-lg shadow-xl space-y-5 max-h-[90dvh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-            <div className="flex justify-between items-center border-b pb-3 gap-3">
-              <h2 className="font-bold text-thy-ink text-lg">Provide Quotation - {selectedRequest.id}</h2>
-              <button
-                onClick={() => setSelectedRequest(null)}
-                className="text-thy-subtle hover:text-thy-muted font-bold text-lg"
-              >
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b pb-3">
+              <div>
+                <span className="text-[10px] font-bold text-gray-400">{selectedRequest.id}</span>
+                <h2 className="font-bold text-gray-900 text-base">Send Quotation to {selectedRequest.customerName}</h2>
+              </div>
+              <button onClick={() => setSelectedRequest(null)} className="text-gray-400 hover:text-gray-600 font-bold text-lg">
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSubmitQuote} className="space-y-4">
+            {/* Request Summary */}
+            <div className="bg-gray-50 p-4 rounded-xl space-y-2 text-xs text-gray-700">
+              <p><strong>Garment:</strong> {selectedRequest.garmentType} ({selectedRequest.category})</p>
+              <p><strong>Fabric Details:</strong> {selectedRequest.fabricDetails}</p>
+              <p><strong>Measurements:</strong> {selectedRequest.measurements}</p>
+              <p><strong>Customer Notes:</strong> {selectedRequest.notes}</p>
+            </div>
+
+            {/* Quote Form */}
+            <form onSubmit={handleSendQuotation} className="space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-thy-ink mb-1">
-                  Estimated Price (₹)
-                </label>
+                <label className="block font-semibold text-gray-700 mb-1">Quoted Price (₹)</label>
                 <input
                   type="number"
                   required
-                  placeholder="e.g. 2500"
-                  value={quotePrice}
-                  onChange={(e) => setQuotePrice(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-thy-brand"
+                  placeholder="e.g. 8500"
+                  value={quotedAmount}
+                  onChange={(e) => setQuotedAmount(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-thy-ink mb-1">
-                  Estimated Completion (Days)
-                </label>
+                <label className="block font-semibold text-gray-700 mb-1">Estimated Days to Complete</label>
                 <input
                   type="number"
                   required
-                  placeholder="e.g. 5"
+                  placeholder="e.g. 10"
                   value={estimatedDays}
                   onChange={(e) => setEstimatedDays(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-thy-brand"
+                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-thy-ink mb-1">
-                  Notes for Customer
-                </label>
+                <label className="block font-semibold text-gray-700 mb-1">Notes / Terms for Customer (Optional)</label>
                 <textarea
                   rows={3}
-                  placeholder="Include details on fabric sourcing, stitching timeline, fittings, etc."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-thy-brand"
+                  placeholder="e.g. Price includes fitting & alteration charges..."
+                  value={quoteNotes}
+                  onChange={(e) => setQuoteNotes(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
                 />
               </div>
 
-              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-3 border-t">
+              <div className="pt-2 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setSelectedRequest(null)}
-                  className="px-4 py-3 sm:py-2 border rounded-xl text-xs font-semibold text-thy-muted hover:bg-thy-mist min-h-11"
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-3 sm:py-2 bg-thy-brand text-white rounded-xl text-xs font-semibold hover:bg-thy-brand-hover min-h-11"
+                  className="px-4 py-2 bg-[#00c9b7] text-white rounded-xl font-semibold hover:bg-[#00b5a4]"
                 >
-                  Submit Quotation
+                  Send Formal Quote
                 </button>
               </div>
             </form>
