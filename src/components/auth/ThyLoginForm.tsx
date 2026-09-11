@@ -21,30 +21,26 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
 
   /**
    * Client-side validation logic
-   * Validates if the input is a valid 10-digit mobile number or standard email address
+   * Validates a 10-digit mobile number or an E.164 phone number.
    */
   const validateInput = (value: string): boolean => {
     const trimmed = value.trim();
     if (!trimmed) {
-      setErrorMessage('Please enter your mobile number or email address');
+      setErrorMessage('Please enter your mobile number');
       return false;
     }
 
     // Strip non-digit characters for phone check
     const digitsOnly = trimmed.replace(/\D/g, '');
 
-    // Standard Email Regex Pattern
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     const isValidMobile = digitsOnly.length === 10;
-    const isValidEmail = emailRegex.test(trimmed);
 
-    if (isValidMobile || isValidEmail) {
+    if (isValidMobile) {
       setErrorMessage(null);
       return true;
     }
 
-    setErrorMessage('Please enter a valid 10-digit mobile number or email address.');
+    setErrorMessage('Please enter a valid 10-digit mobile number.');
     return false;
   };
 
@@ -120,7 +116,7 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
               htmlFor="identifier"
               className="block text-xs font-semibold text-thy-ink mb-1.5 uppercase tracking-wide"
             >
-              Mobile number or email
+              Mobile number
             </label>
             <input
               id="identifier"
@@ -128,9 +124,9 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
               type="text"
               value={identifier}
               onChange={handleInputChange}
-              placeholder="Mobile number or email"
-              autoComplete="username"
-              inputMode="text"
+              placeholder="Enter your 10-digit mobile number"
+              autoComplete="tel"
+              inputMode="tel"
               disabled={isSubmitting || isLoading}
               className={`w-full px-4 py-3 text-sm text-thy-ink bg-thy-surface border rounded-xl placeholder:text-thy-subtle transition-all duration-200 focus:outline-none ${
                 errorMessage
@@ -149,7 +145,7 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
               </p>
             ) : (
               <p className="text-xs text-thy-subtle mt-1.5 leading-normal">
-                Use the mobile number or email linked to your THY account
+                We&apos;ll send a verification code to this mobile number
               </p>
             )}
           </div>
@@ -187,7 +183,10 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
         {/* Secondary Social Login Button */}
         <button
           type="button"
-          onClick={onGoogleSignIn}
+          onClick={() => {
+            if (onGoogleSignIn) onGoogleSignIn();
+            else setErrorMessage('Google sign-in is not available yet. Please continue with your mobile number.');
+          }}
           className="w-full border border-thy-ink/15 hover:border-thy-ink/25 bg-thy-surface hover:bg-thy-mist text-thy-ink font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition-colors duration-200 cursor-pointer active:scale-[0.99]"
         >
           <GoogleIcon size={18} />

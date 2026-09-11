@@ -3,7 +3,7 @@
  */
 
 export interface LoginFormData {
-  identifier: string; // Mobile number or email address
+  identifier: string; // 10-digit mobile number or E.164 phone number
 }
 
 export interface ValidationError {
@@ -15,10 +15,9 @@ export interface LoginApiResponse {
   success: boolean;
   message?: string;
   data?: {
-    userId: string;
-    token?: string;
-    requiresOtp?: boolean;
-    authMethod: 'mobile' | 'email';
+    challengeId: string;
+    expiresAt: string;
+    mockOtp?: string;
   };
   error?: string;
 }

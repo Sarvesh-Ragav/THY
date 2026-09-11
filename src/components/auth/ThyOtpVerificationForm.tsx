@@ -6,7 +6,7 @@ import { ThyLogo } from './ThyLogo';
 export interface ThyOtpVerificationFormProps {
   identifier?: string;
   onVerifyOtp?: (otp: string) => Promise<boolean | void>;
-  onResendOtp?: () => void;
+  onResendOtp?: () => Promise<boolean | void>;
   onNavigateBack?: () => void;
   isLoading?: boolean;
 }
@@ -29,12 +29,18 @@ export const ThyOtpVerificationForm: React.FC<ThyOtpVerificationFormProps> = ({
     if (errorMessage) setErrorMessage(null);
   };
 
-  const handleResend = () => {
-    if (onResendOtp) {
-      onResendOtp();
+  const handleResend = async () => {
+    try {
+      if (onResendOtp) {
+        const result = await onResendOtp();
+        if (result === false) return;
+      }
+      setErrorMessage(null);
+      setResendStatus('Verification code resent successfully!');
+      setTimeout(() => setResendStatus(null), 3500);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Unable to resend the verification code.');
     }
-    setResendStatus('Verification code resent successfully!');
-    setTimeout(() => setResendStatus(null), 3500);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,7 +53,8 @@ export const ThyOtpVerificationForm: React.FC<ThyOtpVerificationFormProps> = ({
     setIsSubmitting(true);
     try {
       if (onVerifyOtp) {
-        await onVerifyOtp(otp);
+        const result = await onVerifyOtp(otp);
+        if (result === false) return;
       } else {
         await new Promise((resolve) => setTimeout(resolve, 800));
         alert('OTP Verified Successfully! Welcome to THY.');

@@ -8,12 +8,14 @@ import { ThyOtpVerificationForm } from '@/components/auth/ThyOtpVerificationForm
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath } from '@/lib/tailor-session';
 import { LoginFormData } from '@/types/auth';
+import { requestOtp, resendOtp, verifyOtp } from '@/lib/auth-api';
 
 export default function LoginPage() {
   const router = useRouter();
   const { session, isReady, updateSession, completeAuthentication } = useTailorSession();
   const [view, setView] = useState<'login' | 'signup' | 'otp'>('login');
   const [userIdentifier, setUserIdentifier] = useState<string>('');
+  const [challengeId, setChallengeId] = useState<string>('');
 
   useEffect(() => {
     if (!isReady) return;
@@ -23,13 +25,16 @@ export default function LoginPage() {
   }, [isReady, session, router]);
 
   const handleLoginContinue = async (formData: LoginFormData) => {
+    const result = await requestOtp(formData.identifier);
     setUserIdentifier(formData.identifier);
+    setChallengeId(result.challengeId);
     updateSession({ identifier: formData.identifier });
     setView('otp');
+    return { success: true, message: 'Verification code sent.', data: result };
   };
 
-  const handleAuthenticated = () => {
-    const next = completeAuthentication();
+  const handleAuthenticated = (accessToken: string) => {
+    const next = completeAuthentication(accessToken);
     router.push(getPostAuthPath(next));
   };
 
@@ -47,7 +52,6 @@ export default function LoginPage() {
         <ThyLoginForm
           initialIdentifier={session.identifier}
           onSubmit={handleLoginContinue}
-          onGoogleSignIn={handleAuthenticated}
           onNavigateSignUp={() => setView('signup')}
         />
       )}
@@ -55,8 +59,15 @@ export default function LoginPage() {
       {view === 'otp' && (
         <ThyOtpVerificationForm
           identifier={userIdentifier || session.identifier}
-          onVerifyOtp={async () => {
-            handleAuthenticated();
+          onVerifyOtp={async (otp) => {
+            const result = await verifyOtp(userIdentifier || session.identifier, challengeId, otp);
+            handleAuthenticated(result.accessToken);
+            return true;
+          }}
+          onResendOtp={async () => {
+            const result = await resendOtp(userIdentifier || session.identifier);
+            setChallengeId(result.challengeId);
+            return true;
           }}
           onNavigateBack={() => setView('login')}
         />
