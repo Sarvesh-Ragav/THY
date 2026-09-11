@@ -69,7 +69,7 @@ export default function TailorRegistration() {
       return;
     }
 
-    const next = updateSession({
+    updateSession({
       role: 'tailor',
       identifier: session.identifier || trimmedPhone,
       profile: {
@@ -81,7 +81,8 @@ export default function TailorRegistration() {
       },
     });
 
-    router.push(getPostAuthPath(next));
+    // Directly route user to verification upload page after saving profile details
+    router.push('/tailor-verification');
   };
 
   if (!isReady) {

@@ -8,7 +8,7 @@ export default function TailorDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome & Status Banner */}
+      {/* Welcome Header */}
       <div className="bg-gradient-to-r from-[#053b36] to-[#00c9b7] p-6 rounded-3xl text-white shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -29,6 +29,20 @@ export default function TailorDashboardPage() {
             Review Requests →
           </Link>
         </div>
+      </div>
+
+      {/* RE-ADDED: Verification Pending Status Banner */}
+      <div className="bg-amber-50 border border-amber-200 text-amber-900 p-4 rounded-2xl flex items-center justify-between text-xs shadow-sm">
+        <div className="flex items-center gap-3">
+          <span className="text-lg">⏳</span>
+          <div>
+            <h2 className="font-bold text-xs text-amber-950">Verification Status: Pending Review</h2>
+            <p className="text-amber-700 text-[11px]">Your tailor studio documentation is under review by admin. Full payout features unlock upon approval.</p>
+          </div>
+        </div>
+        <span className="bg-white text-amber-800 px-3 py-1 rounded-full border border-amber-300 font-bold text-[10px] shrink-0">
+          In Review
+        </span>
       </div>
 
       {/* KPI Metrics Grid */}
@@ -70,10 +84,8 @@ export default function TailorDashboardPage() {
         </div>
       </div>
 
-      {/* Operational Hub: Active Orders & Live Feeds */}
+      {/* Operational Hub */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Left Column: Urgent Action Table */}
         <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
           <div className="flex items-center justify-between border-b pb-3">
             <div>
@@ -96,7 +108,6 @@ export default function TailorDashboardPage() {
             </div>
           </div>
 
-          {/* Orders Quick List */}
           <div className="divide-y divide-gray-50 text-xs">
             <div className="py-3 flex items-center justify-between gap-4">
               <div className="space-y-0.5">
@@ -138,9 +149,7 @@ export default function TailorDashboardPage() {
           </div>
         </div>
 
-        {/* Right Column: Quick Links & Notifications */}
         <div className="space-y-4">
-          {/* Recent Alerts Card */}
           <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-3">
             <div className="flex justify-between items-center border-b pb-2">
               <h3 className="text-sm font-bold text-gray-900">Quick Notifications</h3>
@@ -164,7 +173,6 @@ export default function TailorDashboardPage() {
             </Link>
           </div>
 
-          {/* Quick Shortcuts */}
           <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-3">
             <h3 className="text-sm font-bold text-gray-900">Studio Management</h3>
             <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
@@ -195,7 +203,6 @@ export default function TailorDashboardPage() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

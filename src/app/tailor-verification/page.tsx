@@ -1,152 +1,78 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTailorSession } from '@/components/providers/TailorSessionProvider';
-import { getPostAuthPath, hasTailorProfile, isTailorOnboardingComplete } from '@/lib/tailor-session';
 
-export default function TailorVerification() {
+export default function TailorVerificationPage() {
   const router = useRouter();
-  const { session, isReady, updateSession } = useTailorSession();
-  const [idType, setIdType] = useState('Aadhaar Card');
-  const [idNumber, setIdNumber] = useState('');
-  const [documentName, setDocumentName] = useState('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isReady) return;
-
-    if (session.role === 'customer') {
-      router.replace(getPostAuthPath(session));
-      return;
-    }
-
-    if (!hasTailorProfile(session)) {
-      router.replace('/tailor-registration');
-      return;
-    }
-
-    if (session.isAuthenticated && isTailorOnboardingComplete(session)) {
-      router.replace('/tailor-dashboard');
-      return;
-    }
-
-    if (session.verification) {
-      setIdType(session.verification.idType);
-      setIdNumber(session.verification.idNumber);
-      setDocumentName(session.verification.documentName);
-    }
-    // Prefill once after session hydrates so typing is not reset.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, router]);
+  const [govId, setGovId] = useState<File | null>(null);
+  const [shopProof, setShopProof] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const trimmedId = idNumber.trim();
-    if (!trimmedId) {
-      setErrorMessage('Please enter your ID number.');
-      return;
-    }
-
-    if (!documentName) {
-      setErrorMessage('Please upload a document photo to continue.');
-      return;
-    }
-
-    updateSession({
-      isAuthenticated: true,
-      role: 'tailor',
-      verification: {
-        idType,
-        idNumber: trimmedId,
-        documentName,
-        status: 'pending',
-      },
-    });
-
-    router.push('/tailor-dashboard');
+    // Simulating document upload API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      // Route user to dashboard after verification submission
+      router.push('/tailor-dashboard');
+    }, 1000);
   };
 
-  if (!isReady) {
-    return (
-      <div className="min-h-dvh bg-thy-bg flex items-center justify-center">
-        <p className="text-sm text-thy-muted">Loading...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-dvh bg-thy-bg flex items-start sm:items-center justify-center p-4 md:p-8 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
-      <div className="w-full max-w-md md:max-w-2xl bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.08)] p-6 md:p-10">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-thy-ink">
-            Tailor Verification
-          </h1>
-          <p className="text-sm md:text-base text-thy-muted mt-2">
-            Upload your verification documents to complete setup
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-sm border border-gray-100 space-y-6">
+        <div className="text-center space-y-1">
+          <div className="text-3xl mb-2">📜</div>
+          <h1 className="text-xl font-bold text-gray-900">Tailor Verification</h1>
+          <p className="text-xs text-gray-500">
+            Upload identity & business proofs to activate full payout and ordering features.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           <div>
-            <label className="block text-sm font-medium text-thy-ink mb-1" htmlFor="idType">
-              Government ID Type
-            </label>
-            <select
-              id="idType"
-              value={idType}
-              onChange={(e) => setIdType(e.target.value)}
-              className="thy-input"
-            >
-              <option>Aadhaar Card</option>
-              <option>PAN Card</option>
-              <option>Voter ID</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-thy-ink mb-1" htmlFor="idNumber">
-              ID Number
+            <label className="block font-bold text-gray-700 mb-1">
+              Government ID Proof (Aadhaar / PAN / Driving License)
             </label>
             <input
-              id="idNumber"
-              type="text"
-              value={idNumber}
-              onChange={(e) => setIdNumber(e.target.value)}
-              placeholder="Enter ID number"
-              className="thy-input"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-thy-ink mb-1" htmlFor="document">
-              Upload Document Photo
-            </label>
-            <input
-              id="document"
               type="file"
+              required
               accept="image/*,.pdf"
-              onChange={(e) => setDocumentName(e.target.files?.[0]?.name ?? '')}
-              className="w-full p-2 border border-thy-ink/15 rounded-lg text-sm text-thy-muted file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-thy-mist file:text-thy-brand hover:file:bg-thy-mist"
+              onChange={(e) => setGovId(e.target.files?.[0] || null)}
+              className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-[#00c9b7] hover:file:bg-teal-100 cursor-pointer"
             />
-            {documentName && (
-              <p className="text-xs text-thy-muted mt-2">Selected: {documentName}</p>
-            )}
           </div>
 
-          {errorMessage && (
-            <p className="md:col-span-2 text-sm text-red-600">{errorMessage}</p>
-          )}
-
-          <div className="md:col-span-2 mt-4">
-            <button
-              type="submit"
-              className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors"
-            >
-              Submit Verification
-            </button>
+          <div>
+            <label className="block font-bold text-gray-700 mb-1">
+              Shop / Studio License or Address Proof
+            </label>
+            <input
+              type="file"
+              required
+              accept="image/*,.pdf"
+              onChange={(e) => setShopProof(e.target.files?.[0] || null)}
+              className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-[#00c9b7] hover:file:bg-teal-100 cursor-pointer"
+            />
           </div>
+
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-xl text-[11px] space-y-0.5">
+            <p className="font-bold">⚠️ Review Process</p>
+            <p className="text-amber-700">
+              Documents take 24–48 hours for admin review. You can still set up your profile in the meantime.
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3 bg-[#00c9b7] text-white rounded-xl font-bold text-xs hover:bg-[#00b5a4] transition-colors shadow-sm"
+          >
+            {isSubmitting ? 'Submitting Documents...' : 'Submit Verification & Proceed →'}
+          </button>
         </form>
       </div>
     </div>
