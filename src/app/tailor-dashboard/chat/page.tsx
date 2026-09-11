@@ -3,176 +3,183 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 
-const initialConversations = [
+interface Message {
+  id: string;
+  sender: 'tailor' | 'customer';
+  text: string;
+  timestamp: string;
+}
+
+interface Conversation {
+  id: string;
+  orderId: string;
+  customerName: string;
+  garmentType: string;
+  lastMessage: string;
+  unread: boolean;
+  messages: Message[];
+}
+
+const initialConversations: Conversation[] = [
   {
-    id: 'C-1',
-    customerName: 'Ananya Sharma',
-    orderId: 'REQ-101',
-    lastMessage: 'Will the silk lining be included in the price quote?',
-    time: '10:42 AM',
+    id: 'conv-1',
+    orderId: 'ORD-8091',
+    customerName: 'Priya Verma',
+    garmentType: 'Embroidered Lehenga Choli',
+    lastMessage: 'Can you please share a photo of the blouse embroidery progress?',
     unread: true,
     messages: [
-      { sender: 'customer', text: 'Hi, I submitted a request for an Anarkali suit.', time: '10:30 AM' },
-      { sender: 'tailor', text: 'Hello Ananya! Yes, I received your request and measurements.', time: '10:35 AM' },
-      { sender: 'customer', text: 'Will the silk lining be included in the price quote?', time: '10:42 AM' },
+      { id: 'm1', sender: 'customer', text: 'Hi! Just checking in on ORD-8091.', timestamp: '10:15 AM' },
+      { id: 'm2', sender: 'tailor', text: 'Hello Priya! We have completed cutting and started stitching.', timestamp: '10:18 AM' },
+      { id: 'm3', sender: 'customer', text: 'Can you please share a photo of the blouse embroidery progress?', timestamp: '10:20 AM' },
     ],
   },
   {
-    id: 'C-2',
-    customerName: 'Priya Verma',
-    orderId: 'ORD-8091',
-    lastMessage: 'Thank you! Looking forward to the fitting.',
-    time: 'Yesterday',
+    id: 'conv-2',
+    orderId: 'ORD-8095',
+    customerName: 'Vikram Mehta',
+    garmentType: '3-Piece Tuxedo Suit',
+    lastMessage: 'Thank you! Fitting on Thursday works for me.',
     unread: false,
     messages: [
-      { sender: 'tailor', text: 'Your Lehenga stitching is completed. Fitting is scheduled for tomorrow.', time: 'Yesterday' },
-      { sender: 'customer', text: 'Thank you! Looking forward to the fitting.', time: 'Yesterday' },
+      { id: 'm4', sender: 'tailor', text: 'Hi Vikram, your suit will be ready for first trial by Thursday.', timestamp: 'Yesterday' },
+      { id: 'm5', sender: 'customer', text: 'Thank you! Fitting on Thursday works for me.', timestamp: 'Yesterday' },
     ],
   },
 ];
 
 export default function ChatPage() {
-  const [conversations, setConversations] = useState(initialConversations);
-  const [activeChatId, setActiveChatId] = useState('C-1');
-  const [inputMessage, setInputMessage] = useState('');
-  const [mobileShowChat, setMobileShowChat] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
+  const [activeConvId, setActiveConvId] = useState<string>('conv-1');
+  const [newMessageText, setNewMessageText] = useState<string>('');
 
-  const activeChat = conversations.find((c) => c.id === activeChatId);
+  const activeConv = conversations.find((c) => c.id === activeConvId) || conversations[0];
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || !activeChat) return;
+    if (!newMessageText.trim()) return;
 
-    const newMessage = {
+    const newMsg: Message = {
+      id: `m-${Date.now()}`,
       sender: 'tailor',
-      text: inputMessage,
-      time: 'Just now',
+      text: newMessageText.trim(),
+      timestamp: 'Just now',
     };
 
     setConversations((prev) =>
-      prev.map((c) =>
-        c.id === activeChatId
-          ? {
-              ...c,
-              lastMessage: inputMessage,
-              time: 'Just now',
-              messages: [...c.messages, newMessage],
-            }
-          : c
-      )
+      prev.map((c) => {
+        if (c.id === activeConvId) {
+          return {
+            ...c,
+            lastMessage: newMsg.text,
+            messages: [...c.messages, newMsg],
+          };
+        }
+        return c;
+      })
     );
 
-    setInputMessage('');
+    setNewMessageText('');
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div className="space-y-4 h-[calc(100vh-8rem)] flex flex-col">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-thy-ink">Customer Communication</h1>
-          <p className="text-sm text-thy-muted">Discuss custom fitting requirements and order progress in real time.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Order Messages</h1>
+          <p className="text-xs text-gray-600">Direct communications with active order customers.</p>
         </div>
-        <Link 
-          href="/tailor-dashboard" 
-          className="text-sm font-semibold text-thy-brand hover:underline self-start"
-        >
+        <Link href="/tailor-dashboard" className="text-sm font-semibold text-[#00c9b7] hover:underline">
           ← Back to Dashboard
         </Link>
       </div>
 
-      <div className="bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-sm grid grid-cols-1 md:grid-cols-3 min-h-[min(70dvh,560px)] overflow-hidden">
-        
-        <div className={`${mobileShowChat ? 'hidden md:flex' : 'flex'} border-r border-thy-ink/10 flex-col`}>
-          <div className="p-4 border-b border-thy-ink/10 bg-thy-mist/50">
-            <h2 className="font-bold text-thy-ink text-sm">Recent Conversations</h2>
+      {/* Chat Container */}
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm flex-1 flex flex-col md:flex-row overflow-hidden">
+        {/* Left Sidebar: Conversations List */}
+        <div className="w-full md:w-80 border-r border-gray-100 flex flex-col">
+          <div className="p-3 border-b text-xs font-bold text-gray-500 uppercase tracking-wider">
+            Active Chats
           </div>
-          <div className="divide-y divide-thy-ink/10 flex-1 overflow-y-auto">
-            {conversations.map((chat) => (
+          <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+            {conversations.map((conv) => (
               <button
-                key={chat.id}
-                onClick={() => {
-                  setActiveChatId(chat.id);
-                  setMobileShowChat(true);
-                }}
-                className={`w-full text-left p-4 flex flex-col gap-1 transition-colors min-h-11 ${
-                  activeChatId === chat.id ? 'bg-thy-mist' : 'hover:bg-thy-mist'
+                key={conv.id}
+                onClick={() => setActiveConvId(conv.id)}
+                className={`w-full p-4 text-left transition-colors flex flex-col gap-1 ${
+                  activeConvId === conv.id ? 'bg-teal-50/60 border-l-4 border-[#00c9b7]' : 'hover:bg-gray-50'
                 }`}
               >
-                <div className="flex justify-between items-center gap-2">
-                  <span className="font-bold text-thy-ink text-sm truncate">{chat.customerName}</span>
-                  <span className="text-[10px] text-thy-subtle shrink-0">{chat.time}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-gray-900">{conv.customerName}</span>
+                  <span className="text-[10px] font-bold text-gray-400">{conv.orderId}</span>
                 </div>
-                <div className="text-xs font-semibold text-thy-brand">{chat.orderId}</div>
-                <p className="text-xs text-thy-muted truncate">{chat.lastMessage}</p>
+                <span className="text-[11px] font-semibold text-[#00c9b7]">{conv.garmentType}</span>
+                <p className="text-xs text-gray-500 truncate">{conv.lastMessage}</p>
               </button>
             ))}
           </div>
         </div>
 
-        {activeChat ? (
-          <div className={`${mobileShowChat ? 'flex' : 'hidden md:flex'} md:col-span-2 flex-col justify-between bg-thy-mist/40 min-h-[min(70dvh,560px)]`}>
-            <div className="p-4 bg-thy-surface border-b border-thy-ink/10 flex items-center gap-3">
-              <button
-                type="button"
-                className="md:hidden text-sm font-semibold text-thy-brand min-h-11"
-                onClick={() => setMobileShowChat(false)}
-              >
-                ← Chats
-              </button>
+        {/* Right Main Panel: Active Message Thread */}
+        {activeConv && (
+          <div className="flex-1 flex flex-col bg-gray-50/40">
+            {/* Thread Header */}
+            <div className="p-4 bg-white border-b border-gray-100 flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-thy-ink text-sm">{activeChat.customerName}</h3>
-                <span className="text-xs text-thy-muted">Ref: {activeChat.orderId}</span>
+                <h2 className="text-sm font-bold text-gray-900">{activeConv.customerName}</h2>
+                <p className="text-xs text-gray-500">
+                  Order <span className="font-semibold text-gray-700">{activeConv.orderId}</span> — {activeConv.garmentType}
+                </p>
               </div>
+              <Link
+                href="/tailor-dashboard/active-orders"
+                className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-xl text-xs font-semibold hover:bg-gray-200"
+              >
+                View Order
+              </Link>
             </div>
 
-            <div className="p-4 space-y-3 flex-1 overflow-y-auto">
-              {activeChat.messages.map((msg, idx) => (
+            {/* Message Messages Area */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-3">
+              {activeConv.messages.map((msg) => (
                 <div
-                  key={idx}
-                  className={`flex ${msg.sender === 'tailor' ? 'justify-end' : 'justify-start'}`}
+                  key={msg.id}
+                  className={`flex flex-col ${msg.sender === 'tailor' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] sm:max-w-[75%] p-3 rounded-2xl text-xs space-y-1 ${
+                    className={`max-w-xs md:max-w-md p-3 rounded-2xl text-xs ${
                       msg.sender === 'tailor'
-                        ? 'bg-thy-brand text-white rounded-br-none'
-                        : 'bg-thy-surface border border-thy-ink/10 text-thy-ink rounded-bl-none shadow-sm'
+                        ? 'bg-[#00c9b7] text-white rounded-tr-none'
+                        : 'bg-white border border-gray-100 text-gray-800 shadow-sm rounded-tl-none'
                     }`}
                   >
-                    <p>{msg.text}</p>
-                    <div
-                      className={`text-[9px] text-right ${
-                        msg.sender === 'tailor' ? 'text-thy-canvas/80' : 'text-thy-subtle'
-                      }`}
-                    >
-                      {msg.time}
-                    </div>
+                    {msg.text}
                   </div>
+                  <span className="text-[10px] text-gray-400 mt-1 px-1">{msg.timestamp}</span>
                 </div>
               ))}
             </div>
 
-            <form onSubmit={handleSendMessage} className="p-3 bg-thy-surface border-t border-thy-ink/10 flex gap-2">
+            {/* Input Form */}
+            <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-gray-100 flex gap-2">
               <input
                 type="text"
-                placeholder="Type your response..."
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                className="flex-1 min-w-0 px-4 py-3 border rounded-xl text-base sm:text-xs focus:outline-none focus:ring-2 focus:ring-thy-brand"
+                placeholder="Type your message to customer..."
+                value={newMessageText}
+                onChange={(e) => setNewMessageText(e.target.value)}
+                className="flex-1 px-4 py-2 border rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
               />
               <button
                 type="submit"
-                className="px-5 py-3 bg-thy-brand text-white font-semibold rounded-xl text-xs hover:bg-thy-brand-hover transition-colors min-h-11 shrink-0"
+                className="px-5 py-2 bg-[#00c9b7] text-white rounded-xl text-xs font-bold hover:bg-[#00b5a4] transition-colors"
               >
                 Send
               </button>
             </form>
           </div>
-        ) : (
-          <div className="hidden md:flex md:col-span-2 items-center justify-center text-thy-subtle text-xs">
-            Select a conversation to start chatting.
-          </div>
         )}
-
       </div>
     </div>
   );
