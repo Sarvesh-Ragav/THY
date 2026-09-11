@@ -3,114 +3,134 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 
-const initialNotifications = [
+interface NotificationItem {
+  id: string;
+  type: 'order' | 'quote' | 'payment' | 'system';
+  title: string;
+  message: string;
+  time: string;
+  isRead: boolean;
+  linkUrl: string;
+}
+
+const initialNotifications: NotificationItem[] = [
   {
-    id: 1,
-    type: 'request',
-    title: 'New Order Request Received',
-    description: 'Ananya Sharma submitted a custom request for a Designer Anarkali.',
-    time: '10 minutes ago',
-    unread: true,
+    id: 'notif-1',
+    type: 'quote',
+    title: 'Quote Accepted by Customer',
+    message: 'Aarav Sharma accepted your quotation of ₹12,000 for ORD-8098 (Sherwani).',
+    time: '10 mins ago',
+    isRead: false,
+    linkUrl: '/tailor-dashboard/active-orders',
   },
   {
-    id: 2,
-    type: 'payout',
-    title: 'Payout Processed',
-    description: 'Payment of ₹18,200 for settlement PAY-402 has been sent to your registered bank account.',
+    id: 'notif-2',
+    type: 'order',
+    title: 'New Custom Order Request',
+    message: 'Ananya Iyer submitted a request for Indo-Western Crop Top & Skirt.',
     time: '2 hours ago',
-    unread: true,
+    isRead: false,
+    linkUrl: '/tailor-dashboard/new-requests',
   },
   {
-    id: 3,
+    id: 'notif-3',
+    type: 'payment',
+    title: 'Bank Payout Processed',
+    message: 'Payout PAY-904 of ₹14,000 has been transferred to your registered bank account.',
+    time: 'Yesterday',
+    isRead: true,
+    linkUrl: '/tailor-dashboard/earnings',
+  },
+  {
+    id: 'notif-4',
     type: 'system',
     title: 'Profile Verification Update',
-    description: 'Your tailor studio documentation is currently under final review by THY Admin.',
-    time: '1 day ago',
-    unread: false,
+    message: 'Your tailor studio documentation is currently under final admin review.',
+    time: '2 days ago',
+    isRead: true,
+    linkUrl: '/tailor-dashboard',
   },
 ];
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
 
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+  const handleMarkAllRead = () => {
+    setNotifications((prev) => prev.map((item) => ({ ...item, isRead: true })));
   };
 
-  const clearNotification = (id: number) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  const handleClearNotification = (id: string) => {
+    setNotifications((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-thy-ink">Notifications & Alerts</h1>
-          <p className="text-sm text-thy-muted">Stay informed about order changes, customer updates, and system alerts.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Notifications</h1>
+          <p className="text-xs text-gray-600">Updates on order requests, quote acceptances, and payouts.</p>
         </div>
-        <Link 
-          href="/tailor-dashboard" 
-          className="text-sm font-semibold text-thy-brand hover:underline self-start"
-        >
-          ← Back to Dashboard
-        </Link>
-      </div>
-
-      {/* Action Bar */}
-      <div className="flex justify-between items-center bg-thy-surface p-4 rounded-2xl border border-thy-ink/10 shadow-sm">
-        <span className="text-xs font-semibold text-thy-muted">
-          Unread Alerts: {notifications.filter((n) => n.unread).length}
-        </span>
-        <button
-          onClick={markAllAsRead}
-          className="text-xs font-semibold text-thy-brand hover:underline"
-        >
-          Mark all as read
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleMarkAllRead}
+            className="text-xs font-semibold text-[#00c9b7] hover:underline"
+          >
+            Mark all as read
+          </button>
+          <Link href="/tailor-dashboard" className="text-sm font-semibold text-[#00c9b7] hover:underline">
+            ← Back to Dashboard
+          </Link>
+        </div>
       </div>
 
       {/* Notifications List */}
-      <div className="space-y-3">
+      <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
         {notifications.length > 0 ? (
-          notifications.map((item) => (
-            <div
-              key={item.id}
-              className={`p-4 rounded-2xl border transition-colors flex justify-between items-start gap-3 ${
-                item.unread 
-                  ? 'bg-thy-surface border-thy-brand/30 shadow-sm' 
-                  : 'bg-thy-mist/70 border-thy-ink/10'
-              }`}
-            >
-              <div className="flex gap-3">
-                <div className="text-xl">
-                  {item.type === 'request' && '📩'}
-                  {item.type === 'payout' && '💰'}
-                  {item.type === 'system' && '🔔'}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-sm font-bold text-thy-ink">{item.title}</h3>
-                    {item.unread && (
-                      <span className="w-2 h-2 rounded-full bg-thy-brand"></span>
-                    )}
-                  </div>
-                  <p className="text-xs text-thy-muted mt-0.5">{item.description}</p>
-                  <span className="text-[10px] text-thy-subtle mt-2 block">{item.time}</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => clearNotification(item.id)}
-                className="text-thy-subtle hover:text-thy-muted text-xs font-bold"
+          <div className="divide-y divide-gray-50">
+            {notifications.map((item) => (
+              <div
+                key={item.id}
+                className={`p-4 flex items-start justify-between gap-4 transition-colors ${
+                  item.isRead ? 'bg-white' : 'bg-teal-50/30'
+                }`}
               >
-                ✕
-              </button>
-            </div>
-          ))
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${
+                      item.isRead ? 'bg-gray-300' : 'bg-[#00c9b7]'
+                    }`}
+                  />
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xs font-bold text-gray-900">{item.title}</h3>
+                      <span className="text-[10px] text-gray-400">{item.time}</span>
+                    </div>
+                    <p className="text-xs text-gray-600">{item.message}</p>
+                    <Link
+                      href={item.linkUrl}
+                      className="inline-block text-[11px] font-semibold text-[#00c9b7] hover:underline pt-1"
+                    >
+                      View Details →
+                    </Link>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleClearNotification(item.id)}
+                  className="text-gray-400 hover:text-gray-600 text-xs font-bold px-1"
+                  title="Dismiss"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
         ) : (
-          <div className="bg-thy-surface p-8 rounded-2xl border border-thy-ink/10 text-center text-xs text-thy-muted">
-            No notifications available.
+          <div className="p-12 text-center space-y-2">
+            <div className="text-3xl">🔔</div>
+            <h3 className="text-base font-bold text-gray-800">No notifications</h3>
+            <p className="text-xs text-gray-500">You are all caught up!</p>
           </div>
         )}
       </div>
