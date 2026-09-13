@@ -28,6 +28,13 @@ export const AUTH_PATHS = [
   '/payment-methods',
   '/settings',
   '/notifications',
+  '/chat',
+  '/estimate-details',
+  '/checkout/address',
+  '/checkout/summary',
+  '/checkout/payment',
+  '/checkout/confirmation',
+  '/stitch-your-outfit/cart',
 ] as const;
 
 export interface GarmentCategory {

@@ -44,10 +44,10 @@ export default function RequestEstimatePage() {
           </p>
           <div className="pt-2">
             <Link
-              href="/tailor-dashboard/portfolio"
+              href="/chat?tailor=t1&from=estimate"
               className="inline-block px-6 py-3 bg-[#00c9b7] text-white font-extrabold text-xs rounded-2xl hover:bg-[#00b5a4] transition-all"
             >
-              Back to Dashboard
+              Open chat
             </Link>
           </div>
         </div>

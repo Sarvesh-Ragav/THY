@@ -1,212 +1,189 @@
 'use client';
 
-import React, { useState } from 'react';
-
-interface Message {
-  id: string;
-  sender: 'tailor' | 'customer';
-  text: string;
-  timestamp: string;
-}
-
-interface ChatConversation {
-  id: string;
-  customerName: string;
-  orderId: string;
-  garmentName: string;
-  avatar: string;
-  lastMessage: string;
-  lastTime: string;
-  unreadCount: number;
-  messages: Message[];
-}
-
-const INITIAL_CONVERSATIONS: ChatConversation[] = [
-  {
-    id: 'conv-1',
-    customerName: 'Ananya Ramesh',
-    orderId: 'THY-8842',
-    garmentName: 'Bridal Designer Blouse (Silk)',
-    avatar: 'AR',
-    lastMessage: 'Could you please make sure the back piping is gold?',
-    lastTime: '10:42 AM',
-    unreadCount: 1,
-    messages: [
-      { id: 'm1', sender: 'customer', text: 'Hi! I submitted my order estimate for the silk blouse.', timestamp: '10:30 AM' },
-      { id: 'm2', sender: 'tailor', text: 'Hello Ananya! Received it. I reviewed your measurements.', timestamp: '10:35 AM' },
-      { id: 'm3', sender: 'customer', text: 'Could you please make sure the back piping is gold?', timestamp: '10:42 AM' },
-    ],
-  },
-  {
-    id: 'conv-2',
-    customerName: 'Meera K.',
-    orderId: 'THY-8845',
-    garmentName: 'Heavy Anarkali Suit Set',
-    avatar: 'MK',
-    lastMessage: 'Got it, thank you! Let me know when material arrives.',
-    lastTime: 'Yesterday',
-    unreadCount: 0,
-    messages: [
-      { id: 'm4', sender: 'tailor', text: 'Hi Meera, order accepted! Please hand over the fabric by tomorrow.', timestamp: 'Yesterday 4:15 PM' },
-      { id: 'm5', sender: 'customer', text: 'Got it, thank you! Let me know when material arrives.', timestamp: 'Yesterday 4:30 PM' },
-    ],
-  },
-];
+import React, { useMemo, useState } from 'react';
+import { useC31 } from '@/hooks/useC31';
+import { appendMessage, nowStamp, patchThread } from '@/lib/c31';
 
 export default function TailorChatPage() {
-  const [conversations, setConversations] = useState<ChatConversation[]>(INITIAL_CONVERSATIONS);
-  const [activeConvId, setActiveConvId] = useState<string>(INITIAL_CONVERSATIONS[0].id);
-  const [inputText, setInputText] = useState('');
+  const { state, ready, save } = useC31();
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [text, setText] = useState('');
+  const [price, setPrice] = useState('');
+  const [note, setNote] = useState('Includes stitching, lining, and the discussed customizations.');
+  const [needsClarification, setNeedsClarification] = useState(false);
 
-  const activeConv = conversations.find((c) => c.id === activeConvId) || conversations[0];
+  const threads = state.threads;
+  const active = useMemo(
+    () => threads.find((thread) => thread.id === (activeId || threads[0]?.id)) ?? null,
+    [threads, activeId],
+  );
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputText.trim()) return;
+  if (!ready) return <p className="p-8 text-sm text-thy-subtle">Loading chat...</p>;
 
-    const newMessage: Message = {
-      id: `msg-${Date.now()}`,
-      sender: 'tailor',
-      text: inputText.trim(),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  const sendText = () => {
+    if (!active || !text.trim()) return;
+    const value = text.trim();
+    setText('');
+    save((current) => {
+      let next = appendMessage(current, active.id, {
+        id: `t-${Date.now()}`,
+        sender: 'tailor',
+        kind: 'text',
+        text: value,
+        createdAt: nowStamp(),
+        status: 'sent',
+      });
+      if (needsClarification && active.status === 'request_sent') {
+        next = patchThread(next, active.id, (thread) => ({
+          ...thread,
+          status: 'needs_clarification',
+          request: thread.request ? { ...thread.request, status: 'needs_clarification' } : thread.request,
+        }));
+      }
+      return next;
+    });
+    setNeedsClarification(false);
+  };
+
+  const sendPrice = () => {
+    if (!active || !price.trim()) return;
+    const quote = {
+      id: `q-${Date.now()}`,
+      price: price.trim(),
+      note,
+      sentAt: nowStamp(),
+      updated: Boolean(active.quotation),
     };
-
-    setConversations((prev) =>
-      prev.map((conv) => {
-        if (conv.id === activeConvId) {
-          return {
-            ...conv,
-            lastMessage: newMessage.text,
-            lastTime: newMessage.timestamp,
-            messages: [...conv.messages, newMessage],
-          };
-        }
-        return conv;
-      })
+    save((current) =>
+      patchThread(current, active.id, (thread) => ({
+        ...thread,
+        status: thread.quotation ? 'quotation_updated' : 'price_fixed',
+        quotation: quote,
+        request: thread.request ? { ...thread.request, status: 'priced' } : thread.request,
+        messages: [
+          ...thread.messages,
+          {
+            id: `quote-${Date.now()}`,
+            sender: 'tailor',
+            kind: 'quotation',
+            text: `Final price ₹${quote.price}`,
+            createdAt: nowStamp(),
+            status: 'sent',
+            quotation: quote,
+          },
+        ],
+      })),
     );
-
-    setInputText('');
+    setPrice('');
   };
 
   return (
-    <div className="p-4 md:p-8 min-h-screen bg-slate-50 text-slate-800 space-y-4">
-      
-      {/* Page Header */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex justify-between items-center">
+    <div className="p-4 md:p-8 min-h-screen bg-thy-bg text-thy-ink space-y-4">
+      <div className="thy-card p-5 flex justify-between items-center">
         <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Customer Messaging</h1>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Direct thread for customer inquiries, fittings, and order modifications.
-          </p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-thy-brand font-semibold">C31</p>
+          <h1 className="text-2xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+            Customer chat
+          </h1>
         </div>
-        <span className="text-xs font-bold text-[#00c9b7] bg-teal-50 border border-teal-200/60 px-3 py-1.5 rounded-full">
-          ● Live Chat Active
-        </span>
+        <span className="text-xs text-thy-brand">Online</span>
       </div>
 
-      {/* Main Chat Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[650px] bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-        
-        {/* Sidebar: Conversation List */}
-        <div className="border-r border-slate-100 flex flex-col h-full bg-slate-50/50">
-          <div className="p-4 border-b border-slate-100">
-            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Conversations</h2>
-          </div>
+      {threads.length === 0 ? (
+        <p className="text-sm text-thy-muted">No customer conversations yet. They start when a customer opens chat from a tailor profile.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[36rem]">
+          <aside className="thy-card overflow-hidden">
+            {threads.map((thread) => (
+              <button
+                key={thread.id}
+                type="button"
+                onClick={() => setActiveId(thread.id)}
+                className={`w-full text-left p-4 border-b border-thy-ink/10 ${
+                  thread.id === active?.id ? 'bg-thy-mist' : ''
+                }`}
+              >
+                <p className="text-sm font-medium">Customer</p>
+                <p className="text-xs text-thy-muted">{thread.tailorStudio} · {thread.status.replaceAll('_', ' ')}</p>
+              </button>
+            ))}
+          </aside>
 
-          <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
-            {conversations.map((conv) => {
-              const isActive = conv.id === activeConvId;
-              return (
-                <div
-                  key={conv.id}
-                  onClick={() => setActiveConvId(conv.id)}
-                  className={`p-4 transition-all cursor-pointer flex items-center gap-3 ${
-                    isActive ? 'bg-white border-l-4 border-[#00c9b7] shadow-xs' : 'hover:bg-slate-100/60'
-                  }`}
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#00c9b7]/10 text-[#00c9b7] font-extrabold text-xs flex items-center justify-center shrink-0 border border-[#00c9b7]/20">
-                    {conv.avatar}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-baseline mb-0.5">
-                      <h3 className="text-xs font-bold text-slate-900 truncate">{conv.customerName}</h3>
-                      <span className="text-[10px] text-slate-400 font-medium">{conv.lastTime}</span>
-                    </div>
-                    <p className="text-[10px] font-mono text-slate-400 font-semibold">{conv.orderId}</p>
-                    <p className="text-xs text-slate-500 truncate mt-1">{conv.lastMessage}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Active Chat Thread */}
-        <div className="md:col-span-2 flex flex-col h-full bg-white">
-          
-          {/* Thread Header */}
-          <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#00c9b7] text-white font-extrabold text-xs flex items-center justify-center shadow-xs">
-                {activeConv.avatar}
+          {active && (
+            <section className="md:col-span-2 thy-card flex flex-col">
+              <div className="p-4 border-b border-thy-ink/10">
+                <p className="text-sm">Thread · {active.status.replaceAll('_', ' ')}</p>
+                {active.request && (
+                  <p className="text-xs text-thy-muted mt-1">
+                    {active.request.garment} · {active.request.fabric} · {active.request.measurements}
+                  </p>
+                )}
               </div>
-              <div>
-                <h2 className="text-xs font-bold text-slate-900">{activeConv.customerName}</h2>
-                <p className="text-[11px] text-slate-500 font-medium">
-                  Order: <span className="font-semibold text-slate-700">{activeConv.garmentName}</span> ({activeConv.orderId})
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Messages Display Area */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/20">
-            {activeConv.messages.map((msg) => {
-              const isTailor = msg.sender === 'tailor';
-              return (
-                <div key={msg.id} className={`flex ${isTailor ? 'justify-end' : 'justify-start'}`}>
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[22rem]">
+                {active.messages.map((message) => (
                   <div
-                    className={`max-w-[75%] p-3.5 rounded-2xl text-xs space-y-1 shadow-xs ${
-                      isTailor
-                        ? 'bg-[#00c9b7] text-white rounded-tr-xs'
-                        : 'bg-white border border-slate-200 text-slate-800 rounded-tl-xs'
+                    key={message.id}
+                    className={`max-w-[80%] p-3 text-sm ${
+                      message.sender === 'tailor' ? 'ml-auto bg-thy-deep text-[#fbfefd]' : 'bg-thy-mist'
                     }`}
                   >
-                    <p className="leading-relaxed">{msg.text}</p>
-                    <span
-                      className={`block text-[9px] font-medium text-right ${
-                        isTailor ? 'text-teal-100' : 'text-slate-400'
-                      }`}
-                    >
-                      {msg.timestamp}
-                    </span>
+                    <p>{message.text}</p>
+                    <p className="text-[10px] opacity-70 mt-1">{message.createdAt}</p>
                   </div>
+                ))}
+              </div>
+
+              {(active.status === 'request_sent' || active.status === 'needs_clarification' || active.status === 'price_fixed') && (
+                <div className="p-4 border-t border-thy-ink/10 space-y-3 bg-thy-mist/60">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-thy-subtle">
+                    {active.quotation ? 'Update price' : 'Fix price'}
+                  </p>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={needsClarification}
+                      onChange={(event) => setNeedsClarification(event.target.checked)}
+                    />
+                    Clarification needed — send a chat note first
+                  </label>
+                  <input
+                    className="thy-input"
+                    placeholder="Final price"
+                    value={price}
+                    onChange={(event) => setPrice(event.target.value)}
+                  />
+                  <textarea
+                    className="thy-input min-h-20"
+                    value={note}
+                    onChange={(event) => setNote(event.target.value)}
+                  />
+                  <button type="button" onClick={sendPrice} className="hero-leather-btn w-full min-h-11 text-[11px] uppercase tracking-[0.16em]">
+                    Confirm / send final price
+                  </button>
                 </div>
-              );
-            })}
-          </div>
+              )}
 
-          {/* Message Input Form */}
-          <form onSubmit={handleSendMessage} className="p-3 border-t border-slate-100 flex gap-2 bg-white">
-            <input
-              type="text"
-              placeholder="Type your message or fitting update..."
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#00c9b7] focus:ring-1 focus:ring-[#00c9b7]"
-            />
-            <button
-              type="submit"
-              className="px-5 py-2.5 bg-[#00c9b7] text-white font-bold text-xs rounded-xl hover:bg-[#00b5a4] transition-all shadow-xs"
-            >
-              Send
-            </button>
-          </form>
-
+              <form
+                className="p-3 border-t border-thy-ink/10 flex gap-2"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  sendText();
+                }}
+              >
+                <input
+                  className="thy-input flex-1"
+                  value={text}
+                  onChange={(event) => setText(event.target.value)}
+                  placeholder="Reply to the customer..."
+                />
+                <button type="submit" className="hero-leather-btn px-5 text-[11px] uppercase tracking-[0.14em]">
+                  Send
+                </button>
+              </form>
+            </section>
+          )}
         </div>
-
-      </div>
-
+      )}
     </div>
   );
 }
