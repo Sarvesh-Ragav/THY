@@ -2,6 +2,19 @@ import { asFabricTreatments, type FabricTreatment } from '@/lib/design-studio';
 
 const STUDIO_DRAFT_KEY = 'thy-studio-draft';
 
+export interface GarmentCustomizationDetails {
+  neckline?: string;
+  sleeves?: string;
+  sleeveLength?: string;
+  length?: string;
+  silhouette?: string;
+  fit?: string;
+  sideSlit?: string;
+  hemStyle?: string;
+  frontStyle?: string;
+  garment?: string;
+}
+
 export interface StudioDraft {
   categoryId: string;
   fabricImage: string;
@@ -9,6 +22,11 @@ export interface StudioDraft {
   treatments: FabricTreatment[];
   bodyPhoto?: string;
   bodyPhotoLabel?: string;
+  patternImage?: string;
+  patternLabel?: string;
+  aiRender?: string;
+  tryOnRender?: string;
+  customization?: GarmentCustomizationDetails;
 }
 
 export function readFileAsDataUrl(file: File): Promise<string> {
@@ -35,6 +53,11 @@ export function readStudioDraft(categoryId?: string | null): StudioDraft | null 
       treatments: asFabricTreatments(parsed.treatments),
       bodyPhoto: parsed.bodyPhoto,
       bodyPhotoLabel: parsed.bodyPhotoLabel,
+      patternImage: parsed.patternImage,
+      patternLabel: parsed.patternLabel,
+      aiRender: parsed.aiRender,
+      tryOnRender: parsed.tryOnRender,
+      customization: parsed.customization,
     };
   } catch {
     return null;
@@ -59,5 +82,10 @@ export function patchStudioDraft(categoryId: string, patch: Partial<StudioDraft>
     treatments: patch.treatments ?? current?.treatments ?? [],
     bodyPhoto: patch.bodyPhoto ?? current?.bodyPhoto,
     bodyPhotoLabel: patch.bodyPhotoLabel ?? current?.bodyPhotoLabel,
+    patternImage: patch.patternImage !== undefined ? patch.patternImage : current?.patternImage,
+    patternLabel: patch.patternLabel !== undefined ? patch.patternLabel : current?.patternLabel,
+    aiRender: patch.aiRender !== undefined ? patch.aiRender : current?.aiRender,
+    tryOnRender: patch.tryOnRender !== undefined ? patch.tryOnRender : current?.tryOnRender,
+    customization: patch.customization !== undefined ? patch.customization : current?.customization,
   });
 }
