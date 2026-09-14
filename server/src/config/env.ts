@@ -17,6 +17,9 @@ const envSchema = z.object({
   OTP_RESEND_COOLDOWN_SECONDS: z.coerce.number().int().nonnegative().max(600).default(60),
   DEFAULT_PHONE_COUNTRY_CODE: z.string().regex(/^\+[1-9]\d{0,2}$/).default('+91'),
   EXPOSE_MOCK_OTP: booleanFromString.default('false'),
+  RAZORPAY_KEY_ID: z.string().min(1),
+  RAZORPAY_KEY_SECRET: z.string().min(1),
+  RAZORPAY_WEBHOOK_SECRET: z.string().min(1),
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -2,7 +2,19 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, configure the frontend and API:
+
+```bash
+cp .env.example .env.local
+cp server/.env.example server/.env
+cd server && npm install && npm run migrate && npm run dev
+```
+
+Set the three Razorpay values in `server/.env`. Configure Razorpay's webhook URL as
+`https://<your-api-host>/api/v1/payments/webhook`, using the same webhook secret,
+and subscribe to `payment.captured`, `payment.failed`, and `order.paid`.
+
+Then, in a second terminal, run the frontend:
 
 ```bash
 npm run dev

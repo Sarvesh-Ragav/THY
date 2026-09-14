@@ -1,71 +1,15 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
 import { CustomerPage } from '@/components/customer/CustomerPage';
 import { RequireCustomerAuth } from '@/components/customer/RequireCustomerAuth';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
-import { useC31 } from '@/hooks/useC31';
-import { chatHref } from '@/lib/c31';
+import { formatPaise, getOrders } from '@/lib/payment-api';
+import type { PersistedOrder } from '@/types/payment';
 
-export default function MyOrdersPage() {
-  return (
-    <RequireCustomerAuth>
-      <MyOrdersContent />
-    </RequireCustomerAuth>
-  );
-}
-
+export default function MyOrdersPage() { return <RequireCustomerAuth><MyOrdersContent /></RequireCustomerAuth>; }
 function MyOrdersContent() {
-  const { session } = useTailorSession();
-  const { state } = useC31();
-  const orders = [
-    ...state.orders.map((order) => ({
-      id: order.id,
-      title: order.title,
-      status: order.status,
-      threadId: order.threadId,
-      tailorName: order.tailorName,
-    })),
-    ...session.customerOrders
-      .filter((order) => !state.orders.some((item) => item.id === order.id))
-      .map((order) => ({
-        id: order.id,
-        title: order.title,
-        status: order.status,
-        threadId: '',
-        tailorName: '',
-      })),
-  ];
-
-  return (
-    <CustomerPage title="My Orders">
-      {orders.length === 0 ? (
-        <p className="text-sm text-thy-muted">No orders yet.</p>
-      ) : (
-        <ul className="space-y-3">
-          {orders.map((order) => {
-            const thread = state.threads.find((item) => item.id === order.threadId);
-            return (
-              <li key={order.id} className="thy-card p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <p>{order.title}</p>
-                  <p className="text-sm text-thy-subtle">{order.status}</p>
-                  {order.tailorName && <p className="text-xs text-thy-muted">{order.tailorName}</p>}
-                </div>
-                {thread && (
-                  <Link
-                    href={chatHref(thread.tailorId, 'order')}
-                    className="inline-flex items-center justify-center min-h-11 px-4 border border-thy-ink/15 text-sm"
-                  >
-                    Chat
-                  </Link>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </CustomerPage>
-  );
+  const { accessToken } = useTailorSession(); const [orders, setOrders] = useState<PersistedOrder[]>([]); const [loading, setLoading] = useState(true); const [error, setError] = useState<string | null>(null);
+  useEffect(() => { if (!accessToken) return; void getOrders(accessToken).then(({ orders: saved }) => setOrders(saved)).catch((reason) => setError(reason instanceof Error ? reason.message : 'Unable to load orders.')).finally(() => setLoading(false)); }, [accessToken]);
+  return <CustomerPage title="My Orders">{error ? <p className="text-sm text-red-700">{error}</p> : loading ? <p className="text-sm text-thy-muted">Loading orders...</p> : orders.length === 0 ? <p className="text-sm text-thy-muted">No orders yet.</p> : <ul className="space-y-3">{orders.map((order) => <li key={order.id} className="thy-card p-4"><p>{order.garmentName}</p><p className="text-sm text-thy-subtle">Payment: {order.paymentStatus} · Fulfillment: {order.fulfillmentStatus}</p><p className="text-xs text-thy-muted">{order.tailorName} · {formatPaise(order.amountPaise)}</p></li>)}</ul>}</CustomerPage>;
 }

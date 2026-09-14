@@ -19,6 +19,7 @@ import { logoutAuthentication, refreshAuthentication } from '@/lib/auth-api';
 interface TailorSessionContextValue {
   session: TailorSession;
   isReady: boolean;
+  accessToken: string | null;
   updateSession: (partial: Partial<TailorSession>) => TailorSession;
   completeAuthentication: (accessToken: string, role?: 'customer' | 'tailor' | null) => TailorSession;
   logout: () => void;
@@ -29,7 +30,7 @@ const TailorSessionContext = createContext<TailorSessionContextValue | null>(nul
 export function TailorSessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<TailorSession>(createDefaultSession);
   const [isReady, setIsReady] = useState(false);
-  const [, setAccessToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
     const localSession = loadTailorSession();
@@ -81,8 +82,8 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
   }, [session]);
 
   const value = useMemo(
-    () => ({ session, isReady, updateSession, completeAuthentication, logout }),
-    [session, isReady, updateSession, completeAuthentication, logout]
+    () => ({ session, isReady, accessToken, updateSession, completeAuthentication, logout }),
+    [session, isReady, accessToken, updateSession, completeAuthentication, logout]
   );
 
   return (
