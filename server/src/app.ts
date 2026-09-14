@@ -7,7 +7,9 @@ import { checkDatabase } from './db/pool.js';
 import { errorHandler, notFound } from './middleware/error-handler.js';
 import { authRouter } from './routes/auth.routes.js';
 import { paymentRouter } from './routes/payment.routes.js';
+import { meRouter, tailorRouter } from './routes/profile.routes.js';
 import { razorpayWebhook } from './controllers/payment.controller.js';
+import { categoryRouter, designRouter, directoryTailorRouter } from './routes/catalogue.routes.js';
 
 export const app = express();
 app.set('trust proxy', 1);
@@ -21,6 +23,11 @@ app.get('/api/v1/health', async (_request, response, next) => {
   try { await checkDatabase(); response.json({ success: true, data: { status: 'ok' } }); } catch (error) { next(error); }
 });
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/designs', designRouter);
+app.use('/api/v1/me', meRouter);
+app.use('/api/v1/tailors', tailorRouter);
+app.use('/api/v1/tailors', directoryTailorRouter);
 app.use('/api/v1/payments', paymentRouter);
 app.use(notFound);
 app.use(errorHandler);
