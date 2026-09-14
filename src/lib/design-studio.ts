@@ -1,3 +1,5 @@
+import { c15ToStudio, getC15Garment } from '@/lib/c15-catalog';
+
 export const STUDIO_STEPS = [
   { id: 'design', label: 'Design', href: '/stitch-your-outfit/preview' },
   { id: 'try-on', label: 'Try On', href: '/stitch-your-outfit/try-on' },
@@ -67,6 +69,8 @@ export function getStudioGarment(categoryId?: string | null): StudioGarment {
   if (categoryId && STUDIO_GARMENTS[categoryId]) {
     return STUDIO_GARMENTS[categoryId];
   }
+  const c15 = getC15Garment(categoryId);
+  if (c15) return c15ToStudio(c15);
   return STUDIO_GARMENTS.salwars;
 }
 

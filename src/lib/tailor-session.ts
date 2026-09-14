@@ -96,6 +96,8 @@ export interface CustomerDesignSave {
   fabric?: string;
   treatments?: string[];
   fabricImage?: string;
+  patternImage?: string;
+  patternLabel?: string;
   favorite?: boolean;
   createdAt?: string;
 }

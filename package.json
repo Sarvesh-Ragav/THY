@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/genai": "^2.22.0",
     "@hookform/resolvers": "^5.9.1",
     "clsx": "^2.1.1",
     "gsap": "^3.15.0",
