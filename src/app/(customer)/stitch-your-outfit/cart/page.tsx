@@ -88,8 +88,8 @@ const TRANSLATIONS = {
     estimatedTurnaround: 'Estimated Delivery Timeline',
     turnaroundDays: '4-6 Days (Includes Fabric Pickup, Cutting & Stitching)',
     printQuotation: 'Print Invoice',
-    checkoutHeading: 'Checkout & Fabric Pickup Setup',
-    checkoutSubheading: 'Complete doorstep fabric pickup details, measurements, and instant payment.',
+    checkoutHeading: 'Order Summary & Payment',
+    checkoutSubheading: 'Review your bespoke tailoring quotation and select your preferred payment mode.',
     step1Title: 'Doorstep Fabric Pickup Details',
     step1Sub: 'Address, pickup date & preferred time slot',
     step2Title: 'Measurement Preferences',
@@ -110,11 +110,7 @@ const TRANSLATIONS = {
     measureOptionBSub: 'Send a perfect-fitting existing blouse/garment for exact clone sizing.',
     measureOptionC: 'Use Saved Sizing Profile (Chest 36", Waist 30")',
     measureOptionCSub: 'Verified profile from previous order #THY-8842.',
-    payGPay: 'Google Pay / GPay',
-    payUPI: 'UPI ID / VPA',
-    payCard: 'Credit / Debit Card',
-    payCOP: 'Cash on Fabric Pickup',
-    placeOrderBtn: 'Confirm & Place Bespoke Order',
+    placeOrderBtn: 'Proceed to Payment',
     orderSuccessTitle: 'Bespoke Order Confirmed!',
     orderRef: 'Tracking Reference:',
     deliveryTimeline: 'Track Live Status:',
@@ -177,9 +173,6 @@ export default function StitchCartPage() {
   const [couponCode, setCouponCode] = useState('FESTIVETHY15');
   const [appliedDiscount, setAppliedDiscount] = useState(0.15);
   const [couponMsg, setCouponMsg] = useState({ text: '15% Festive Offer FESTIVETHY15 Applied!', type: 'success' });
-  const [pickupOption, setPickupOption] = useState('morning');
-  const [measurementOption, setMeasurementOption] = useState('optionA');
-  const [paymentMethod, setPaymentMethod] = useState('gpay');
 
   const t = TRANSLATIONS[lang];
 
@@ -187,10 +180,6 @@ export default function StitchCartPage() {
     return INITIAL_PRODUCT.addons.reduce((acc, addon) => {
       return selectedAddons[addon.id] ? acc + addon.price : acc;
     }, 0);
-  };
-
-  const calculateProductGrandTotal = () => {
-    return INITIAL_PRODUCT.baseStitchingPrice + calculateAddonsSubtotal();
   };
 
   const handleAddToCart = (shouldRedirect = false) => {
@@ -263,7 +252,6 @@ export default function StitchCartPage() {
   };
 
   const activeCartItems = cart.filter(i => !i.savedForLater);
-  const savedCartItems = cart.filter(i => i.savedForLater);
 
   const calculateItemTotal = (item: typeof cart[0] | null) => {
     if (!item) return 0;
@@ -278,15 +266,15 @@ export default function StitchCartPage() {
   const grandTotal = cartSubtotal - discountAmount + fittingFee + estimatedTax;
 
   return (
-    <div className="min-h-dvh bg-transparent text-thy-ink pb-16">
-      <header className="sticky top-0 z-40 bg-thy-canvas/90 border-b border-thy-burgundy/15 backdrop-blur-md">
+    <div className="min-h-dvh bg-transparent text-slate-800 pb-16">
+      <header className="sticky top-0 z-40 bg-white/90 border-b border-slate-200 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('product')}>
-              <div className="w-10 h-10 rounded-xl bg-thy-burgundy flex items-center justify-center text-white font-bold text-xl shadow-md shadow-thy-burgundy/30">
+              <div className="w-10 h-10 rounded-xl bg-[#26988a] flex items-center justify-center text-white font-bold text-xl shadow-md shadow-[#26988a]/30">
                 thy
               </div>
-              <span className="text-xl sm:text-2xl font-bold text-thy-ink tracking-tight">
+              <span className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
                 {t.brandName}
               </span>
             </div>
@@ -294,8 +282,8 @@ export default function StitchCartPage() {
             <nav className="hidden md:flex items-center space-x-2 bg-slate-100 p-1.5 rounded-full border border-slate-200">
               <button
                 onClick={() => setActiveTab('product')}
-                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 ${
-                  activeTab === 'product' ? 'bg-thy-burgundy text-white shadow' : 'text-slate-600 hover:text-thy-ink'
+                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                  activeTab === 'product' ? 'bg-[#26988a] text-white shadow' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <span className="w-5 h-5 rounded-full bg-white/20 text-center text-[10px] leading-5 font-bold">1</span>
@@ -304,15 +292,15 @@ export default function StitchCartPage() {
 
               <button
                 onClick={() => setActiveTab('cart')}
-                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 relative ${
-                  activeTab === 'cart' || activeTab === 'quotation' ? 'bg-thy-burgundy text-white shadow' : 'text-slate-600 hover:text-thy-ink'
+                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 relative cursor-pointer ${
+                  activeTab === 'cart' || activeTab === 'quotation' ? 'bg-[#26988a] text-white shadow' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <span className="w-5 h-5 rounded-full bg-white/20 text-center text-[10px] leading-5 font-bold">2</span>
                 <span>{t.navCart}</span>
                 {activeCartItems.length > 0 && (
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    activeTab === 'cart' || activeTab === 'quotation' ? 'bg-white text-thy-ink' : 'bg-thy-burgundy text-white'
+                    activeTab === 'cart' || activeTab === 'quotation' ? 'bg-white text-slate-900' : 'bg-[#26988a] text-white'
                   }`}>
                     {activeCartItems.reduce((acc, i) => acc + i.quantity, 0)}
                   </span>
@@ -321,8 +309,8 @@ export default function StitchCartPage() {
 
               <button
                 onClick={() => setActiveTab('checkout')}
-                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 ${
-                  activeTab === 'checkout' ? 'bg-thy-burgundy text-white shadow' : 'text-slate-600 hover:text-thy-ink'
+                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+                  activeTab === 'checkout' ? 'bg-[#26988a] text-white shadow' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 <span className="w-5 h-5 rounded-full bg-white/20 text-center text-[10px] leading-5 font-bold">3</span>
@@ -331,7 +319,7 @@ export default function StitchCartPage() {
             </nav>
 
             <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-              <Globe className="w-4 h-4 text-thy-burgundy" />
+              <Globe className="w-4 h-4 text-[#26988a]" />
               <select 
                 value={lang}
                 onChange={(e) => setLang(e.target.value as 'EN')}
@@ -345,16 +333,178 @@ export default function StitchCartPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        
+        {/* ========================================== */}
+        {/* STEP 1: PRODUCT DETAILS TAB */}
+        {/* ========================================== */}
+        {activeTab === 'product' && (
+          <div className="space-y-8">
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <span>{t.breadcrumbHome}</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span>{t.breadcrumbCategory}</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span className="font-bold text-slate-900">{INITIAL_PRODUCT.title}</span>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              
+              {/* Image Gallery */}
+              <div className="lg:col-span-6 space-y-4">
+                <div className="relative h-[420px] rounded-3xl overflow-hidden border border-slate-200 bg-slate-100 shadow-sm">
+                  <img 
+                    src={selectedImage} 
+                    alt={INITIAL_PRODUCT.title} 
+                    className="w-full h-full object-cover transition-all duration-300"
+                  />
+                  <span className="absolute top-4 left-4 bg-[#26988a] text-white text-[10px] font-black tracking-widest uppercase px-3 py-1 rounded-full shadow-md">
+                    {t.customTailoredBadge}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-4 gap-3">
+                  {INITIAL_PRODUCT.images.map((imgUrl, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImage(imgUrl)}
+                      className={`h-24 rounded-2xl overflow-hidden border-2 transition-all cursor-pointer ${
+                        selectedImage === imgUrl ? 'border-[#26988a] ring-2 ring-[#26988a]/30 scale-95' : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Product Info & Customizations */}
+              <div className="lg:col-span-6 space-y-6">
+                <div>
+                  <span className="text-[11px] font-black text-[#26988a] tracking-widest uppercase block mb-1">
+                    {INITIAL_PRODUCT.category}
+                  </span>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                    {INITIAL_PRODUCT.title}
+                  </h1>
+                  
+                  <div className="flex items-center gap-3 mt-2">
+                    <div className="flex items-center bg-amber-50 text-amber-700 px-2.5 py-1 rounded-md font-bold text-xs border border-amber-200/60">
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 mr-1" />
+                      {INITIAL_PRODUCT.rating}
+                    </div>
+                    <span className="text-xs text-slate-500 font-medium">{t.verifiedReviews}</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-xs text-emerald-600 font-semibold">{t.stockStatus}</span>
+                  </div>
+                </div>
+
+                {/* Master Tailor Info Card */}
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-[#26988a]/10 text-[#26988a] flex items-center justify-center font-bold shrink-0">
+                      <Scissors className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-extrabold text-slate-400 tracking-wider block uppercase">
+                        {t.stitchingHandledBy}
+                      </span>
+                      <h4 className="text-xs font-bold text-slate-900">{t.tailorName}</h4>
+                      <p className="text-[11px] text-slate-500">{t.tailorLocation}</p>
+                    </div>
+                  </div>
+                  <button className="px-3 py-1.5 bg-white border border-slate-200 hover:border-[#26988a] text-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1 cursor-pointer">
+                    <MessageCircle className="w-3.5 h-3.5 text-[#26988a]" />
+                    {t.chatBtn}
+                  </button>
+                </div>
+
+                {/* Add-on Customization Section */}
+                <div className="space-y-3">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">{t.customizeTitle}</h3>
+                    <p className="text-xs text-slate-500">{t.customizeSub}</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    {INITIAL_PRODUCT.addons.map((addon) => (
+                      <label 
+                        key={addon.id}
+                        className={`flex items-center justify-between p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                          selectedAddons[addon.id]
+                            ? 'border-[#26988a] bg-teal-50/40 ring-1 ring-[#26988a]'
+                            : 'border-slate-200 bg-white hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input 
+                            type="checkbox"
+                            checked={!!selectedAddons[addon.id]}
+                            onChange={(e) => setSelectedAddons({ ...selectedAddons, [addon.id]: e.target.checked })}
+                            className="w-4 h-4 rounded accent-[#26988a]"
+                          />
+                          <span className="text-xs font-semibold text-slate-800">{addon.name}</span>
+                        </div>
+                        <span className="text-xs font-bold text-[#26988a]">+₹{addon.price}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Live Quotation Summary & Add to Cart */}
+                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                  <div className="flex justify-between items-center text-xs text-slate-600 pb-2 border-b border-slate-100">
+                    <span>{t.baseStitching}: ₹{INITIAL_PRODUCT.baseStitchingPrice}</span>
+                    <span>{t.addonsCost}: ₹{calculateAddonsSubtotal()}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs text-slate-500 block">{t.totalQuotationLabel}</span>
+                      <span className="text-2xl font-black text-[#26988a]">
+                        ₹{(INITIAL_PRODUCT.baseStitchingPrice + calculateAddonsSubtotal()).toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                      {t.guaranteeText}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <button
+                      onClick={() => handleAddToCart(false)}
+                      className="py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <ShoppingBag className="w-4 h-4 text-[#26988a]" />
+                      {t.addToCart}
+                    </button>
+                    <button
+                      onClick={() => handleAddToCart(true)}
+                      className="py-3 px-4 bg-[#26988a] hover:bg-[#22877b] text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      {t.proceedToCart}
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* ========================================== */}
+        {/* STEP 2: SHOPPING CART TAB */}
+        {/* ========================================== */}
         {activeTab === 'cart' && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
               <div>
-                <h1 className="text-2xl font-extrabold text-thy-ink">{t.cartHeading}</h1>
+                <h1 className="text-2xl font-extrabold text-slate-900">{t.cartHeading}</h1>
                 <p className="text-xs text-slate-500 mt-1">{t.cartSubheading}</p>
               </div>
               <button 
                 onClick={() => setActiveTab('product')}
-                className="text-xs text-thy-burgundy hover:underline flex items-center gap-1 font-bold"
+                className="text-xs text-[#26988a] hover:underline flex items-center gap-1 font-bold cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 {t.continueCustomizing}
@@ -363,14 +513,14 @@ export default function StitchCartPage() {
 
             {activeCartItems.length === 0 ? (
               <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center space-y-4 shadow-sm">
-                <div className="w-16 h-16 bg-thy-mist rounded-full flex items-center justify-center mx-auto text-thy-burgundy">
+                <div className="w-16 h-16 bg-[#26988a]/10 rounded-full flex items-center justify-center mx-auto text-[#26988a]">
                   <ShoppingBag className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-bold text-thy-ink">{t.emptyCartTitle}</h3>
+                <h3 className="text-lg font-bold text-slate-900">{t.emptyCartTitle}</h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto">{t.emptyCartSub}</p>
                 <button
                   onClick={() => setActiveTab('product')}
-                  className="px-6 py-3 bg-thy-burgundy text-white font-bold text-xs rounded-full hover:bg-[#4A1520] transition-all shadow-md shadow-thy-burgundy/20"
+                  className="px-6 py-3 bg-[#26988a] text-white font-bold text-xs rounded-full hover:bg-[#22877b] transition-all shadow-md cursor-pointer"
                 >
                   {t.configureNow}
                 </button>
@@ -381,13 +531,13 @@ export default function StitchCartPage() {
                   {activeCartItems.map((item) => (
                     <div 
                       key={item.id}
-                      className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4 hover:border-thy-burgundy/20 transition-all"
+                      className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4 hover:border-[#26988a]/30 transition-all"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                         <div className="flex items-center gap-4">
                           <div 
                             onClick={() => setActiveTab('product')}
-                            className="relative group cursor-pointer flex-shrink-0"
+                            className="relative group cursor-pointer shrink-0"
                             title="Click to view Product Details"
                           >
                             <img 
@@ -403,18 +553,18 @@ export default function StitchCartPage() {
                           <div className="space-y-1">
                             <h2 
                               onClick={() => setActiveTab('product')}
-                              className="text-base font-bold text-thy-ink hover:text-thy-burgundy cursor-pointer transition-colors flex items-center gap-1.5"
+                              className="text-base font-bold text-slate-900 hover:text-[#26988a] cursor-pointer transition-colors flex items-center gap-1.5"
                               title="Click to view Product Details"
                             >
                               <span>{item.title}</span>
                               <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                             </h2>
                             <p className="text-xs text-slate-500 flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5 text-thy-burgundy" />
+                              <MapPin className="w-3.5 h-3.5 text-[#26988a]" />
                               {t.fabricProvided}
                             </p>
                             <div className="inline-flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-full text-[11px] text-slate-700 font-medium">
-                              <Scissors className="w-3.5 h-3.5 text-thy-burgundy" />
+                              <Scissors className="w-3.5 h-3.5 text-[#26988a]" />
                               <span>{item.tailorName} ({item.tailorExperience})</span>
                             </div>
                           </div>
@@ -424,16 +574,16 @@ export default function StitchCartPage() {
                           <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1">
                             <button
                               onClick={() => updateQuantity(item.id, -1)}
-                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-thy-ink hover:bg-white rounded-lg transition-colors"
+                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors cursor-pointer"
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
-                            <span className="w-8 text-center text-xs font-bold text-thy-ink">
+                            <span className="w-8 text-center text-xs font-bold text-slate-900">
                               {item.quantity}
                             </span>
                             <button
                               onClick={() => updateQuantity(item.id, 1)}
-                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-thy-ink hover:bg-white rounded-lg transition-colors"
+                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors cursor-pointer"
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>
@@ -441,7 +591,7 @@ export default function StitchCartPage() {
 
                           <div className="text-right">
                             <span className="text-[11px] text-slate-400 block">{t.quantity} Total</span>
-                            <span className="text-xl font-extrabold text-thy-burgundy">
+                            <span className="text-xl font-extrabold text-[#26988a]">
                               ₹{calculateItemTotal(item)}
                             </span>
                           </div>
@@ -451,24 +601,24 @@ export default function StitchCartPage() {
                       <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                         <button
                           onClick={() => handleOpenQuotationPage(item)}
-                          className="px-4 py-2 bg-thy-mist hover:bg-thy-mist text-thy-ink border border-thy-burgundy/20 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-sm"
+                          className="px-4 py-2 bg-teal-50 hover:bg-teal-100/60 text-slate-800 border border-teal-200 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-xs cursor-pointer"
                         >
-                          <FileText className="w-4 h-4 text-thy-burgundy" />
+                          <FileText className="w-4 h-4 text-[#26988a]" />
                           <span>{t.viewQuotationBtn}</span>
-                          <ChevronRight className="w-3.5 h-3.5 text-thy-burgundy" />
+                          <ChevronRight className="w-3.5 h-3.5 text-[#26988a]" />
                         </button>
 
                         <div className="flex items-center gap-4 text-xs">
                           <button
                             onClick={() => removeItem(item.id)}
-                            className="text-rose-600 hover:text-rose-700 flex items-center gap-1 font-semibold transition-colors"
+                            className="text-rose-600 hover:text-rose-700 flex items-center gap-1 font-semibold transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                             {t.deleteItem}
                           </button>
                           <button
                             onClick={() => toggleSaveForLater(item.id)}
-                            className="text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors"
+                            className="text-slate-500 hover:text-slate-800 flex items-center gap-1 transition-colors cursor-pointer"
                           >
                             {t.saveForLater}
                           </button>
@@ -480,13 +630,13 @@ export default function StitchCartPage() {
 
                 <div className="lg:col-span-4 space-y-5 sticky top-24">
                   <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
-                    <h2 className="text-lg font-bold text-thy-ink border-b border-slate-200 pb-3">
+                    <h2 className="text-lg font-bold text-slate-900 border-b border-slate-200 pb-3">
                       {t.orderSummary}
                     </h2>
 
                     <form onSubmit={handleApplyCoupon} className="space-y-2">
                       <label className="text-xs text-slate-600 font-semibold flex items-center gap-1.5">
-                        <Tag className="w-3.5 h-3.5 text-thy-burgundy" />
+                        <Tag className="w-3.5 h-3.5 text-[#26988a]" />
                         {t.promoLabel}
                       </label>
                       <div className="flex gap-2">
@@ -495,17 +645,17 @@ export default function StitchCartPage() {
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value)}
                           placeholder="FESTIVETHY15"
-                          className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 uppercase focus:outline-none focus:border-thy-burgundy"
+                          className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 uppercase focus:outline-none focus:border-[#26988a]"
                         />
                         <button 
                           type="submit"
-                          className="px-4 py-2 bg-slate-800 text-xs font-bold text-white rounded-xl hover:bg-slate-900 transition-colors"
+                          className="px-4 py-2 bg-slate-800 text-xs font-bold text-white rounded-xl hover:bg-slate-900 transition-colors cursor-pointer"
                         >
                           {t.applyBtn}
                         </button>
                       </div>
                       {couponMsg.text && (
-                        <p className={`text-[11px] font-semibold ${couponMsg.type === 'error' ? 'text-rose-600' : 'text-thy-burgundy'}`}>
+                        <p className={`text-[11px] font-semibold ${couponMsg.type === 'error' ? 'text-rose-600' : 'text-[#26988a]'}`}>
                           {couponMsg.text}
                         </p>
                       )}
@@ -514,11 +664,11 @@ export default function StitchCartPage() {
                     <div className="space-y-2.5 text-xs text-slate-600 border-t border-b border-slate-200 py-4">
                       <div className="flex justify-between">
                         <span>{t.subtotal}:</span>
-                        <span className="font-bold text-thy-ink">₹{cartSubtotal}</span>
+                        <span className="font-bold text-slate-900">₹{cartSubtotal}</span>
                       </div>
                       
                       {appliedDiscount > 0 && (
-                        <div className="flex justify-between text-thy-burgundy font-semibold">
+                        <div className="flex justify-between text-[#26988a] font-semibold">
                           <span>{t.discount}:</span>
                           <span>- ₹{discountAmount.toFixed(0)}</span>
                         </div>
@@ -526,28 +676,28 @@ export default function StitchCartPage() {
 
                       <div className="flex justify-between">
                         <span>{t.pickupFee}:</span>
-                        <span className="font-bold text-thy-ink">₹{fittingFee}</span>
+                        <span className="font-bold text-slate-900">₹{fittingFee}</span>
                       </div>
 
                       <div className="flex justify-between">
                         <span>{t.estimatedTax}:</span>
-                        <span className="font-bold text-thy-ink">₹{estimatedTax.toFixed(0)}</span>
+                        <span className="font-bold text-slate-900">₹{estimatedTax.toFixed(0)}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="text-xs text-slate-500 block">{t.grandTotal}</span>
-                        <span className="text-2xl font-extrabold text-thy-burgundy">₹{grandTotal.toFixed(0)}</span>
+                        <span className="text-2xl font-extrabold text-[#26988a]">₹{grandTotal.toFixed(0)}</span>
                       </div>
-                      <span className="text-[10px] text-thy-burgundy bg-thy-mist border border-thy-burgundy/20 px-2 py-1 rounded-full font-bold">
+                      <span className="text-[10px] text-[#26988a] bg-teal-50 border border-teal-200 px-2 py-1 rounded-full font-bold">
                         {t.guaranteedPricing}
                       </span>
                     </div>
 
                     <button
                       onClick={() => setActiveTab('checkout')}
-                      className="w-full py-4 bg-thy-burgundy hover:bg-[#4A1520] text-white font-bold rounded-full shadow-lg shadow-thy-burgundy/30 flex items-center justify-center gap-2 text-xs transition-all transform hover:scale-[1.01]"
+                      className="w-full py-4 bg-[#26988a] hover:bg-[#22877b] text-white font-bold rounded-full shadow-lg shadow-[#26988a]/20 flex items-center justify-center gap-2 text-xs transition-all cursor-pointer"
                     >
                       <span>{t.proceedToCheckout}</span>
                     </button>
@@ -557,6 +707,136 @@ export default function StitchCartPage() {
             )}
           </div>
         )}
+
+        {/* ========================================== */}
+        {/* QUOTATION BREAKDOWN MODAL / VIEW */}
+        {/* ========================================== */}
+        {activeTab === 'quotation' && selectedQuotationItem && (
+          <div className="max-w-3xl mx-auto space-y-6">
+            <button
+              onClick={() => setActiveTab('cart')}
+              className="text-xs font-bold text-[#26988a] hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              {t.backToCart}
+            </button>
+
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+              <div className="flex justify-between items-start border-b border-slate-100 pb-4">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">{t.quotationPageTitle}</h2>
+                  <p className="text-xs text-slate-500 mt-0.5">{selectedQuotationItem.title}</p>
+                </div>
+                <div className="text-right text-xs">
+                  <span className="font-mono text-slate-500 block">ID: THY-QT-{selectedQuotationItem.id.slice(-4)}</span>
+                  <span className="text-emerald-600 font-semibold">Verified Quotation</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t.stitchingBreakdownTitle}</h4>
+                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-2 text-xs">
+                  <div className="flex justify-between py-1 border-b border-slate-200/60">
+                    <span className="text-slate-700">Base Garment Stitching</span>
+                    <span className="font-bold text-slate-900">₹{selectedQuotationItem.stitchingCost}</span>
+                  </div>
+                  {selectedQuotationItem.customizations.map((c, idx) => (
+                    <div key={idx} className="flex justify-between py-1 border-b border-slate-200/60">
+                      <span className="text-slate-600">+ {c.name}</span>
+                      <span className="font-semibold text-slate-800">₹{c.cost}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between pt-2 text-sm font-extrabold text-[#26988a]">
+                    <span>Item Total (Qty x {selectedQuotationItem.quantity})</span>
+                    <span>₹{calculateItemTotal(selectedQuotationItem)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  onClick={() => setActiveTab('checkout')}
+                  className="px-6 py-3 bg-[#26988a] hover:bg-[#22877b] text-white font-bold text-xs rounded-full shadow-md transition-all cursor-pointer"
+                >
+                  {t.proceedToCheckoutFromQuotation}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================== */}
+        {/* STEP 3: CHECKOUT & PAYMENT SUMMARY TAB */}
+        {/* ========================================== */}
+        {activeTab === 'checkout' && (
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div>
+              <h1 className="text-2xl font-extrabold text-slate-900">Order Summary & Payment</h1>
+              <p className="text-xs text-slate-500 mt-1">Review your bespoke tailoring quotation and proceed with Razorpay secure payment.</p>
+            </div>
+
+            {/* Order Summary Breakdown Card */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-slate-100 pb-3">
+                <ShoppingBag className="w-4 h-4 text-[#26988a]" /> Custom Outfit Breakdown
+              </h3>
+
+              <div className="space-y-3 text-xs">
+                {activeCartItems.map((item) => (
+                  <div key={item.id} className="flex justify-between items-start border-b border-slate-50 pb-2">
+                    <div>
+                      <span className="font-bold text-slate-900 block text-sm">{item.quantity}x {item.title}</span>
+                      <span className="text-slate-500 flex items-center gap-1 mt-0.5">
+                        <Scissors className="w-3.5 h-3.5 text-[#26988a]" /> Tailor: {item.tailorName}
+                      </span>
+                    </div>
+                    <span className="font-extrabold text-slate-900 text-sm">₹{calculateItemTotal(item)}</span>
+                  </div>
+                ))}
+
+                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Doorstep Pickup Address</span>
+                  <p className="text-slate-700 flex items-start gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-[#26988a] shrink-0 mt-0.5" />
+                    <span>Flat 4B, Ceebros Apartments, Adyar, Chennai - 600020</span>
+                  </p>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 flex justify-between items-center text-sm font-black">
+                  <span className="text-slate-800">Total Payable Amount</span>
+                  <span className="text-[#26988a] text-lg">₹{grandTotal.toFixed(0)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Razorpay Secure Gateway Option Card */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-2 border-b border-slate-100 pb-3">
+                <CreditCard className="w-4 h-4 text-[#26988a]" /> Payment Gateway
+              </h3>
+
+              <label className="p-4 rounded-2xl border border-[#26988a] bg-teal-50/40 ring-1 ring-[#26988a] cursor-pointer flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <input type="radio" checked readOnly className="accent-[#26988a]" />
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 block">Razorpay Secure Checkout</span>
+                    <span className="text-[11px] text-slate-500">Supports UPI, Google Pay, Credit/Debit Cards, Net Banking & Wallets</span>
+                  </div>
+                </div>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Trusted</span>
+              </label>
+            </div>
+
+            {/* Proceed to Payment Button */}
+            <button
+              onClick={() => alert("Redirecting to Razorpay secure payment gateway...")}
+              className="w-full py-4 bg-[#26988a] hover:bg-[#22877b] text-white font-bold rounded-2xl shadow-sm text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Proceed to Payment • ₹{grandTotal.toFixed(0)}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
       </main>
     </div>
   );
