@@ -41,20 +41,13 @@ export interface GarmentCategory {
   id: string;
   title: string;
   image: string;
-  group: 'Women' | 'Men';
 }
 
 export const GARMENT_CATEGORIES: GarmentCategory[] = [
-  { id: 'kurti', title: 'Kurti', image: '/hero/fabric-beige.png', group: 'Women' },
-  { id: 'salwar-suit', title: 'Salwar Suit / Churidar', image: '/hero/fabric-charcoal.png', group: 'Women' },
-  { id: 'blouse', title: 'Blouse', image: '/hero/fabric-olive.png', group: 'Women' },
-  { id: 'top', title: 'Top', image: '/hero/fabric-beige.png', group: 'Women' },
-  { id: 'dress', title: 'Dress (Frock + Gown)', image: '/hero/hero-couple.png', group: 'Women' },
-  { id: 'lehenga', title: 'Lehenga', image: '/hero/fabric-charcoal.png', group: 'Women' },
-  { id: 'shirt', title: "Shirt / Men's Shirt", image: '/hero/fabric-olive.png', group: 'Men' },
-  { id: 'mens-kurta', title: "Men's Kurta", image: '/hero/fabric-beige.png', group: 'Men' },
-  { id: 'sherwani', title: 'Sherwani', image: '/hero/fabric-olive.png', group: 'Men' },
-  { id: 'blazer-coat', title: 'Blazer / Coat', image: '/hero/fabric-charcoal.png', group: 'Men' },
+  { id: 'sarees', title: 'Sarees', image: '/hero/fabric-charcoal.png' },
+  { id: 'salwars', title: 'Salwars & Suits', image: '/hero/fabric-beige.png' },
+  { id: 'sherwanis', title: 'Sherwanis', image: '/hero/fabric-olive.png' },
+  { id: 'lehengas', title: 'Lehengas', image: '/hero/hero-couple.png' },
 ];
 
 export interface CatalogDesign {
