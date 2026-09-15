@@ -55,7 +55,7 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
         identifier: storedName || local.identifier,
       });
     } else {
-      setSession({ ...local, isAuthenticated: false });
+      setSession({ ...local, isAuthenticated: false, identifier: '' });
     }
   }, []);
 
@@ -81,7 +81,11 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
       .finally(() => setIsReady(true));
 
     window.addEventListener('storage', syncSessionFromStorage);
-    return () => window.removeEventListener('storage', syncSessionFromStorage);
+    window.addEventListener('thy-auth-change', syncSessionFromStorage);
+    return () => {
+      window.removeEventListener('storage', syncSessionFromStorage);
+      window.removeEventListener('thy-auth-change', syncSessionFromStorage);
+    };
   }, [syncSessionFromStorage]);
 
   const updateSession = useCallback((partial: Partial<TailorSession>) => {
@@ -113,6 +117,7 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
       localStorage.removeItem('thy_session');
       localStorage.removeItem('thy_user');
       localStorage.removeItem('tailor_session');
+      window.dispatchEvent(new Event('thy-auth-change'));
     }
 
     const resetSession = createDefaultSession();

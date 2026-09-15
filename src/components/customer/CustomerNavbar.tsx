@@ -16,12 +16,13 @@ export function CustomerNavbar() {
   const [locationOpen, setLocationOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
   const profileRef = useRef<HTMLDivElement>(null);
   const desktopLocationRef = useRef<HTMLDivElement>(null);
   const mobileLocationRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Step 2: Simplified auth check bypassing strict onboarding flags for dev smooth testing
+  // Directly evaluate session state managed by TailorSessionProvider
   const loggedIn = isReady && session.isAuthenticated;
   const displayName = session.identifier || 'Account';
 
@@ -63,11 +64,12 @@ export function CustomerNavbar() {
     }
   }, [searchOpen]);
 
+  // Handle logout with global context state update & smooth SPA redirection
   const handleLogout = () => {
     logout();
     setProfileOpen(false);
     setMenuOpen(false);
-    router.push('/');
+    router.push('/login');
     router.refresh();
   };
 
@@ -124,6 +126,7 @@ export function CustomerNavbar() {
         >
           <Search size={16} className="text-thy-subtle shrink-0 mr-2" />
           <input
+            ref={searchInputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search designs, styles or tailors..."
@@ -214,7 +217,7 @@ export function CustomerNavbar() {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation Controls */}
         <div className="flex lg:hidden items-center gap-0.5 ml-auto shrink-0">
           <button
             type="button"
