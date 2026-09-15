@@ -286,28 +286,6 @@ export function CustomerChatView({
       </header>
 
       <div className="mt-5 grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.8fr)] gap-4">
-<<<<<<< Updated upstream
-        <section className="thy-card flex flex-col min-h-[32rem]">
-          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 max-h-[32rem]">
-            {thread.messages.map((message) => (
-              <article
-                key={message.id}
-                className={`max-w-[85%] p-3 text-sm ${
-                  message.sender === 'customer'
-                    ? 'ml-auto bg-thy-deep text-[#FBF6ED]'
-                    : 'bg-thy-mist text-thy-ink'
-                }`}
-              >
-                {message.kind === 'attachment' && message.attachment && (
-                  <div className="mb-2">
-                    {message.attachment.preview && (
-                      <img src={message.attachment.preview} alt="" className="h-24 w-full object-cover mb-2" />
-                    )}
-                    <p className="text-[10px] uppercase tracking-[0.14em] opacity-80">{message.attachment.kind}</p>
-                    {message.attachment.href && (
-                      <Link href={message.attachment.href} className="underline text-xs">
-                        Open preview
-=======
         <section className="thy-card flex flex-col min-h-[34rem]">
           {/* Message stream */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 max-h-[34rem]">
@@ -332,7 +310,6 @@ export function CustomerChatView({
                     isCustomer ? 'ml-auto bg-thy-deep text-[#fbfefd]' : 'bg-thy-mist text-thy-ink'
                   }`}
                 >
-                  {/* Visual Attachment (Dress or Fabric) */}
                   {message.kind === 'attachment' && message.attachment && (
                     <div className="mb-2 p-2 bg-black/10 rounded-sm">
                       {message.attachment.preview && (
@@ -355,7 +332,6 @@ export function CustomerChatView({
                     </div>
                   )}
 
-                  {/* Measurement Card */}
                   {message.kind === 'measurements' && (
                     <div className="mb-2 p-2.5 border border-white/20 bg-black/10 rounded-sm space-y-1">
                       <div className="flex items-center gap-1.5 text-xs font-semibold">
@@ -375,14 +351,12 @@ export function CustomerChatView({
                     </div>
                   )}
 
-                  {/* Voice Player */}
                   {message.kind === 'voice' && message.voiceUrl && (
                     <div className="mb-2">
                       <audio controls src={resolveMediaUrl(message.voiceUrl)} className="w-full h-8" />
                     </div>
                   )}
 
-                  {/* Tailor Quotation Card */}
                   {message.kind === 'quotation' && message.quotation && (
                     <div className="border border-white/20 p-3 space-y-2 bg-thy-mist/10 rounded-sm">
                       <div className="flex justify-between items-center">
@@ -400,7 +374,6 @@ export function CustomerChatView({
                         className="inline-flex text-xs underline font-medium mt-1 text-thy-brand"
                       >
                         Proceed to Checkout
->>>>>>> Stashed changes
                       </Link>
                     </div>
                   )}

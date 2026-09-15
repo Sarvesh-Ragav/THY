@@ -1,16 +1,18 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { Bell, LogOut, User } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { ThyLogo } from '@/components/auth/ThyLogo';
 
 const NAV_LINKS = [
   { label: 'Dashboard', href: '/tailor-dashboard' },
-  { label: 'New Requests', href: '/tailor-dashboard/new-requests' },
-  { label: 'Active Orders', href: '/tailor-dashboard/active-orders' },
-  { label: 'Portfolio', href: '/tailor-dashboard/portfolio' }, // 👈 Separated from Profile
+  { label: 'Requests', href: '/tailor-dashboard/new-requests' },
+  { label: 'Orders', href: '/tailor-dashboard/active-orders' },
+  { label: 'Chat', href: '/tailor-dashboard/chat' },
+  { label: 'Portfolio', href: '/tailor-dashboard/portfolio' },
   { label: 'Earnings', href: '/tailor-dashboard/earnings' },
   { label: 'Availability', href: '/tailor-dashboard/availability' },
   { label: 'Settings', href: '/tailor-dashboard/settings' },
@@ -33,7 +35,6 @@ export default function TailorDashboardLayout({
     }
   }, [isReady, session.isAuthenticated, router]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -44,103 +45,108 @@ export default function TailorDashboardLayout({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    setIsDropdownOpen(false);
+  }, [pathname]);
+
   if (!isReady || !session.isAuthenticated) {
     return (
-      <div className="min-h-dvh flex items-center justify-center text-sm text-thy-muted">
+      <div className="min-h-dvh flex items-center justify-center text-sm text-thy-muted font-sans">
         Loading...
       </div>
     );
   }
 
-  const displayName = session.identifier || session.profile?.fullName || 'Tailor Account';
+  const displayName = session.profile?.fullName || session.identifier || 'Tailor Account';
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* Top Navigation Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-          {/* Brand Logo */}
-          <div className="flex items-center gap-3">
-            <Link href="/tailor-dashboard" className="font-serif font-extrabold text-xl tracking-wider text-slate-900">
-              THY
-            </Link>
-          </div>
+    <div
+      className="thy-app-glow min-h-dvh bg-transparent text-thy-ink flex flex-col"
+      style={{ fontFamily: 'var(--font-outfit), sans-serif' }}
+    >
+      <header className="thy-silk-bar sticky top-0 z-50 border-b border-white/20 pt-[env(safe-area-inset-top)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 lg:h-[4.5rem] flex items-center gap-3">
+          <Link
+            href="/tailor-dashboard"
+            className="shrink-0 inline-flex items-center text-white"
+            aria-label="THY tailor home"
+          >
+            <ThyLogo size={40} />
+          </Link>
 
-          {/* User Profile Dropdown Menu */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              type="button"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs px-3.5 py-1.5 rounded-full font-bold border border-teal-200/60 transition-colors cursor-pointer"
+          <p className="hidden sm:block text-[11px] uppercase tracking-[0.18em] text-white/70">
+            Tailor workspace
+          </p>
+
+          <div className="ml-auto flex items-center gap-1">
+            <Link
+              href="/tailor-dashboard/notifications"
+              aria-label="Notifications"
+              className="thy-nav-icon inline-flex items-center justify-center h-11 w-11"
             >
-              <svg className="w-3.5 h-3.5 text-teal-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              <span>{displayName}</span>
-            </button>
+              <Bell size={18} />
+            </Link>
 
-            {/* Floating Dropdown Card */}
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="px-4 py-3 border-b border-slate-100">
-                  <p className="text-xs font-black text-slate-900 truncate">{displayName}</p>
-                  <p className="text-[10px] font-semibold text-slate-400">Tailor Partner Account</p>
-                </div>
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen((open) => !open)}
+                className="thy-nav-link thy-nav-link-tall inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] min-h-11 px-2"
+              >
+                <User size={14} />
+                <span className="max-w-[10rem] truncate">{displayName}</span>
+              </button>
 
-                <div className="py-1 text-xs font-semibold text-slate-700">
-                  <Link
-                    href="/tailor-dashboard/profile-preview"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center px-4 py-2 hover:bg-slate-50 transition-colors"
-                  >
-                    My Atelier Profile
-                  </Link>
-                  <Link
-                    href="/tailor-dashboard/portfolio"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center px-4 py-2 hover:bg-slate-50 transition-colors"
-                  >
-                    Work Portfolio
-                  </Link>
-                  <Link
-                    href="/tailor-dashboard/settings"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center px-4 py-2 hover:bg-slate-50 transition-colors"
-                  >
-                    Settings
-                  </Link>
-                  <Link
-                    href="/help"
-                    onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center px-4 py-2 hover:bg-slate-50 transition-colors"
-                  >
-                    Help & Support
-                  </Link>
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-thy-surface border border-thy-ink/10 shadow-xl py-2 z-50 rounded-xl">
+                  <div className="px-4 py-3 border-b border-thy-burgundy/10">
+                    <p className="text-xs font-semibold text-thy-ink truncate">{displayName}</p>
+                    <p className="text-[10px] text-thy-subtle uppercase tracking-[0.14em] mt-0.5">
+                      Tailor partner
+                    </p>
+                  </div>
+                  <div className="py-1">
+                    <Link
+                      href="/tailor-dashboard/profile-preview"
+                      className="block px-4 py-2.5 text-xs font-medium text-thy-ink hover:bg-thy-mist"
+                    >
+                      My atelier profile
+                    </Link>
+                    <Link
+                      href="/tailor-dashboard/portfolio"
+                      className="block px-4 py-2.5 text-xs font-medium text-thy-ink hover:bg-thy-mist"
+                    >
+                      Work portfolio
+                    </Link>
+                    <Link
+                      href="/tailor-dashboard/settings"
+                      className="block px-4 py-2.5 text-xs font-medium text-thy-ink hover:bg-thy-mist"
+                    >
+                      Settings
+                    </Link>
+                  </div>
+                  <div className="border-t border-thy-burgundy/10 pt-1 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsDropdownOpen(false);
+                        logout();
+                        router.push('/login');
+                      }}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-thy-brand hover:bg-thy-mist text-left"
+                    >
+                      <LogOut size={12} />
+                      Logout
+                    </button>
+                  </div>
                 </div>
-
-                <div className="border-t border-slate-100 pt-1 mt-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsDropdownOpen(false);
-                      logout();
-                      router.push('/login');
-                    }}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors text-left"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Logout
-                  </button>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
         <div className="border-t border-white/15 px-4 sm:px-6">
-          <div className="max-w-7xl mx-auto flex items-center gap-1 overflow-x-auto thy-scroll-x">
+          <nav className="max-w-7xl mx-auto flex items-center gap-1 overflow-x-auto thy-scroll-x">
             {NAV_LINKS.map((link) => {
               const isActive =
                 pathname === link.href ||
@@ -157,7 +163,7 @@ export default function TailorDashboardLayout({
                 </Link>
               );
             })}
-          </div>
+          </nav>
         </div>
       </header>
 

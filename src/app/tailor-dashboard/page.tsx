@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { TailorPage } from '@/components/tailor/TailorPage';
 
 export default function TailorDashboardPage() {
   const [isAvailable, setIsAvailable] = useState(true);
@@ -11,34 +12,21 @@ export default function TailorDashboardPage() {
   const displayName = session?.profile?.fullName || session?.identifier || 'Priya S!';
 
   return (
-    <div className="space-y-6 text-thy-ink">
-      {/* Welcome Banner */}
-      <div 
-        className="relative rounded-3xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center overflow-hidden shadow-sm border border-thy-mist/60 bg-cover bg-center"
-        style={{
-          backgroundImage: `linear-gradient(to right, rgba(247, 240, 228, 0.95), rgba(251, 246, 237, 0.88), rgba(255, 255, 255, 0.75)), url('https://images.unsplash.com/photo-1528458876861-544fd1761a91?auto=format&fit=crop&w=1200&q=80')`
-        }}
-      >
-        <div className="space-y-1 z-10">
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#3F1218] tracking-tight">
-            Welcome back, {displayName}
-          </h1>
-          <p className="text-xs md:text-sm text-thy-ink/90 font-medium">
-            Manage your tailoring orders and grow your business with THY.
-          </p>
-        </div>
-        <div className="mt-4 md:mt-0 text-right z-10 hidden lg:block">
-          <p className="text-xs font-bold text-thy-burgundy italic tracking-wide">
-            "Your Skill, Our Support — A More Stylish Tomorrow ♡"
-          </p>
-        </div>
-      </div>
-
+    <TailorPage
+      title={`Welcome back, ${displayName}`}
+      description="Manage your tailoring orders and grow your business with THY."
+      actions={
+        <p className="hidden lg:block text-xs font-semibold text-thy-burgundy italic tracking-wide max-w-xs text-right">
+          Your Skill, Our Support — A More Stylish Tomorrow
+        </p>
+      }
+    >
+      <div className="space-y-6">
       {/* Top Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* New Requests */}
-        <div className="bg-thy-canvas/90 backdrop-blur-md p-4 rounded-2xl border border-thy-burgundy/10 shadow-xs flex items-center gap-4 hover:shadow-md transition-shadow">
-          <div className="w-12 h-12 rounded-2xl bg-thy-mist/80 border border-thy-mist text-[#5C1A24] flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="thy-card p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+          <div className="w-12 h-12 rounded-2xl bg-thy-mist/80 border border-thy-mist text-thy-burgundy flex items-center justify-center shrink-0 overflow-hidden">
             <img 
               src="https://images.unsplash.com/photo-1584208124888-3a20b9c799e2?auto=format&fit=crop&w=150&q=80" 
               alt="Design Sketch" 
@@ -48,15 +36,15 @@ export default function TailorDashboardPage() {
           <div className="space-y-0.5">
             <p className="text-xs font-semibold text-thy-muted">New Order Requests</p>
             <p className="text-xl font-black text-thy-ink">3</p>
-            <Link href="/tailor-dashboard/new-requests" className="text-[11px] font-bold text-[#5C1A24] hover:underline block">
+            <Link href="/tailor-dashboard/new-requests" className="text-[11px] font-bold text-thy-burgundy hover:underline block">
               View Requests →
             </Link>
           </div>
         </div>
 
         {/* Active Orders */}
-        <div className="bg-thy-canvas/90 backdrop-blur-md p-4 rounded-2xl border border-thy-burgundy/10 shadow-xs flex items-center gap-4 hover:shadow-md transition-shadow">
-          <div className="w-12 h-12 rounded-2xl bg-thy-mist/80 border border-thy-mist text-[#5C1A24] flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="thy-card p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+          <div className="w-12 h-12 rounded-2xl bg-thy-mist/80 border border-thy-mist text-thy-burgundy flex items-center justify-center shrink-0 overflow-hidden">
             <img 
               src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=150&q=80" 
               alt="Sewing Machine" 
@@ -66,14 +54,14 @@ export default function TailorDashboardPage() {
           <div className="space-y-0.5">
             <p className="text-xs font-semibold text-thy-muted">Active Orders</p>
             <p className="text-xl font-black text-thy-ink">5</p>
-            <Link href="/tailor-dashboard/active-orders" className="text-[11px] font-bold text-[#5C1A24] hover:underline block">
+            <Link href="/tailor-dashboard/active-orders" className="text-[11px] font-bold text-thy-burgundy hover:underline block">
               View Orders →
             </Link>
           </div>
         </div>
 
         {/* Completed Orders */}
-        <div className="bg-thy-canvas/90 backdrop-blur-md p-4 rounded-2xl border border-thy-burgundy/10 shadow-xs flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div className="thy-card p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
           <div className="w-12 h-12 rounded-2xl bg-thy-mist/80 border border-thy-mist text-thy-burgundy flex items-center justify-center shrink-0 overflow-hidden">
             <img 
               src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=150&q=80" 
@@ -89,8 +77,8 @@ export default function TailorDashboardPage() {
         </div>
 
         {/* Total Earnings */}
-        <div className="bg-thy-canvas/90 backdrop-blur-md p-4 rounded-2xl border border-thy-burgundy/10 shadow-xs flex items-center gap-4 hover:shadow-md transition-shadow">
-          <div className="w-12 h-12 rounded-2xl bg-thy-mist/80 border border-thy-mist text-[#5C1A24] flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="thy-card p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+          <div className="w-12 h-12 rounded-2xl bg-thy-mist/80 border border-thy-mist text-thy-burgundy flex items-center justify-center shrink-0 overflow-hidden">
             <img 
               src="https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?auto=format&fit=crop&w=150&q=80" 
               alt="Shopping Bags" 
@@ -100,14 +88,14 @@ export default function TailorDashboardPage() {
           <div className="space-y-0.5">
             <p className="text-xs font-semibold text-thy-muted">Total Earnings</p>
             <p className="text-xl font-black text-thy-ink">₹ 18,600</p>
-            <Link href="/tailor-dashboard/earnings" className="text-[11px] font-bold text-[#5C1A24] hover:underline block">
+            <Link href="/tailor-dashboard/earnings" className="text-[11px] font-bold text-thy-burgundy hover:underline block">
               View Reports →
             </Link>
           </div>
         </div>
 
         {/* Verification Status */}
-        <div className="bg-thy-canvas/90 backdrop-blur-md p-4 rounded-2xl border border-thy-burgundy/10 shadow-xs flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div className="thy-card p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
           <div className="w-12 h-12 rounded-2xl bg-thy-mist/80 border border-thy-mist text-thy-burgundy flex items-center justify-center shrink-0 overflow-hidden">
             <img 
               src="https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=150&q=80" 
@@ -134,13 +122,13 @@ export default function TailorDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* New Order Requests */}
-            <div className="bg-thy-canvas/90 backdrop-blur-md rounded-2xl border border-thy-burgundy/10 shadow-xs p-5 space-y-4">
+            <div className="thy-card p-5 space-y-4">
               <div className="flex justify-between items-center border-b border-thy-burgundy/10 pb-3">
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-bold text-thy-ink">New Order Requests</h2>
-                  <span className="bg-[#5C1A24] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
+                  <span className="bg-thy-burgundy text-white text-[10px] font-bold px-2 py-0.5 rounded-full">3</span>
                 </div>
-                <Link href="/tailor-dashboard/new-requests" className="text-xs font-bold text-[#5C1A24] hover:underline">
+                <Link href="/tailor-dashboard/new-requests" className="text-xs font-bold text-thy-burgundy hover:underline">
                   View All →
                 </Link>
               </div>
@@ -151,7 +139,7 @@ export default function TailorDashboardPage() {
                     <img
                       src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=400&q=80"
                       alt="Anarkali Suit"
-                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15/60"
+                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15"
                     />
                     <div className="space-y-0.5 text-xs">
                       <p className="font-extrabold text-thy-ink">#REQ-1024</p>
@@ -161,12 +149,12 @@ export default function TailorDashboardPage() {
                     </div>
                   </div>
                   <div className="text-right space-y-2 shrink-0">
-                    <span className="bg-thy-mist text-[#5C1A24] font-bold px-2 py-0.5 rounded-md text-[9px] inline-block">
+                    <span className="bg-thy-mist text-thy-burgundy font-bold px-2 py-0.5 rounded-md text-[9px] inline-block">
                       New Request
                     </span>
                     <Link
                       href="/tailor-dashboard/new-requests"
-                      className="px-3 py-1.5 bg-[#5C1A24] text-white rounded-xl text-xs font-bold hover:bg-[#4A1520] transition-colors block text-center shadow-2xs"
+                      className="px-3 py-1.5 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-active transition-colors block text-center shadow-2xs"
                     >
                       View Details
                     </Link>
@@ -178,7 +166,7 @@ export default function TailorDashboardPage() {
                     <img
                       src="https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=400&q=80"
                       alt="Blouse Design"
-                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15/60"
+                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15"
                     />
                     <div className="space-y-0.5 text-xs">
                       <p className="font-extrabold text-thy-ink">#REQ-1025</p>
@@ -188,12 +176,12 @@ export default function TailorDashboardPage() {
                     </div>
                   </div>
                   <div className="text-right space-y-2 shrink-0">
-                    <span className="bg-thy-mist text-[#5C1A24] font-bold px-2 py-0.5 rounded-md text-[9px] inline-block">
+                    <span className="bg-thy-mist text-thy-burgundy font-bold px-2 py-0.5 rounded-md text-[9px] inline-block">
                       New Request
                     </span>
                     <Link
                       href="/tailor-dashboard/new-requests"
-                      className="px-3 py-1.5 bg-[#5C1A24] text-white rounded-xl text-xs font-bold hover:bg-[#4A1520] transition-colors block text-center shadow-2xs"
+                      className="px-3 py-1.5 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-active transition-colors block text-center shadow-2xs"
                     >
                       View Details
                     </Link>
@@ -205,7 +193,7 @@ export default function TailorDashboardPage() {
                     <img
                       src="https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=400&q=80"
                       alt="Kurta Set"
-                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15/60"
+                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15"
                     />
                     <div className="space-y-0.5 text-xs">
                       <p className="font-extrabold text-thy-ink">#REQ-1026</p>
@@ -215,12 +203,12 @@ export default function TailorDashboardPage() {
                     </div>
                   </div>
                   <div className="text-right space-y-2 shrink-0">
-                    <span className="bg-thy-mist text-[#5C1A24] font-bold px-2 py-0.5 rounded-md text-[9px] inline-block">
+                    <span className="bg-thy-mist text-thy-burgundy font-bold px-2 py-0.5 rounded-md text-[9px] inline-block">
                       New Request
                     </span>
                     <Link
                       href="/tailor-dashboard/new-requests"
-                      className="px-3 py-1.5 bg-[#5C1A24] text-white rounded-xl text-xs font-bold hover:bg-[#4A1520] transition-colors block text-center shadow-2xs"
+                      className="px-3 py-1.5 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-active transition-colors block text-center shadow-2xs"
                     >
                       View Details
                     </Link>
@@ -230,13 +218,13 @@ export default function TailorDashboardPage() {
             </div>
 
             {/* Active Orders */}
-            <div className="bg-thy-canvas/90 backdrop-blur-md rounded-2xl border border-thy-burgundy/10 shadow-xs p-5 space-y-4">
+            <div className="thy-card p-5 space-y-4">
               <div className="flex justify-between items-center border-b border-thy-burgundy/10 pb-3">
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-bold text-thy-ink">Active Orders</h2>
-                  <span className="bg-[#5C1A24] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">5</span>
+                  <span className="bg-thy-burgundy text-white text-[10px] font-bold px-2 py-0.5 rounded-full">5</span>
                 </div>
-                <Link href="/tailor-dashboard/active-orders" className="text-xs font-bold text-[#5C1A24] hover:underline">
+                <Link href="/tailor-dashboard/active-orders" className="text-xs font-bold text-thy-burgundy hover:underline">
                   View All →
                 </Link>
               </div>
@@ -247,7 +235,7 @@ export default function TailorDashboardPage() {
                     <img
                       src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=400&q=80"
                       alt="Lehenga"
-                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15/60"
+                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15"
                     />
                     <div className="space-y-0.5 text-xs">
                       <p className="font-extrabold text-thy-ink">#ORD-1008</p>
@@ -262,7 +250,7 @@ export default function TailorDashboardPage() {
                     </span>
                     <Link
                       href="/tailor-dashboard/active-orders"
-                      className="px-3 py-1.5 bg-[#5C1A24] text-white rounded-xl text-xs font-bold hover:bg-[#4A1520] transition-colors block text-center shadow-2xs"
+                      className="px-3 py-1.5 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-active transition-colors block text-center shadow-2xs"
                     >
                       View Details
                     </Link>
@@ -274,7 +262,7 @@ export default function TailorDashboardPage() {
                     <img
                       src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=400&q=80"
                       alt="Frock"
-                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15/60"
+                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15"
                     />
                     <div className="space-y-0.5 text-xs">
                       <p className="font-extrabold text-thy-ink">#ORD-1009</p>
@@ -289,7 +277,7 @@ export default function TailorDashboardPage() {
                     </span>
                     <Link
                       href="/tailor-dashboard/active-orders"
-                      className="px-3 py-1.5 bg-[#5C1A24] text-white rounded-xl text-xs font-bold hover:bg-[#4A1520] transition-colors block text-center shadow-2xs"
+                      className="px-3 py-1.5 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-active transition-colors block text-center shadow-2xs"
                     >
                       View Details
                     </Link>
@@ -301,7 +289,7 @@ export default function TailorDashboardPage() {
                     <img
                       src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80"
                       alt="Sherwani"
-                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15/60"
+                      className="w-14 h-16 object-cover rounded-xl shrink-0 shadow-xs border border-thy-burgundy/15"
                     />
                     <div className="space-y-0.5 text-xs">
                       <p className="font-extrabold text-thy-ink">#ORD-1010</p>
@@ -316,7 +304,7 @@ export default function TailorDashboardPage() {
                     </span>
                     <Link
                       href="/tailor-dashboard/active-orders"
-                      className="px-3 py-1.5 bg-[#5C1A24] text-white rounded-xl text-xs font-bold hover:bg-[#4A1520] transition-colors block text-center shadow-2xs"
+                      className="px-3 py-1.5 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-active transition-colors block text-center shadow-2xs"
                     >
                       View Details
                     </Link>
@@ -336,7 +324,7 @@ export default function TailorDashboardPage() {
           >
             <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md border border-white/30 uppercase tracking-wider">
+                <span className="bg-thy-surface/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full backdrop-blur-md border border-white/30 uppercase tracking-wider">
                   Tailoring Tip
                 </span>
                 <h3 className="text-base font-bold mt-2">Fabric Quality & Precision Fitting</h3>
@@ -346,7 +334,7 @@ export default function TailorDashboardPage() {
               </div>
               <Link 
                 href="/tailor-dashboard/portfolio" 
-                className="px-4 py-2 bg-white text-[#3F1218] text-xs font-extrabold rounded-xl hover:bg-thy-mist transition-colors shadow-sm shrink-0"
+                className="px-4 py-2 bg-thy-surface text-thy-ink text-xs font-extrabold rounded-xl hover:bg-thy-mist transition-colors shadow-sm shrink-0"
               >
                 Upload Work
               </Link>
@@ -356,10 +344,10 @@ export default function TailorDashboardPage() {
           {/* Activity Feeds */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            <div className="bg-thy-canvas/90 backdrop-blur-md p-5 rounded-2xl border border-thy-burgundy/10 shadow-xs space-y-3">
+            <div className="thy-card p-5 space-y-3">
               <div className="flex justify-between items-center border-b border-thy-burgundy/10 pb-3">
                 <h3 className="text-xs font-bold text-thy-ink">Recent Notifications</h3>
-                <Link href="/tailor-dashboard/notifications" className="text-[11px] font-bold text-[#5C1A24] hover:underline">
+                <Link href="/tailor-dashboard/notifications" className="text-[11px] font-bold text-thy-burgundy hover:underline">
                   View All →
                 </Link>
               </div>
@@ -379,10 +367,10 @@ export default function TailorDashboardPage() {
               </div>
             </div>
 
-            <div className="bg-thy-canvas/90 backdrop-blur-md p-5 rounded-2xl border border-thy-burgundy/10 shadow-xs space-y-3">
+            <div className="thy-card p-5 space-y-3">
               <div className="flex justify-between items-center border-b border-thy-burgundy/10 pb-3">
                 <h3 className="text-xs font-bold text-thy-ink">Recent Messages</h3>
-                <Link href="/tailor-dashboard/chat" className="text-[11px] font-bold text-[#5C1A24] hover:underline">
+                <Link href="/tailor-dashboard/chat" className="text-[11px] font-bold text-thy-burgundy hover:underline">
                   View All →
                 </Link>
               </div>
@@ -422,7 +410,7 @@ export default function TailorDashboardPage() {
         {/* Right Sidebar */}
         <div className="space-y-6">
           
-          <div className="bg-thy-canvas/90 backdrop-blur-md p-5 rounded-2xl border border-thy-burgundy/10 shadow-xs space-y-4">
+          <div className="thy-card p-5 space-y-4">
             <h3 className="text-xs font-bold text-thy-ink">Your Availability</h3>
             <div className="flex items-center justify-between">
               <div>
@@ -434,11 +422,11 @@ export default function TailorDashboardPage() {
               <button
                 onClick={() => setIsAvailable(!isAvailable)}
                 className={`w-12 h-6 rounded-full p-1 transition-colors cursor-pointer ${
-                  isAvailable ? 'bg-[#5C1A24]' : 'bg-thy-mist'
+                  isAvailable ? 'bg-thy-burgundy' : 'bg-thy-mist'
                 }`}
               >
                 <div
-                  className={`w-4 h-4 rounded-full bg-white transition-transform shadow-xs ${
+                  className={`w-4 h-4 rounded-full bg-thy-surface transition-transform shadow-xs ${
                     isAvailable ? 'translate-x-6' : 'translate-x-0'
                   }`}
                 />
@@ -451,7 +439,7 @@ export default function TailorDashboardPage() {
                 alt="Boutique Studio"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent flex items-end p-2.5">
+              <div className="absolute inset-0 bg-gradient-to-t from-thy-deep/70 to-transparent flex items-end p-2.5">
                 <span className="text-[10px] font-bold text-white tracking-wide">
                   ✂ Studio Status: Active & Operational
                 </span>
@@ -466,10 +454,10 @@ export default function TailorDashboardPage() {
             </Link>
           </div>
 
-          <div className="bg-thy-canvas/90 backdrop-blur-md p-5 rounded-2xl border border-thy-burgundy/10 shadow-xs space-y-3">
+          <div className="thy-card p-5 space-y-3">
             <div className="flex justify-between items-center border-b border-thy-burgundy/10 pb-3">
               <h3 className="text-xs font-bold text-thy-ink">Earnings & Reports</h3>
-              <Link href="/tailor-dashboard/earnings" className="text-[11px] font-bold text-[#5C1A24] hover:underline">
+              <Link href="/tailor-dashboard/earnings" className="text-[11px] font-bold text-thy-burgundy hover:underline">
                 View Reports →
               </Link>
             </div>
@@ -494,7 +482,7 @@ export default function TailorDashboardPage() {
                 alt="Revenue Analytics"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent flex items-end p-2.5">
+              <div className="absolute inset-0 bg-gradient-to-t from-thy-deep/70 to-transparent flex items-end p-2.5">
                 <span className="text-[10px] font-bold text-white tracking-wide">
                   📈 Monthly Growth: +18% vs Last Month
                 </span>
@@ -502,10 +490,10 @@ export default function TailorDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-thy-canvas/90 backdrop-blur-md p-5 rounded-2xl border border-thy-burgundy/10 shadow-xs space-y-3">
+          <div className="thy-card p-5 space-y-3">
             <div className="flex justify-between items-center border-b border-thy-burgundy/10 pb-3">
               <h3 className="text-xs font-bold text-thy-ink">Your Portfolio</h3>
-              <Link href="/tailor-dashboard/portfolio" className="text-[11px] font-bold text-[#5C1A24] hover:underline">
+              <Link href="/tailor-dashboard/portfolio" className="text-[11px] font-bold text-thy-burgundy hover:underline">
                 View Portfolio →
               </Link>
             </div>
@@ -541,6 +529,7 @@ export default function TailorDashboardPage() {
         </div>
 
       </div>
-    </div>
+      </div>
+    </TailorPage>
   );
 }

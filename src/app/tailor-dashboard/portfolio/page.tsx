@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { TailorPage } from '@/components/tailor/TailorPage';
 
 interface PortfolioItem {
   id: string;
@@ -143,36 +144,30 @@ export default function TailorPortfolioManagementPage() {
   };
 
   return (
-    <div className="space-y-6 text-thy-ink">
-      {/* Header with Route Switcher */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-thy-canvas/90 p-5 rounded-2xl border border-thy-burgundy/15/80 shadow-xs">
-        <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-            Portfolio & Gallery Management
-          </h1>
-          <p className="text-xs text-thy-muted font-medium mt-0.5">
-            Manage your finished work, pricing ranges, and active service offerings.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl w-full sm:w-auto">
-          <span className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-thy-canvas/90 text-[#5C1A24] shadow-xs text-center">
-            ⚙️ Tailor Management
+    <TailorPage
+      title="Portfolio"
+      description="Manage finished work, pricing ranges, and active service offerings."
+      actions={
+        <div className="flex items-center gap-2 bg-thy-mist p-1.5 w-full sm:w-auto">
+          <span className="flex-1 sm:flex-none px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] bg-thy-burgundy text-white text-center">
+            Management
           </span>
           <Link
             href="/tailor-dashboard/profile-preview"
-            className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:text-thy-ink transition-all text-center"
+            className="flex-1 sm:flex-none px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-thy-muted hover:text-thy-ink text-center"
           >
-            👁️ Public Profile Preview
+            Public preview
           </Link>
         </div>
-      </div>
+      }
+    >
+      <div className="space-y-6 text-thy-ink">
 
       {/* Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <button
           onClick={() => setIsAddWorkOpen(true)}
-          className="p-5 bg-gradient-to-r from-[#00c9b7] to-[#00b5a4] text-white rounded-2xl font-bold text-sm shadow-sm hover:opacity-95 transition-all flex items-center justify-between group cursor-pointer"
+          className="p-5 bg-gradient-to-r from-thy-burgundy to-thy-brand-hover text-white rounded-2xl font-bold text-sm shadow-sm hover:opacity-95 transition-all flex items-center justify-between group cursor-pointer"
         >
           <div className="text-left">
             <p className="text-base font-extrabold">+ Add New Work</p>
@@ -183,35 +178,35 @@ export default function TailorPortfolioManagementPage() {
 
         <button
           onClick={() => setIsEditServicesOpen(true)}
-          className="p-5 bg-white border border-slate-200 rounded-2xl font-bold text-sm text-slate-800 shadow-xs hover:bg-slate-50 transition-all flex items-center justify-between cursor-pointer"
+          className="p-5 bg-thy-surface border border-thy-burgundy/15 rounded-2xl font-bold text-sm text-thy-ink shadow-xs hover:bg-thy-mist transition-all flex items-center justify-between cursor-pointer"
         >
           <div className="text-left">
-            <p className="text-base font-extrabold text-slate-900">Edit Services Offered</p>
-            <p className="text-xs text-slate-500 font-normal">Manage tailoring services & set min/max rates</p>
+            <p className="text-base font-extrabold text-thy-ink">Edit Services Offered</p>
+            <p className="text-xs text-thy-muted font-normal">Manage tailoring services & set min/max rates</p>
           </div>
-          <span className="text-slate-400">✂️</span>
+          <span className="text-thy-subtle">✂️</span>
         </button>
       </div>
 
       {/* Manage Work Grid */}
-      <div className="bg-thy-canvas/90 p-6 rounded-2xl border border-thy-burgundy/15/80 shadow-xs space-y-4">
-        <div className="flex justify-between items-center border-b border-slate-100 pb-4">
+      <div className="thy-card p-6 space-y-4">
+        <div className="flex justify-between items-center border-b border-thy-burgundy/10 pb-4">
           <h2 className="text-base font-bold text-thy-ink">Your Work Gallery ({portfolioItems.length})</h2>
-          <p className="text-xs text-slate-400 hidden sm:block">Featured items display prominently on your public profile</p>
+          <p className="text-xs text-thy-subtle hidden sm:block">Featured items display prominently on your public profile</p>
         </div>
 
         {portfolioItems.length === 0 ? (
           <div className="text-center py-12 border-2 border-dashed border-thy-burgundy/15 rounded-2xl space-y-3">
-            <div className="w-16 h-16 bg-thy-mist text-[#5C1A24] rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+            <div className="w-16 h-16 bg-thy-mist text-thy-burgundy rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
               🧵
             </div>
-            <h3 className="text-base font-bold text-slate-800">Empty Portfolio</h3>
+            <h3 className="text-base font-bold text-thy-ink">Empty Portfolio</h3>
             <p className="text-xs text-thy-muted max-w-sm mx-auto">
               Show customers what you can create. Add your services, indicative price ranges, and best work.
             </p>
             <button
               onClick={() => setIsAddWorkOpen(true)}
-              className="px-4 py-2 bg-[#00c9b7] text-white rounded-xl text-xs font-bold hover:bg-[#00b5a4] transition-colors cursor-pointer"
+              className="px-4 py-2 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-hover transition-colors cursor-pointer"
             >
               + Add Your First Work
             </button>
@@ -219,11 +214,11 @@ export default function TailorPortfolioManagementPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {portfolioItems.map(item => (
-              <div key={item.id} className="border border-thy-burgundy/15 rounded-2xl overflow-hidden group bg-slate-50/50 hover:shadow-md transition-shadow">
+              <div key={item.id} className="border border-thy-burgundy/15 rounded-2xl overflow-hidden group bg-thy-mist/50 hover:shadow-md transition-shadow">
                 <div className="relative h-48 w-full">
                   <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                   {item.isFeatured && (
-                    <span className="absolute top-2 left-2 bg-[#5C1A24] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-xs">
+                    <span className="absolute top-2 left-2 bg-thy-burgundy text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-xs">
                       ★ Featured
                     </span>
                   )}
@@ -233,10 +228,10 @@ export default function TailorPortfolioManagementPage() {
                     <p className="text-xs font-bold text-thy-ink truncate">{item.title}</p>
                     <p className="text-[10px] text-thy-muted font-medium">{item.category}</p>
                   </div>
-                  <div className="flex items-center justify-between border-t border-thy-burgundy/15/60 pt-2 text-[11px]">
+                  <div className="flex items-center justify-between border-t border-thy-burgundy/10 pt-2 text-[11px]">
                     <button
                       onClick={() => toggleFeature(item.id)}
-                      className={`font-bold hover:underline cursor-pointer ${item.isFeatured ? 'text-amber-600' : 'text-slate-600'}`}
+                      className={`font-bold hover:underline cursor-pointer ${item.isFeatured ? 'text-amber-600' : 'text-thy-muted'}`}
                     >
                       {item.isFeatured ? 'Unfeature' : 'Feature Work'}
                     </button>
@@ -256,28 +251,28 @@ export default function TailorPortfolioManagementPage() {
 
       {/* Add Work Modal */}
       {isAddWorkOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-thy-canvas/90 rounded-3xl p-6 max-w-md w-full space-y-4 shadow-xl">
+        <div className="fixed inset-0 bg-thy-deep/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="thy-card p-6 max-w-md w-full space-y-4">
             <h3 className="text-base font-bold text-thy-ink">Add Finished Garment Work</h3>
             <form onSubmit={handleAddWork} className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Work Title</label>
+                <label className="text-xs font-bold text-thy-ink block mb-1">Work Title</label>
                 <input
                   type="text"
                   placeholder="e.g. Silk Bridal Blouse"
                   value={newTitle}
                   onChange={e => setNewTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-thy-burgundy/15 rounded-xl text-xs focus:outline-none focus:border-[#5C1A24]"
+                  className="w-full px-3 py-2 border border-thy-burgundy/15 rounded-xl text-xs focus:outline-none focus:border-thy-burgundy"
                   required
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Garment Category</label>
+                <label className="text-xs font-bold text-thy-ink block mb-1">Garment Category</label>
                 <select
                   value={newCategory}
                   onChange={e => setNewCategory(e.target.value)}
-                  className="w-full px-3 py-2 border border-thy-burgundy/15 rounded-xl text-xs focus:outline-none focus:border-[#5C1A24]"
+                  className="w-full px-3 py-2 border border-thy-burgundy/15 rounded-xl text-xs focus:outline-none focus:border-thy-burgundy"
                 >
                   {categories.filter(c => c !== 'All').map(c => (
                     <option key={c} value={c}>{c}</option>
@@ -286,9 +281,9 @@ export default function TailorPortfolioManagementPage() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Upload Garment Photo</label>
+                <label className="text-xs font-bold text-thy-ink block mb-1">Upload Garment Photo</label>
                 {newImage ? (
-                  <div className="relative rounded-2xl overflow-hidden border border-slate-200 h-36 w-full group">
+                  <div className="relative rounded-2xl overflow-hidden border border-thy-burgundy/15 h-36 w-full group">
                     <img src={newImage} alt="Preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -299,12 +294,12 @@ export default function TailorPortfolioManagementPage() {
                     </button>
                   </div>
                 ) : (
-                  <label className="border-2 border-dashed border-slate-200 hover:border-[#00c9b7] rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-teal-50/20">
-                    <svg className="w-8 h-8 text-slate-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <label className="border-2 border-dashed border-thy-burgundy/15 hover:border-thy-burgundy rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer transition-colors bg-thy-mist/50 hover:bg-thy-mist/40">
+                    <svg className="w-8 h-8 text-thy-subtle mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span className="text-xs font-bold text-slate-700">Click to upload photo</span>
-                    <span className="text-[10px] text-slate-400 mt-0.5">PNG, JPG, or WEBP (Max 5MB)</span>
+                    <span className="text-xs font-bold text-thy-ink">Click to upload photo</span>
+                    <span className="text-[10px] text-thy-subtle mt-0.5">PNG, JPG, or WEBP (Max 5MB)</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -322,23 +317,23 @@ export default function TailorPortfolioManagementPage() {
                   id="featured"
                   checked={newIsFeatured}
                   onChange={e => setNewIsFeatured(e.target.checked)}
-                  className="rounded text-[#5C1A24]"
+                  className="rounded text-thy-burgundy"
                 />
-                <label htmlFor="featured" className="text-xs font-medium text-slate-700 cursor-pointer">Set as Featured Work</label>
+                <label htmlFor="featured" className="text-xs font-medium text-thy-ink cursor-pointer">Set as Featured Work</label>
               </div>
 
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsAddWorkOpen(false)}
-                  className="flex-1 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200 cursor-pointer"
+                  className="flex-1 py-2 bg-thy-mist text-thy-ink rounded-xl text-xs font-bold hover:bg-thy-mist cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!newImage}
-                  className="flex-1 py-2 bg-[#00c9b7] text-white rounded-xl text-xs font-bold hover:bg-[#00b5a4] disabled:opacity-50 cursor-pointer"
+                  className="flex-1 py-2 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-hover disabled:opacity-50 cursor-pointer"
                 >
                   Save Work
                 </button>
@@ -350,22 +345,22 @@ export default function TailorPortfolioManagementPage() {
 
       {/* Edit Services Modal */}
       {isEditServicesOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl p-6 max-w-lg w-full space-y-4 shadow-xl">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <h3 className="text-base font-bold text-slate-900">Edit Services & Price Ranges</h3>
+        <div className="fixed inset-0 bg-thy-deep/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="thy-card p-6 max-w-lg w-full space-y-4">
+            <div className="flex justify-between items-center border-b border-thy-burgundy/10 pb-3">
+              <h3 className="text-base font-bold text-thy-ink">Edit Services & Price Ranges</h3>
               <button
                 type="button"
                 onClick={() => setIsEditServicesOpen(false)}
-                className="text-slate-400 hover:text-slate-600 text-sm font-bold"
+                className="text-thy-subtle hover:text-thy-muted text-sm font-bold"
               >
                 ✕
               </button>
             </div>
 
             {/* Add New Service Input Form */}
-            <form onSubmit={handleAddNewService} className="bg-teal-50/50 border border-teal-100 p-3 rounded-2xl space-y-2">
-              <p className="text-xs font-extrabold text-[#083e38] flex items-center gap-1">
+            <form onSubmit={handleAddNewService} className="bg-thy-mist/70 border border-thy-burgundy/15 p-3 rounded-2xl space-y-2">
+              <p className="text-xs font-extrabold text-thy-ink flex items-center gap-1">
                 <span>+</span> Add New Service Offering
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -374,7 +369,7 @@ export default function TailorPortfolioManagementPage() {
                   placeholder="Service Name (e.g. Blazer)"
                   value={newServiceName}
                   onChange={e => setNewServiceName(e.target.value)}
-                  className="px-2.5 py-1.5 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#00c9b7]"
+                  className="px-2.5 py-1.5 border border-thy-burgundy/15 rounded-xl text-xs bg-thy-surface focus:outline-none focus:border-thy-burgundy"
                   required
                 />
                 <input
@@ -382,7 +377,7 @@ export default function TailorPortfolioManagementPage() {
                   placeholder="Min Price (₹)"
                   value={newServiceMin}
                   onChange={e => setNewServiceMin(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="px-2.5 py-1.5 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#00c9b7] text-center"
+                  className="px-2.5 py-1.5 border border-thy-burgundy/15 rounded-xl text-xs bg-thy-surface focus:outline-none focus:border-thy-burgundy text-center"
                   required
                 />
                 <input
@@ -390,13 +385,13 @@ export default function TailorPortfolioManagementPage() {
                   placeholder="Max Price (₹)"
                   value={newServiceMax}
                   onChange={e => setNewServiceMax(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="px-2.5 py-1.5 border border-slate-200 rounded-xl text-xs bg-white focus:outline-none focus:border-[#00c9b7] text-center"
+                  className="px-2.5 py-1.5 border border-thy-burgundy/15 rounded-xl text-xs bg-thy-surface focus:outline-none focus:border-thy-burgundy text-center"
                   required
                 />
               </div>
               <button
                 type="submit"
-                className="w-full py-1.5 bg-[#00c9b7] text-white rounded-xl text-xs font-bold hover:bg-[#00b5a4] transition-colors cursor-pointer"
+                className="w-full py-1.5 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-hover transition-colors cursor-pointer"
               >
                 + Add Service
               </button>
@@ -404,7 +399,7 @@ export default function TailorPortfolioManagementPage() {
 
             {/* Services List with Dedicated Min/Max Header Columns */}
             <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-              <div className="flex items-center gap-3 text-[10px] font-extrabold text-slate-400 px-3 uppercase tracking-wider">
+              <div className="flex items-center gap-3 text-[10px] font-extrabold text-thy-subtle px-3 uppercase tracking-wider">
                 <span className="w-32 shrink-0">Service Name</span>
                 <div className="flex items-center gap-2 flex-1">
                   <span className="w-full text-center">Min Price (₹)</span>
@@ -415,8 +410,8 @@ export default function TailorPortfolioManagementPage() {
               </div>
 
               {services.map(service => (
-                <div key={service.id} className="p-3 border border-slate-100 bg-slate-50 rounded-2xl flex items-center gap-3">
-                  <span className="text-xs font-bold text-slate-800 w-32 shrink-0 truncate">{service.name}</span>
+                <div key={service.id} className="p-3 border border-thy-burgundy/10 bg-thy-mist rounded-2xl flex items-center gap-3">
+                  <span className="text-xs font-bold text-thy-ink w-32 shrink-0 truncate">{service.name}</span>
                   <div className="flex items-center gap-2 flex-1">
                     <input
                       type="number"
@@ -425,9 +420,9 @@ export default function TailorPortfolioManagementPage() {
                         const val = parseInt(e.target.value) || 0;
                         setServices(services.map(s => (s.id === service.id ? { ...s, minPrice: val } : s)));
                       }}
-                      className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-xs bg-white text-center font-semibold focus:outline-none focus:border-[#00c9b7]"
+                      className="w-full px-2 py-1.5 border border-thy-burgundy/15 rounded-lg text-xs bg-thy-surface text-center font-semibold focus:outline-none focus:border-thy-burgundy"
                     />
-                    <span className="text-xs text-slate-400 font-bold">-</span>
+                    <span className="text-xs text-thy-subtle font-bold">-</span>
                     <input
                       type="number"
                       value={service.maxPrice}
@@ -435,13 +430,13 @@ export default function TailorPortfolioManagementPage() {
                         const val = parseInt(e.target.value) || 0;
                         setServices(services.map(s => (s.id === service.id ? { ...s, maxPrice: val } : s)));
                       }}
-                      className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-xs bg-white text-center font-semibold focus:outline-none focus:border-[#00c9b7]"
+                      className="w-full px-2 py-1.5 border border-thy-burgundy/15 rounded-lg text-xs bg-thy-surface text-center font-semibold focus:outline-none focus:border-thy-burgundy"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={() => handleDeleteService(service.id)}
-                    className="text-slate-400 hover:text-rose-600 transition-colors p-1 cursor-pointer w-6 shrink-0 text-center"
+                    className="text-thy-subtle hover:text-rose-600 transition-colors p-1 cursor-pointer w-6 shrink-0 text-center"
                     title="Remove Service"
                   >
                     🗑️
@@ -450,10 +445,10 @@ export default function TailorPortfolioManagementPage() {
               ))}
             </div>
 
-            <div className="flex gap-2 pt-2 border-t border-slate-100">
+            <div className="flex gap-2 pt-2 border-t border-thy-burgundy/10">
               <button
                 onClick={() => setIsEditServicesOpen(false)}
-                className="w-full py-2.5 bg-[#00c9b7] text-white rounded-xl text-xs font-bold hover:bg-[#00b5a4] cursor-pointer"
+                className="w-full py-2.5 bg-thy-burgundy text-white rounded-xl text-xs font-bold hover:bg-thy-brand-hover cursor-pointer"
               >
                 Save Changes
               </button>
@@ -461,6 +456,7 @@ export default function TailorPortfolioManagementPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </TailorPage>
   );
 }

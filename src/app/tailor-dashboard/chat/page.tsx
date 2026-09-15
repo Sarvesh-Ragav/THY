@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
 import { Ruler, CheckCheck, Clock, Send, Image as ImageIcon } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { useSocketChat } from '@/hooks/useSocketChat';
@@ -12,6 +11,7 @@ import {
 } from '@/lib/chat-api';
 import { ThreadList } from '@/components/chat/ThreadList';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
+import { TailorPage } from '@/components/tailor/TailorPage';
 
 export default function TailorChatPage() {
   const { accessToken } = useTailorSession();
@@ -111,28 +111,20 @@ export default function TailorChatPage() {
   }
 
   return (
-<<<<<<< Updated upstream
-    <div className="space-y-4 text-thy-ink">
-=======
-    <div className="p-4 md:p-8 min-h-screen bg-thy-bg text-thy-ink space-y-4">
-      {/* Top bar */}
->>>>>>> Stashed changes
-      <div className="thy-card p-5 flex justify-between items-center">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-thy-brand font-semibold">
-            Tailor Workspace · Live Consultation
-          </p>
-          <h1 className="text-2xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-            Customer Conversations
-          </h1>
-        </div>
+    <TailorPage
+      kicker="Live consultation"
+      title="Conversations"
+      description="Reply to customer inquiries and send quotations in real time."
+      actions={
         <div className="flex items-center gap-2">
-          <span className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-emerald-500' : 'bg-amber-400'}`} />
+          <span className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-thy-burgundy' : 'bg-amber-400'}`} />
           <span className="text-xs text-thy-muted">
             {isConnected ? 'Socket connected' : 'Connecting...'}
           </span>
         </div>
-      </div>
+      }
+    >
+      <div className="space-y-4 text-thy-ink">
 
       {threads.length === 0 ? (
         <div className="thy-card p-12 text-center space-y-2">
@@ -176,21 +168,6 @@ export default function TailorChatPage() {
                   </div>
                 )}
               </div>
-<<<<<<< Updated upstream
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[22rem]">
-                {active.messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`max-w-[80%] p-3 text-sm ${
-                      message.sender === 'tailor' ? 'ml-auto bg-thy-deep text-[#FBF6ED]' : 'bg-thy-mist'
-                    }`}
-                  >
-                    <p>{message.text}</p>
-                    <p className="text-[10px] opacity-70 mt-1">{message.createdAt}</p>
-                  </div>
-                ))}
-=======
-
               {/* Message Stream */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[26rem]">
                 {messages.map((message) => {
@@ -211,7 +188,7 @@ export default function TailorChatPage() {
                     <article
                       key={message._id || message.id}
                       className={`max-w-[85%] p-3.5 text-sm rounded-sm ${
-                        isTailor ? 'ml-auto bg-thy-deep text-[#fbfefd]' : 'bg-thy-mist text-thy-ink'
+                        isTailor ? 'ml-auto bg-thy-deep text-thy-cream' : 'bg-thy-mist text-thy-ink'
                       }`}
                     >
                       {/* Visual Design / Fabric Attachment */}
@@ -299,7 +276,6 @@ export default function TailorChatPage() {
 
                 {isTyping && <TypingIndicator who={activeThread.customerName || 'Customer'} />}
                 <div ref={bottomRef} />
->>>>>>> Stashed changes
               </div>
 
               {/* Quotation Composer Drawer */}
@@ -364,6 +340,7 @@ export default function TailorChatPage() {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </TailorPage>
   );
 }

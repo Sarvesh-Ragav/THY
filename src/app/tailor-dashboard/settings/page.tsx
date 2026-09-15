@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, createContext, useContext } from 'react';
+import { TailorPage } from '@/components/tailor/TailorPage';
 import { 
   User, 
   Languages, 
@@ -18,7 +19,6 @@ import {
   Camera, 
   ChevronRight, 
   CheckCircle2, 
-  Scissors, 
   Trash2,
   Eye,
   EyeOff,
@@ -449,7 +449,7 @@ function TailorSettingsPage() {
   };
 
   const getPassStrength = (pass: string) => {
-    if (!pass) return { score: 0, label: '', color: 'bg-slate-200 dark:bg-slate-700' };
+    if (!pass) return { score: 0, label: '', color: 'bg-thy-mist' };
     if (pass.length < 6) return { score: 1, label: 'Weak', color: 'bg-rose-500' };
     if (pass.length < 10) return { score: 2, label: 'Medium', color: 'bg-amber-500' };
     return { score: 3, label: 'Strong', color: 'bg-thy-burgundy' };
@@ -457,71 +457,49 @@ function TailorSettingsPage() {
   const passStrength = getPassStrength(newPass);
 
   return (
-    <div className={`min-h-dvh antialiased transition-colors duration-200 ${
-      darkMode ? 'bg-[#3F1218] text-thy-cream' : 'bg-transparent text-thy-ink'
+    <div className={`antialiased transition-colors duration-200 ${
+      darkMode ? 'text-thy-cream' : 'text-thy-ink'
     } ${highContrast ? 'contrast-125' : ''}`}>
-      
-      {/* Top Bar */}
-      <header className={`sticky top-0 z-40 border-b shadow-sm transition-colors ${
-        darkMode ? 'bg-[#4A1520]/95 border-white/10 backdrop-blur-md' : 'bg-thy-canvas/90 border-thy-burgundy/15 backdrop-blur-md'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-thy-burgundy flex items-center justify-center text-white font-bold text-xl shadow-md shadow-thy-burgundy/30">
-                <Scissors className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <span className={`text-xl sm:text-2xl font-bold tracking-tight block leading-none ${
-                  darkMode ? 'text-white' : 'text-thy-ink'
-                }`}>
-                  {t('brandName')}
-                </span>
-                <span className="text-[10px] font-semibold text-thy-burgundy tracking-wider uppercase">
-                  {t('subtitle')}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border shadow-sm ${
-                darkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-white border-slate-200 text-slate-700'
-              }`}>
-                <Globe className="w-4 h-4 text-thy-burgundy flex-shrink-0" />
-                <select 
-                  value={lang}
-                  onChange={(e) => {
-                    setLang(e.target.value);
-                    triggerToast('toastSaveSuccess');
-                  }}
-                  className="bg-transparent text-xs font-bold focus:outline-none cursor-pointer"
-                >
-                  <option value="en">English</option>
-                  <option value="hi">हिंदी (Hindi)</option>
-                  <option value="ta">தமிழ் (Tamil)</option>
-                </select>
-              </div>
-
-              <button
-                onClick={() => setDarkMode(!darkMode)}
-                className={`p-2.5 rounded-full border transition-all ${
-                  darkMode ? 'bg-slate-800 border-slate-700 text-amber-400' : 'bg-slate-100 border-slate-200 text-slate-700'
-                }`}
+      <TailorPage
+        title={t('brandName')}
+        description={t('subtitle')}
+        actions={
+          <div className="flex items-center gap-3">
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 border ${
+              darkMode ? 'bg-thy-deep border-white/15 text-thy-canvas' : 'bg-thy-surface border-thy-burgundy/15 text-thy-ink'
+            }`}>
+              <Globe className="w-4 h-4 text-thy-burgundy flex-shrink-0" />
+              <select 
+                value={lang}
+                onChange={(e) => {
+                  setLang(e.target.value);
+                  triggerToast('toastSaveSuccess');
+                }}
+                className="bg-transparent text-xs font-bold focus:outline-none cursor-pointer"
               >
-                {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </button>
+                <option value="en">English</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="ta">தமிழ் (Tamil)</option>
+              </select>
             </div>
-          </div>
-        </div>
-      </header>
 
-      {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`p-2.5 border transition-all ${
+                darkMode ? 'bg-thy-deep border-white/15 text-amber-400' : 'bg-thy-mist border-thy-burgundy/15 text-thy-ink'
+              }`}
+            >
+              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+          </div>
+        }
+      >
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* Sidebar Tabs */}
-          <div className={`lg:col-span-4 border rounded-3xl p-3 space-y-1.5 shadow-sm sticky top-28 ${
-            darkMode ? 'bg-[#4A1520] border-white/10' : 'bg-thy-canvas/90 border-thy-burgundy/15'
+          <div className={`lg:col-span-4 thy-card p-3 space-y-1.5 sticky top-28 ${
+            darkMode ? 'bg-thy-brand-active border-white/10' : ''
           }`}>
             {[
               { key: 'profile', label: t('tabProfile'), icon: User },
@@ -540,7 +518,7 @@ function TailorSettingsPage() {
                   className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-xs font-bold transition-all ${
                     activeTab === item.key
                       ? 'bg-thy-burgundy text-white shadow-md shadow-thy-burgundy/20'
-                      : darkMode ? 'text-slate-300 hover:bg-slate-800/80' : 'text-slate-700 hover:bg-slate-100'
+                      : darkMode ? 'text-thy-subtle hover:bg-thy-deep/80' : 'text-thy-ink hover:bg-thy-mist'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -558,12 +536,12 @@ function TailorSettingsPage() {
             
             {/* 1. Profile */}
             {activeTab === 'profile' && (
-              <div className={`border rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 ${darkMode ? 'bg-[#4A1520] border-white/10' : 'bg-thy-canvas/90 border-thy-burgundy/15'}`}>
-                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
+              <div className={`thy-card p-6 sm:p-8 space-y-6 ${darkMode ? 'bg-thy-brand-active border-white/10' : ''}`}>
+                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-white/10' : 'text-thy-ink border-thy-burgundy/15'}`}>
                   <User className="w-5 h-5 text-thy-burgundy" />
                   {t('profileTitle')}
                 </h2>
-                <p className="text-xs text-slate-400">{t('profileSub')}</p>
+                <p className="text-xs text-thy-subtle">{t('profileSub')}</p>
 
                 <div className="flex items-center gap-5">
                   <div className="relative group cursor-pointer">
@@ -576,34 +554,34 @@ function TailorSettingsPage() {
                     <button onClick={() => triggerToast('toastSaveSuccess')} className="px-4 py-2 border border-thy-burgundy text-thy-burgundy hover:bg-thy-burgundy hover:text-white rounded-xl text-xs font-bold transition-all">
                       {t('changePhoto')}
                     </button>
-                    <p className="text-[10px] text-slate-400 mt-1">Allowed JPG, PNG or WEBP (Max 2MB)</p>
+                    <p className="text-[10px] text-thy-subtle mt-1">Allowed JPG, PNG or WEBP (Max 2MB)</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                   <div>
                     <label className="text-xs font-bold block mb-1.5">{t('fullName')}</label>
-                    <input type="text" value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'}`} />
+                    <input type="text" value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-thy-deep border-white/15 text-white' : 'bg-thy-mist border-thy-burgundy/20 text-thy-ink'}`} />
                   </div>
                   <div>
                     <label className="text-xs font-bold block mb-1.5">{t('emailAddress')}</label>
-                    <input type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'}`} />
+                    <input type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-thy-deep border-white/15 text-white' : 'bg-thy-mist border-thy-burgundy/20 text-thy-ink'}`} />
                   </div>
                   <div>
                     <label className="text-xs font-bold block mb-1.5">{t('phoneNumber')}</label>
-                    <input type="text" value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'}`} />
+                    <input type="text" value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-thy-deep border-white/15 text-white' : 'bg-thy-mist border-thy-burgundy/20 text-thy-ink'}`} />
                   </div>
                   <div>
                     <label className="text-xs font-bold block mb-1.5">{t('preferredStudio')}</label>
-                    <input type="text" value={profile.studio} onChange={(e) => setProfile({ ...profile, studio: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'}`} />
+                    <input type="text" value={profile.studio} onChange={(e) => setProfile({ ...profile, studio: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-thy-deep border-white/15 text-white' : 'bg-thy-mist border-thy-burgundy/20 text-thy-ink'}`} />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="text-xs font-bold block mb-1.5">{t('pickupAddress')}</label>
-                    <textarea rows={2} value={profile.address} onChange={(e) => setProfile({ ...profile, address: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'}`} />
+                    <textarea rows={2} value={profile.address} onChange={(e) => setProfile({ ...profile, address: e.target.value })} className={`w-full border rounded-xl px-4 py-2.5 text-xs focus:outline-none ${darkMode ? 'bg-thy-deep border-white/15 text-white' : 'bg-thy-mist border-thy-burgundy/20 text-thy-ink'}`} />
                   </div>
                 </div>
 
-                <button onClick={() => triggerToast('toastSaveSuccess')} className="px-6 py-3 bg-thy-burgundy hover:bg-[#4A1520] text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                <button onClick={() => triggerToast('toastSaveSuccess')} className="px-6 py-3 bg-thy-burgundy hover:bg-thy-brand-active text-white font-bold text-xs rounded-xl shadow-md transition-all">
                   {t('saveProfileBtn')}
                 </button>
               </div>
@@ -611,17 +589,17 @@ function TailorSettingsPage() {
 
             {/* 2. Language */}
             {activeTab === 'language' && (
-              <div className={`border rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 ${darkMode ? 'bg-[#4A1520] border-white/10' : 'bg-thy-canvas/90 border-thy-burgundy/15'}`}>
-                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
+              <div className={`thy-card p-6 sm:p-8 space-y-6 ${darkMode ? 'bg-thy-brand-active border-white/10' : ''}`}>
+                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-white/10' : 'text-thy-ink border-thy-burgundy/15'}`}>
                   <Languages className="w-5 h-5 text-thy-burgundy" />
                   {t('languageTitle')}
                 </h2>
-                <div className={`p-5 rounded-2xl border space-y-4 ${darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-thy-mist/60 border-thy-mist'}`}>
+                <div className={`p-5 rounded-2xl border space-y-4 ${darkMode ? 'bg-thy-deep/60 border-white/15' : 'bg-thy-mist/60 border-thy-mist'}`}>
                   <div className="flex items-center gap-2.5">
                     <Globe className="w-5 h-5 text-thy-burgundy" />
                     <div>
-                      <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{t('centralizedLangTitle')}</h3>
-                      <p className="text-xs text-slate-400 mt-0.5">{t('centralizedLangSub')}</p>
+                      <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-thy-ink'}`}>{t('centralizedLangTitle')}</h3>
+                      <p className="text-xs text-thy-subtle mt-0.5">{t('centralizedLangSub')}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
@@ -630,7 +608,7 @@ function TailorSettingsPage() {
                       { code: 'hi', label: 'हिंदी (Hindi)' },
                       { code: 'ta', label: 'தமிழ் (Tamil)' }
                     ].map((l) => (
-                      <button key={l.code} onClick={() => { setLang(l.code); triggerToast('toastSaveSuccess'); }} className={`p-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${lang === l.code ? 'bg-thy-burgundy text-white border-thy-burgundy shadow-md' : darkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-white border-slate-200 text-slate-700'}`}>
+                      <button key={l.code} onClick={() => { setLang(l.code); triggerToast('toastSaveSuccess'); }} className={`p-4 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${lang === l.code ? 'bg-thy-burgundy text-white border-thy-burgundy shadow-md' : darkMode ? 'bg-thy-deep border-white/15 text-thy-subtle' : 'bg-thy-surface border-thy-burgundy/15 text-thy-ink'}`}>
                         <span>{l.label}</span>
                         {lang === l.code && <Check className="w-4 h-4 text-white" />}
                       </button>
@@ -642,19 +620,19 @@ function TailorSettingsPage() {
 
             {/* 3. Appearance */}
             {activeTab === 'appearance' && (
-              <div className={`border rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 ${darkMode ? 'bg-[#4A1520] border-white/10' : 'bg-thy-canvas/90 border-thy-burgundy/15'}`}>
-                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
+              <div className={`thy-card p-6 sm:p-8 space-y-6 ${darkMode ? 'bg-thy-brand-active border-white/10' : ''}`}>
+                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-white/10' : 'text-thy-ink border-thy-burgundy/15'}`}>
                   <Sun className="w-5 h-5 text-thy-burgundy" />
                   {t('appearanceTitle')}
                 </h2>
                 <div className="space-y-3">
-                  <label className={`text-xs font-bold block ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{t('colorTheme')}</label>
+                  <label className={`text-xs font-bold block ${darkMode ? 'text-thy-canvas' : 'text-thy-ink'}`}>{t('colorTheme')}</label>
                   <div className="grid grid-cols-2 gap-3">
-                    <button onClick={() => setDarkMode(false)} className={`p-4 rounded-2xl border flex items-center gap-3 transition-all ${!darkMode ? 'bg-thy-mist border-thy-burgundy text-thy-ink font-bold shadow-md' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>
+                    <button onClick={() => setDarkMode(false)} className={`p-4 rounded-2xl border flex items-center gap-3 transition-all ${!darkMode ? 'bg-thy-mist border-thy-burgundy text-thy-ink font-bold shadow-md' : 'bg-thy-deep border-white/15 text-thy-subtle'}`}>
                       <Sun className="w-5 h-5 text-amber-500" />
                       <span className="text-xs">{t('themeLight')}</span>
                     </button>
-                    <button onClick={() => setDarkMode(true)} className={`p-4 rounded-2xl border flex items-center gap-3 transition-all ${darkMode ? 'bg-[#3F1218] border-thy-burgundy text-thy-cream font-bold shadow-md' : 'bg-slate-50 border-slate-200 text-slate-700'}`}>
+                    <button onClick={() => setDarkMode(true)} className={`p-4 rounded-2xl border flex items-center gap-3 transition-all ${darkMode ? 'bg-thy-ink border-thy-burgundy text-thy-cream font-bold shadow-md' : 'bg-thy-mist border-thy-burgundy/15 text-thy-ink'}`}>
                       <Moon className="w-5 h-5 text-indigo-400" />
                       <span className="text-xs">{t('themeDark')}</span>
                     </button>
@@ -662,20 +640,20 @@ function TailorSettingsPage() {
                 </div>
 
                 <div className="space-y-3 pt-2">
-                  <label className={`text-xs font-bold block ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{t('fontSizeLabel')}</label>
+                  <label className={`text-xs font-bold block ${darkMode ? 'text-thy-canvas' : 'text-thy-ink'}`}>{t('fontSizeLabel')}</label>
                   <div className="grid grid-cols-3 gap-3">
                     {[{ key: 'small', label: t('fontSmall') }, { key: 'medium', label: t('fontMedium') }, { key: 'large', label: t('fontLarge') }].map((f) => (
-                      <button key={f.key} onClick={() => setFontSize(f.key)} className={`p-3 rounded-xl border text-xs font-bold transition-all ${fontSize === f.key ? 'bg-thy-burgundy text-white border-thy-burgundy' : darkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'}`}>
+                      <button key={f.key} onClick={() => setFontSize(f.key)} className={`p-3 rounded-xl border text-xs font-bold transition-all ${fontSize === f.key ? 'bg-thy-burgundy text-white border-thy-burgundy' : darkMode ? 'bg-thy-deep border-white/15 text-thy-subtle' : 'bg-thy-mist border-thy-burgundy/15 text-thy-ink'}`}>
                         {f.label}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className={`p-4 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                <div className={`p-4 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-thy-deep/50 border-white/15' : 'bg-thy-mist border-thy-burgundy/15'}`}>
                   <div>
                     <h4 className="text-xs font-bold">{t('highContrastTitle')}</h4>
-                    <p className="text-[11px] text-slate-400">{t('highContrastSub')}</p>
+                    <p className="text-[11px] text-thy-subtle">{t('highContrastSub')}</p>
                   </div>
                   <input type="checkbox" checked={highContrast} onChange={(e) => setHighContrast(e.target.checked)} className="w-5 h-5 accent-thy-burgundy cursor-pointer" />
                 </div>
@@ -684,24 +662,24 @@ function TailorSettingsPage() {
 
             {/* 4. Security */}
             {activeTab === 'security' && (
-              <div className={`border rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 ${darkMode ? 'bg-[#4A1520] border-white/10' : 'bg-thy-canvas/90 border-thy-burgundy/15'}`}>
-                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
+              <div className={`thy-card p-6 sm:p-8 space-y-6 ${darkMode ? 'bg-thy-brand-active border-white/10' : ''}`}>
+                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-white/10' : 'text-thy-ink border-thy-burgundy/15'}`}>
                   <Shield className="w-5 h-5 text-thy-burgundy" />
                   {t('securityTitle')}
                 </h2>
-                <p className="text-xs text-slate-400">{t('securitySub')}</p>
+                <p className="text-xs text-thy-subtle">{t('securitySub')}</p>
 
                 <div className="space-y-4 max-w-md">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-thy-burgundy">{t('changePassHeading')}</h3>
                   <div>
                     <label className="text-xs font-semibold block mb-1">{t('currentPass')}</label>
-                    <input type="password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300'}`} />
+                    <input type="password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs ${darkMode ? 'bg-thy-deep border-white/15 text-white' : 'bg-thy-mist border-thy-burgundy/20'}`} />
                   </div>
                   <div>
                     <label className="text-xs font-semibold block mb-1">{t('newPass')}</label>
                     <div className="relative">
-                      <input type={showPass ? 'text' : 'password'} value={newPass} onChange={(e) => setNewPass(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300'}`} />
-                      <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-slate-400 hover:text-slate-600">
+                      <input type={showPass ? 'text' : 'password'} value={newPass} onChange={(e) => setNewPass(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs ${darkMode ? 'bg-thy-deep border-white/15 text-white' : 'bg-thy-mist border-thy-burgundy/20'}`} />
+                      <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-3 text-thy-subtle hover:text-thy-muted">
                         {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
@@ -711,7 +689,7 @@ function TailorSettingsPage() {
                           <span>{t('passStrengthLabel')}</span>
                           <span className="text-thy-burgundy">{passStrength.label}</span>
                         </div>
-                        <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                        <div className="w-full h-1.5 rounded-full bg-thy-mist bg-thy-mist overflow-hidden">
                           <div className={`h-full transition-all duration-300 ${passStrength.color}`} style={{ width: `${(passStrength.score / 3) * 100}%` }} />
                         </div>
                       </div>
@@ -719,42 +697,42 @@ function TailorSettingsPage() {
                   </div>
                   <div>
                     <label className="text-xs font-semibold block mb-1">{t('confirmPass')}</label>
-                    <input type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-300'}`} />
+                    <input type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className={`w-full border rounded-xl px-4 py-2.5 text-xs ${darkMode ? 'bg-thy-deep border-white/15 text-white' : 'bg-thy-mist border-thy-burgundy/20'}`} />
                   </div>
-                  <button onClick={() => { triggerToast('toastPassUpdated'); setCurrentPass(''); setNewPass(''); setConfirmPass(''); }} className="px-6 py-2.5 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-sm transition-all">
+                  <button onClick={() => { triggerToast('toastPassUpdated'); setCurrentPass(''); setNewPass(''); setConfirmPass(''); }} className="px-6 py-2.5 bg-thy-deep bg-thy-mist hover:bg-thy-deep text-white font-bold text-xs rounded-xl shadow-sm transition-all">
                     {t('updatePassBtn')}
                   </button>
                 </div>
 
-                <div className={`border-t pt-6 space-y-4 ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+                <div className={`border-t pt-6 space-y-4 ${darkMode ? 'border-white/10' : 'border-thy-burgundy/15'}`}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{t('twoFactorTitle')}</h3>
-                      <p className="text-xs text-slate-400">{t('twoFactorSub')}</p>
+                      <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-thy-ink'}`}>{t('twoFactorTitle')}</h3>
+                      <p className="text-xs text-thy-subtle">{t('twoFactorSub')}</p>
                     </div>
                     <input type="checkbox" checked={twoFactorEnabled} onChange={(e) => setTwoFactorEnabled(e.target.checked)} className="w-5 h-5 accent-thy-burgundy cursor-pointer" />
                   </div>
                   {twoFactorEnabled && (
-                    <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center gap-4 ${darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-thy-mist/50 border-thy-mist'}`}>
-                      <div className="w-24 h-24 bg-white p-2 rounded-xl flex items-center justify-center border shadow-sm">
-                        <svg className="w-full h-full text-slate-900" viewBox="0 0 24 24" fill="currentColor">
+                    <div className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-center gap-4 ${darkMode ? 'bg-thy-deep/60 border-white/15' : 'bg-thy-mist/50 border-thy-mist'}`}>
+                      <div className="w-24 h-24 bg-thy-surface p-2 rounded-xl flex items-center justify-center border shadow-sm">
+                        <svg className="w-full h-full text-thy-ink" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M2 2h8v8H2V2zm2 2v4h4V4H4zm9-2h8v8h-8V2zm2 2v4h4V4h-4zM2 14h8v8H2v-8zm2 2v4h4v-4H4zm13-2h2v2h-2v-2zm-4 0h2v4h-2v-4zm2 4h4v2h-4v-2zm2 2h2v2h-2v-2zm-4 0h2v2h-2v-2z" />
                         </svg>
                       </div>
                       <div>
                         <span className="text-[10px] font-bold text-thy-burgundy uppercase tracking-wider block">{t('twoFactorEnabled')}</span>
-                        <p className="text-xs text-slate-400 mt-1">{t('twoFactorQR')}</p>
-                        <code className="text-xs font-mono bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded mt-2 inline-block font-bold">THY-AUTHY-9921-X8</code>
+                        <p className="text-xs text-thy-subtle mt-1">{t('twoFactorQR')}</p>
+                        <code className="text-xs font-mono bg-thy-mist dark:bg-thy-deep px-2 py-1 rounded mt-2 inline-block font-bold">THY-AUTHY-9921-X8</code>
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className={`border-t pt-6 space-y-4 ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+                <div className={`border-t pt-6 space-y-4 ${darkMode ? 'border-white/10' : 'border-thy-burgundy/15'}`}>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{t('sessionsHeading')}</h3>
-                      <p className="text-xs text-slate-400">{t('sessionsSub')}</p>
+                      <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-thy-ink'}`}>{t('sessionsHeading')}</h3>
+                      <p className="text-xs text-thy-subtle">{t('sessionsSub')}</p>
                     </div>
                     {sessions.length > 1 && (
                       <button onClick={() => { setSessions(sessions.filter(s => s.current)); triggerToast('toastSessionRevoked'); }} className="px-3 py-1.5 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl text-xs font-bold transition-all text-left">
@@ -764,14 +742,14 @@ function TailorSettingsPage() {
                   </div>
                   <div className="space-y-2.5">
                     {sessions.map((sess) => (
-                      <div key={sess.id} className={`p-3.5 rounded-2xl border flex items-center justify-between gap-4 ${darkMode ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                      <div key={sess.id} className={`p-3.5 rounded-2xl border flex items-center justify-between gap-4 ${darkMode ? 'bg-thy-deep/40 border-white/10' : 'bg-thy-mist border-thy-burgundy/15'}`}>
                         <div className="flex items-center gap-3">
                           <div className="p-2 rounded-xl bg-thy-mist0/10 text-thy-burgundy">
                             <Smartphone className="w-4 h-4" />
                           </div>
                           <div>
-                            <h4 className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{t(sess.title)}</h4>
-                            <p className="text-[10px] text-slate-400">IP: {sess.ip}</p>
+                            <h4 className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-thy-ink'}`}>{t(sess.title)}</h4>
+                            <p className="text-[10px] text-thy-subtle">IP: {sess.ip}</p>
                           </div>
                         </div>
                         {sess.current ? (
@@ -788,18 +766,18 @@ function TailorSettingsPage() {
 
             {/* 5. Tailoring */}
             {activeTab === 'tailoring' && (
-              <div className={`border rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 ${darkMode ? 'bg-[#4A1520] border-white/10' : 'bg-thy-canvas/90 border-thy-burgundy/15'}`}>
-                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
+              <div className={`thy-card p-6 sm:p-8 space-y-6 ${darkMode ? 'bg-thy-brand-active border-white/10' : ''}`}>
+                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-white/10' : 'text-thy-ink border-thy-burgundy/15'}`}>
                   <Ruler className="w-5 h-5 text-thy-burgundy" />
                   {t('tailoringTitle')}
                 </h2>
-                <p className="text-xs text-slate-400">{t('tailoringSub')}</p>
+                <p className="text-xs text-thy-subtle">{t('tailoringSub')}</p>
 
                 <div className="flex items-center gap-4">
-                  <span className="text-xs font-bold text-slate-400">{t('unitLabel')}:</span>
-                  <div className={`flex rounded-xl p-1 border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-100 border-slate-200'}`}>
-                    <button onClick={() => setUnit('inches')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${unit === 'inches' ? 'bg-thy-burgundy text-white shadow' : 'text-slate-500'}`}>{t('inches')}</button>
-                    <button onClick={() => setUnit('cm')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${unit === 'cm' ? 'bg-thy-burgundy text-white shadow' : 'text-slate-500'}`}>{t('centimeters')}</button>
+                  <span className="text-xs font-bold text-thy-subtle">{t('unitLabel')}:</span>
+                  <div className={`flex rounded-xl p-1 border ${darkMode ? 'bg-thy-deep border-white/15' : 'bg-thy-mist border-thy-burgundy/15'}`}>
+                    <button onClick={() => setUnit('inches')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${unit === 'inches' ? 'bg-thy-burgundy text-white shadow' : 'text-thy-muted'}`}>{t('inches')}</button>
+                    <button onClick={() => setUnit('cm')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${unit === 'cm' ? 'bg-thy-burgundy text-white shadow' : 'text-thy-muted'}`}>{t('centimeters')}</button>
                   </div>
                 </div>
 
@@ -807,11 +785,11 @@ function TailorSettingsPage() {
                   <h3 className="text-xs font-bold uppercase tracking-wider text-thy-burgundy">{t('savedMeasurements')}</h3>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {Object.keys(measurements).map((mKey) => (
-                      <div key={mKey} className={`p-3.5 rounded-2xl border ${darkMode ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                        <label className="text-[11px] font-bold text-slate-400 block mb-1 uppercase">{t(mKey) || mKey}</label>
+                      <div key={mKey} className={`p-3.5 rounded-2xl border ${darkMode ? 'bg-thy-deep/40 border-white/10' : 'bg-thy-mist border-thy-burgundy/15'}`}>
+                        <label className="text-[11px] font-bold text-thy-subtle block mb-1 uppercase">{t(mKey) || mKey}</label>
                         <div className="flex items-center gap-1">
                           <input type="text" value={measurements[mKey]} onChange={(e) => setMeasurements({ ...measurements, [mKey]: e.target.value })} className={`w-full bg-transparent text-sm font-extrabold focus:outline-none ${darkMode ? 'text-thy-cream' : 'text-thy-burgundy'}`} />
-                          <span className="text-[10px] text-slate-400 font-bold">{unit === 'inches' ? 'in' : 'cm'}</span>
+                          <span className="text-[10px] text-thy-subtle font-bold">{unit === 'inches' ? 'in' : 'cm'}</span>
                         </div>
                       </div>
                     ))}
@@ -822,22 +800,22 @@ function TailorSettingsPage() {
                   <label className="text-xs font-bold block">{t('fitPreference')}</label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[{ key: 'slim', label: t('fitSlim') }, { key: 'regular', label: t('fitRegular') }, { key: 'relaxed', label: t('fitRelaxed') }].map((f) => (
-                      <button key={f.key} onClick={() => setFitStyle(f.key)} className={`p-3.5 rounded-2xl border text-xs font-bold transition-all ${fitStyle === f.key ? 'bg-thy-burgundy text-white border-thy-burgundy shadow' : darkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'}`}>
+                      <button key={f.key} onClick={() => setFitStyle(f.key)} className={`p-3.5 rounded-2xl border text-xs font-bold transition-all ${fitStyle === f.key ? 'bg-thy-burgundy text-white border-thy-burgundy shadow' : darkMode ? 'bg-thy-deep border-white/15 text-thy-subtle' : 'bg-thy-mist border-thy-burgundy/15 text-thy-ink'}`}>
                         {f.label}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className={`p-4 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                <div className={`p-4 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-thy-deep/50 border-white/15' : 'bg-thy-mist border-thy-burgundy/15'}`}>
                   <div>
                     <h4 className="text-xs font-bold">{t('fabricCarePref')}</h4>
-                    <p className="text-[11px] text-slate-400">{t('fabricCareSub')}</p>
+                    <p className="text-[11px] text-thy-subtle">{t('fabricCareSub')}</p>
                   </div>
                   <input type="checkbox" checked={fabricCare} onChange={(e) => setFabricCare(e.target.checked)} className="w-5 h-5 accent-thy-burgundy cursor-pointer" />
                 </div>
 
-                <button onClick={() => triggerToast('toastSaveSuccess')} className="px-6 py-3 bg-thy-burgundy hover:bg-[#4A1520] text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                <button onClick={() => triggerToast('toastSaveSuccess')} className="px-6 py-3 bg-thy-burgundy hover:bg-thy-brand-active text-white font-bold text-xs rounded-xl shadow-md transition-all">
                   {t('saveMeasurementsBtn')}
                 </button>
               </div>
@@ -845,12 +823,12 @@ function TailorSettingsPage() {
 
             {/* 6. Notifications */}
             {activeTab === 'notifications' && (
-              <div className={`border rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 ${darkMode ? 'bg-[#4A1520] border-white/10' : 'bg-thy-canvas/90 border-thy-burgundy/15'}`}>
-                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
+              <div className={`thy-card p-6 sm:p-8 space-y-6 ${darkMode ? 'bg-thy-brand-active border-white/10' : ''}`}>
+                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-white/10' : 'text-thy-ink border-thy-burgundy/15'}`}>
                   <Bell className="w-5 h-5 text-thy-burgundy" />
                   {t('notificationsTitle')}
                 </h2>
-                <p className="text-xs text-slate-400">{t('notificationsSub')}</p>
+                <p className="text-xs text-thy-subtle">{t('notificationsSub')}</p>
 
                 <div className="space-y-4">
                   {[
@@ -859,17 +837,17 @@ function TailorSettingsPage() {
                     { key: 'tailorMsg', title: t('notifTailorMsg'), sub: t('notifTailorMsgSub') },
                     { key: 'quietHours', title: t('quietHoursTitle'), sub: t('quietHoursSub') }
                   ].map((item) => (
-                    <div key={item.key} className={`p-4 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                    <div key={item.key} className={`p-4 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-thy-deep/40 border-white/10' : 'bg-thy-mist border-thy-burgundy/15'}`}>
                       <div>
                         <h4 className="text-xs font-bold">{item.title}</h4>
-                        <p className="text-[11px] text-slate-400">{item.sub}</p>
+                        <p className="text-[11px] text-thy-subtle">{item.sub}</p>
                       </div>
                       <input type="checkbox" checked={notifications[item.key as keyof typeof notifications]} onChange={(e) => setNotifications({ ...notifications, [item.key]: e.target.checked })} className="w-5 h-5 accent-thy-burgundy cursor-pointer" />
                     </div>
                   ))}
                 </div>
 
-                <button onClick={() => triggerToast('toastSaveSuccess')} className="px-6 py-3 bg-thy-burgundy hover:bg-[#4A1520] text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                <button onClick={() => triggerToast('toastSaveSuccess')} className="px-6 py-3 bg-thy-burgundy hover:bg-thy-brand-active text-white font-bold text-xs rounded-xl shadow-md transition-all">
                   {t('saveProfileBtn')}
                 </button>
               </div>
@@ -877,25 +855,25 @@ function TailorSettingsPage() {
 
             {/* 7. Privacy */}
             {activeTab === 'privacy' && (
-              <div className={`border rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 ${darkMode ? 'bg-[#4A1520] border-white/10' : 'bg-thy-canvas/90 border-thy-burgundy/15'}`}>
-                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-slate-800' : 'text-slate-900 border-slate-200'}`}>
+              <div className={`thy-card p-6 sm:p-8 space-y-6 ${darkMode ? 'bg-thy-brand-active border-white/10' : ''}`}>
+                <h2 className={`text-lg font-bold border-b pb-4 flex items-center gap-2 ${darkMode ? 'text-white border-white/10' : 'text-thy-ink border-thy-burgundy/15'}`}>
                   <Lock className="w-5 h-5 text-thy-burgundy" />
                   {t('privacyTitle')}
                 </h2>
 
                 <div className="space-y-5">
-                  <div className={`p-4 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className={`p-4 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-thy-deep/40 border-white/10' : 'bg-thy-mist border-thy-burgundy/15'}`}>
                     <div>
                       <h4 className="text-xs font-bold">{t('measurementPrivacy')}</h4>
-                      <p className="text-[11px] text-slate-400">{t('measurementPrivacySub')}</p>
+                      <p className="text-[11px] text-thy-subtle">{t('measurementPrivacySub')}</p>
                     </div>
                     <input type="checkbox" checked={shareMeasurements} onChange={(e) => setShareMeasurements(e.target.checked)} className="w-5 h-5 accent-thy-burgundy cursor-pointer" />
                   </div>
 
-                  <div className={`p-5 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className={`p-5 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-thy-deep/40 border-white/10' : 'bg-thy-mist border-thy-burgundy/15'}`}>
                     <div>
                       <h4 className="text-xs font-bold">{t('exportDataTitle')}</h4>
-                      <p className="text-[11px] text-slate-400">{t('exportDataSub')}</p>
+                      <p className="text-[11px] text-thy-subtle">{t('exportDataSub')}</p>
                     </div>
                     <button onClick={() => triggerToast('toastDataExported')} className="px-4 py-2 border border-thy-burgundy text-thy-burgundy hover:bg-thy-burgundy hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
                       <Download className="w-4 h-4" />
@@ -903,18 +881,18 @@ function TailorSettingsPage() {
                     </button>
                   </div>
 
-                  <div className={`p-5 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-slate-800/40 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className={`p-5 rounded-2xl border flex items-center justify-between ${darkMode ? 'bg-thy-deep/40 border-white/10' : 'bg-thy-mist border-thy-burgundy/15'}`}>
                     <div>
                       <h4 className="text-xs font-bold">{t('clearCacheTitle')}</h4>
-                      <p className="text-[11px] text-slate-400">{t('clearCacheSub')}</p>
+                      <p className="text-[11px] text-thy-subtle">{t('clearCacheSub')}</p>
                     </div>
-                    <button onClick={() => triggerToast('toastCacheCleared')} className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
+                    <button onClick={() => triggerToast('toastCacheCleared')} className="px-4 py-2 border border-thy-burgundy/20 dark:border-white/15 text-thy-muted dark:text-thy-subtle hover:bg-thy-mist dark:hover:bg-thy-deep rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
                       <HardDrive className="w-4 h-4" />
                       <span>{t('clearCacheBtn')}</span>
                     </button>
                   </div>
 
-                  <div className={`border-t pt-6 space-y-3 ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+                  <div className={`border-t pt-6 space-y-3 ${darkMode ? 'border-white/10' : 'border-thy-burgundy/15'}`}>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-rose-500">{t('dangerZoneTitle')}</h4>
                     <div className="flex flex-wrap gap-3">
                       <button onClick={() => setShowLogoutModal(true)} className="px-5 py-2.5 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5">
@@ -934,12 +912,11 @@ function TailorSettingsPage() {
 
           </div>
         </div>
-      </main>
 
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 animate-bounce">
-          <div className="bg-slate-900 text-white border border-thy-burgundy px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-bold">
+          <div className="bg-thy-deep text-white border border-thy-burgundy px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-bold">
             <CheckCircle2 className="w-5 h-5 text-thy-cream" />
             <span>{toastMessage}</span>
           </div>
@@ -948,12 +925,12 @@ function TailorSettingsPage() {
 
       {/* Logout Confirmation Modal */}
       {showLogoutModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className={`border rounded-3xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl ${darkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+        <div className="fixed inset-0 z-50 bg-thy-deep/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className={`thy-card p-6 max-w-sm w-full space-y-4 text-center ${darkMode ? 'bg-thy-deep border-white/10 text-white' : 'text-thy-ink'}`}>
             <h3 className="text-base font-bold">{t('logoutModalTitle')}</h3>
-            <p className="text-xs text-slate-400">{t('logoutModalSub')}</p>
+            <p className="text-xs text-thy-subtle">{t('logoutModalSub')}</p>
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <button onClick={() => setShowLogoutModal(false)} className="py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700">
+              <button onClick={() => setShowLogoutModal(false)} className="py-2.5 rounded-xl text-xs font-bold border border-thy-burgundy/20 dark:border-white/15">
                 {t('cancelBtn')}
               </button>
               <button onClick={() => { setShowLogoutModal(false); triggerToast('toastSaveSuccess'); }} className="py-2.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700">
@@ -966,12 +943,12 @@ function TailorSettingsPage() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className={`border rounded-3xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl ${darkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`}>
+        <div className="fixed inset-0 z-50 bg-thy-deep/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className={`thy-card p-6 max-w-sm w-full space-y-4 text-center ${darkMode ? 'bg-thy-deep border-white/10 text-white' : 'text-thy-ink'}`}>
             <h3 className="text-base font-bold">{t('deleteModalTitle')}</h3>
-            <p className="text-xs text-slate-400">{t('deleteModalSub')}</p>
+            <p className="text-xs text-thy-subtle">{t('deleteModalSub')}</p>
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <button onClick={() => setShowDeleteModal(false)} className="py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700">
+              <button onClick={() => setShowDeleteModal(false)} className="py-2.5 rounded-xl text-xs font-bold border border-thy-burgundy/20 dark:border-white/15">
                 {t('cancelBtn')}
               </button>
               <button onClick={() => { setShowDeleteModal(false); triggerToast('toastSaveSuccess'); }} className="py-2.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700">
@@ -981,6 +958,7 @@ function TailorSettingsPage() {
           </div>
         </div>
       )}
+      </TailorPage>
     </div>
   );
 }

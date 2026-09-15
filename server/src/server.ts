@@ -1,15 +1,12 @@
 import http from 'node:http';
+import dns from 'node:dns';
 import { app } from './app.js';
 import { env } from './config/env.js';
 import { pool } from './db/pool.js';
 import { connectMongo, disconnectMongo } from './db/mongo.js';
-<<<<<<< Updated upstream
-import dns from 'node:dns';
+import { initSocket } from './socket/index.js';
 
 dns.setServers(['8.8.8.8', '1.1.1.1']);
-=======
-import { initSocket } from './socket/index.js';
->>>>>>> Stashed changes
 
 // Connect to MongoDB
 connectMongo().catch((err) => {
@@ -37,4 +34,3 @@ process.on('SIGINT', () => {
 process.on('SIGTERM', () => {
   void shutdown();
 });
-
