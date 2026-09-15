@@ -32,19 +32,46 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
   const [isReady, setIsReady] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
+  const syncSessionFromStorage = useCallback(() => {
+    const local = loadTailorSession();
+    let storedName = '';
+
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('thy_user');
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          storedName = parsed?.name || parsed?.fullName || '';
+        } catch {
+          storedName = '';
+        }
+      }
+    }
+
+    if (storedName || local.isAuthenticated) {
+      setSession({
+        ...local,
+        isAuthenticated: true,
+        identifier: storedName || local.identifier,
+      });
+    } else {
+      setSession({ ...local, isAuthenticated: false });
+    }
+  }, []);
+
   useEffect(() => {
-    const localSession = loadTailorSession();
-    setSession({ ...localSession, isAuthenticated: false });
+    syncSessionFromStorage();
 
     refreshAuthentication()
       .then(({ accessToken, user }) => {
         setAccessToken(accessToken);
         setSession((current) => {
+          const userObj = user as Record<string, any>;
           const next: TailorSession = {
             ...current,
             isAuthenticated: true,
-            role: user.role ?? current.role ?? 'tailor',
-            identifier: user.phoneNumber,
+            role: userObj?.role ?? current.role ?? 'customer',
+            identifier: userObj?.name || userObj?.fullName || userObj?.phoneNumber || current.identifier,
           };
           persistTailorSession(next);
           return next;
@@ -52,7 +79,10 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
       })
       .catch(() => undefined)
       .finally(() => setIsReady(true));
-  }, []);
+
+    window.addEventListener('storage', syncSessionFromStorage);
+    return () => window.removeEventListener('storage', syncSessionFromStorage);
+  }, [syncSessionFromStorage]);
 
   const updateSession = useCallback((partial: Partial<TailorSession>) => {
     setSession((current) => {
@@ -64,13 +94,13 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
   }, [session]);
 
   const completeAuthentication = useCallback(
-    (accessToken: string, authenticatedRole?: 'customer' | 'tailor' | null) => {
+    (token: string, authenticatedRole?: 'customer' | 'tailor' | null) => {
       const next: TailorSession = {
         ...session,
         isAuthenticated: true,
-        role: authenticatedRole ?? session.role ?? 'tailor',
+        role: authenticatedRole ?? session.role ?? 'customer',
       };
-      setAccessToken(accessToken);
+      setAccessToken(token);
       setSession(next);
       persistTailorSession(next);
       return next;
