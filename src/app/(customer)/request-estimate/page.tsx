@@ -40,7 +40,7 @@ export default function RequestEstimatePage() {
           </div>
           <h2 className="text-xl font-extrabold text-slate-900">Estimate Request Sent!</h2>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Your request for <span className="font-bold text-slate-800">{garmentType}</span> has been submitted to <span className="font-bold text-slate-800">Priya's Boutique</span>. You will receive an estimate update in your active requests within 24 hours.
+            Your request for <span className="font-bold text-slate-800">{garmentType}</span> has been submitted to <span className="font-bold text-slate-800">Priya&apos;s Boutique</span>. You will receive an estimate update in your active requests within 24 hours.
           </p>
           <div className="pt-2">
             <Link
@@ -62,7 +62,7 @@ export default function RequestEstimatePage() {
         {/* Header */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-2">
           <h1 className="text-xl font-black text-slate-900 tracking-tight">Request Custom Garment Estimate</h1>
-          <p className="text-xs text-slate-500">Provide design specifications and measurements to receive a precise quote from Priya's Boutique.</p>
+          <p className="text-xs text-slate-500">Provide design specifications and measurements to receive a precise quote from Priya&apos;s Boutique.</p>
           
           {/* Progress Tracker */}
           <div className="flex items-center gap-2 pt-4">

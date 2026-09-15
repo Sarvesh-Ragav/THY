@@ -27,7 +27,8 @@ function EstimateDetails() {
   const thread = findThread(state, searchParams.get('thread'));
 
   if (!ready) return <p className="p-8 text-sm text-thy-subtle">Loading...</p>;
-  if (!thread?.quotation) {
+  const quotation = thread?.quotation;
+  if (!thread || !quotation) {
     return (
       <main className="max-w-3xl mx-auto px-4 py-12 space-y-4">
         <h1 className="text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
@@ -42,7 +43,7 @@ function EstimateDetails() {
   }
 
   const addToCart = () => {
-    if (state.cart.some((item) => item.quotationId === thread.quotation?.id)) {
+    if (state.cart.some((item) => item.quotationId === quotation.id)) {
       router.push('/stitch-your-outfit/cart');
       return;
     }
@@ -51,11 +52,11 @@ function EstimateDetails() {
       cart: [
         {
           id: `cart-${Date.now()}`,
-          quotationId: thread.quotation.id,
+          quotationId: quotation.id,
           threadId: thread.id,
           tailorName: thread.tailorName,
           garment: thread.request?.garment || 'Custom outfit',
-          price: thread.quotation.price,
+          price: quotation.price,
         },
         ...state.cart,
       ],
@@ -73,10 +74,10 @@ function EstimateDetails() {
       <section className="thy-card p-6 space-y-4">
         <p className="text-[10px] uppercase tracking-[0.16em] text-thy-subtle">Price fixed</p>
         <p className="text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-          ₹{thread.quotation.price}
+          ₹{quotation.price}
         </p>
-        <p className="text-sm text-thy-muted">{thread.quotation.note}</p>
-        <p className="text-xs text-thy-subtle">Sent {thread.quotation.sentAt} · {thread.tailorName}</p>
+        <p className="text-sm text-thy-muted">{quotation.note}</p>
+        <p className="text-xs text-thy-subtle">Sent {quotation.sentAt} · {thread.tailorName}</p>
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm pt-2">
           <div>
             <dt className="text-[10px] uppercase tracking-[0.14em] text-thy-subtle">Garment</dt>

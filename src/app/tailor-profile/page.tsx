@@ -259,7 +259,7 @@ const CUSTOMER_ORDERS = [
 ];
 
 export default function App() {
-  const [lang, setLang] = useState('en'); // 'en', 'hi', 'ta'
+  const [lang, setLang] = useState<keyof typeof TRANSLATIONS>('en'); // 'en', 'hi', 'ta'
   const [viewMode, setViewMode] = useState('tailor'); // 'tailor' or 'customer'
   const [activeTab, setActiveTab] = useState('main');
   const [isHired, setIsHired] = useState(false);
@@ -286,7 +286,7 @@ export default function App() {
               <Globe className="w-3.5 h-3.5 mr-1.5 text-teal-200" />
               <select 
                 value={lang} 
-                onChange={(e) => setLang(e.target.value)}
+                onChange={(e) => setLang(e.target.value as keyof typeof TRANSLATIONS)}
                 className="bg-transparent text-white focus:outline-none cursor-pointer pr-1"
               >
                 <option value="en" className="text-slate-900">English</option>

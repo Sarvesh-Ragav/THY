@@ -222,7 +222,7 @@ const CUSTOMER_DATA = {
 export default function App() {
   const [activeTab, setActiveTab] = useState('orders');
   const [selectedProfileId, setSelectedProfileId] = useState('self');
-  const [selectedOrderModal, setSelectedOrderModal] = useState(null);
+  const [selectedOrderModal, setSelectedOrderModal] = useState<(typeof CUSTOMER_DATA.orders)[number] | null>(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [showAddWishlistModal, setShowAddWishlistModal] = useState(false);
 
