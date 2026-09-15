@@ -202,7 +202,7 @@ function DesignPreviewContent() {
       setAiRender(data.image);
       setShowAiRender(true);
       persistDraft({ aiRender: data.image });
-      setMessage('AI render complete — now showing Gemini visualization.');
+      setMessage('Dress visualization ready.');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'AI generation failed';
       setAiError(msg);
@@ -292,10 +292,7 @@ function DesignPreviewContent() {
             {aiGenerating && (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-thy-deep/60 backdrop-blur-sm">
                 <span className="h-12 w-12 rounded-full border-2 border-thy-brand/30 border-t-thy-brand animate-spin" />
-                <div className="text-center">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-white font-semibold">Generating with Gemini AI</p>
-                  <p className="text-[10px] text-white/60 mt-1">Rendering your bespoke garment…</p>
-                </div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-white font-semibold">Visualizing your dress</p>
               </div>
             )}
 
@@ -356,7 +353,7 @@ function DesignPreviewContent() {
           <p className="mt-3 text-xs text-thy-subtle">
             {hasUserFabric
               ? showAiRender
-                ? 'Gemini AI render · photorealistic studio visualization'
+                ? 'Dress visualization'
                 : 'Your uploaded fabric photo'
               : 'JPG, PNG or WEBP · drop a clear photo of the cloth'}
           </p>
@@ -469,35 +466,15 @@ function DesignPreviewContent() {
 
           {message && <p className="text-xs text-thy-muted">{message}</p>}
 
-          <div className="relative overflow-hidden border border-thy-brand/30 bg-gradient-to-br from-thy-mist to-thy-surface p-4 space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="shrink-0 h-8 w-8 rounded-full bg-thy-brand/10 border border-thy-brand/20 flex items-center justify-center">
-                <Sparkles size={15} className="text-thy-brand" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-thy-brand font-semibold">Gemini AI</p>
-                <p className="text-sm font-medium text-thy-ink mt-0.5">Photorealistic garment render</p>
-                <p className="text-xs text-thy-muted mt-1 leading-relaxed">
-                  Generate a studio-quality photo of your garment using your fabric and pattern as references.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              id="generate-with-gemini"
-              disabled={aiGenerating}
-              onClick={generateWithAI}
-              className="inline-flex w-full items-center justify-center gap-2 min-h-11 px-4 text-sm font-semibold bg-thy-brand text-white border border-thy-brand/60 transition-all hover:bg-thy-deep disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
-            >
-              <Sparkles size={15} />
-              {aiGenerating ? 'Generating…' : aiRender ? 'Re-generate' : 'Generate'}
-            </button>
-            {aiRender && !aiGenerating && (
-              <p className="text-[10px] text-thy-brand text-center font-medium uppercase tracking-[0.14em]">
-                ✓ AI render ready · use toggle below to view
-              </p>
-            )}
-          </div>
+          <button
+            type="button"
+            id="generate-with-gemini"
+            disabled={aiGenerating}
+            onClick={generateWithAI}
+            className="inline-flex w-full items-center justify-center min-h-12 px-4 text-sm font-semibold bg-thy-brand text-white border border-thy-brand/60 transition-all hover:bg-thy-deep disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {aiGenerating ? 'Visualizing…' : 'Visualize your dress'}
+          </button>
 
           <div className="mt-auto pt-1 space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
