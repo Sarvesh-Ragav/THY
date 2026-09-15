@@ -2,6 +2,9 @@ import { app } from './app.js';
 import { env } from './config/env.js';
 import { pool } from './db/pool.js';
 import { connectMongo, disconnectMongo } from './db/mongo.js';
+import dns from 'node:dns';
+
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 // Connect to MongoDB
 connectMongo().catch((err) => {
