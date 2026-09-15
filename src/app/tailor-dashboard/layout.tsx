@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { label: 'Portfolio & Profile', href: '/tailor-dashboard/portfolio' },
   { label: 'Earnings', href: '/tailor-dashboard/earnings' },
   { label: 'Availability', href: '/tailor-dashboard/availability' },
+  { label: 'Settings', href: '/tailor-dashboard/settings' }, // 👈 Added Settings here
 ];
 
 export default function TailorDashboardLayout({
