@@ -184,6 +184,7 @@ export const DEFAULT_ORDERS: TailorActiveOrder[] = [
   },
 ];
 
+// STEP 1 INTEGRATION: Reset default state explicitly without forced mock active credentials
 export function createDefaultSession(): TailorSession {
   return {
     identifier: '',
@@ -200,8 +201,8 @@ export function createDefaultSession(): TailorSession {
       ...DEFAULT_AVAILABILITY,
       workingDays: { ...DEFAULT_WORKING_DAYS },
     },
-    requests: DEFAULT_REQUESTS.map((request) => ({ ...request })),
-    orders: DEFAULT_ORDERS.map((order) => ({ ...order })),
+    requests: [],
+    orders: [],
   };
 }
 
@@ -299,8 +300,8 @@ export function loadTailorSession(): TailorSession {
           ...parsed.availability?.workingDays,
         },
       },
-      requests: Array.isArray(parsed.requests) ? parsed.requests : fallback.requests,
-      orders: Array.isArray(parsed.orders) ? parsed.orders : fallback.orders,
+      requests: Array.isArray(parsed.requests) ? parsed.requests : [],
+      orders: Array.isArray(parsed.orders) ? parsed.orders : [],
       profile: parsed.profile ?? null,
       verification: parsed.verification ?? null,
       customerProfile: parsed.customerProfile ?? null,

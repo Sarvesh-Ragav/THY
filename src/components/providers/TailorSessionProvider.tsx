@@ -14,7 +14,6 @@ import {
   loadTailorSession,
   persistTailorSession,
 } from '@/lib/tailor-session';
-import { logoutAuthentication, refreshAuthentication } from '@/lib/auth-api';
 
 interface TailorSessionContextValue {
   session: TailorSession;
@@ -32,61 +31,19 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
   const [isReady, setIsReady] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  const syncSessionFromStorage = useCallback(() => {
+  useEffect(() => {
+    // Only hydrate from storage if explicitly logged in
     const local = loadTailorSession();
-    let storedName = '';
-
     if (typeof window !== 'undefined') {
-      const storedUser = localStorage.getItem('thy_user');
-      if (storedUser) {
-        try {
-          const parsed = JSON.parse(storedUser);
-          storedName = parsed?.name || parsed?.fullName || '';
-        } catch {
-          storedName = '';
-        }
+      const isLoggedOut = localStorage.getItem('thy_logged_out') === 'true';
+      if (isLoggedOut) {
+        setSession(createDefaultSession());
+      } else {
+        setSession(local);
       }
     }
-
-    if (storedName || local.isAuthenticated) {
-      setSession({
-        ...local,
-        isAuthenticated: true,
-        identifier: storedName || local.identifier,
-      });
-    } else {
-      setSession({ ...local, isAuthenticated: false, identifier: '' });
-    }
+    setIsReady(true);
   }, []);
-
-  useEffect(() => {
-    syncSessionFromStorage();
-
-    refreshAuthentication()
-      .then(({ accessToken, user }) => {
-        setAccessToken(accessToken);
-        setSession((current) => {
-          const userObj = user as Record<string, any>;
-          const next: TailorSession = {
-            ...current,
-            isAuthenticated: true,
-            role: userObj?.role ?? current.role ?? 'customer',
-            identifier: userObj?.name || userObj?.fullName || userObj?.phoneNumber || current.identifier,
-          };
-          persistTailorSession(next);
-          return next;
-        });
-      })
-      .catch(() => undefined)
-      .finally(() => setIsReady(true));
-
-    window.addEventListener('storage', syncSessionFromStorage);
-    window.addEventListener('thy-auth-change', syncSessionFromStorage);
-    return () => {
-      window.removeEventListener('storage', syncSessionFromStorage);
-      window.removeEventListener('thy-auth-change', syncSessionFromStorage);
-    };
-  }, [syncSessionFromStorage]);
 
   const updateSession = useCallback((partial: Partial<TailorSession>) => {
     setSession((current) => {
@@ -99,6 +56,9 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
 
   const completeAuthentication = useCallback(
     (token: string, authenticatedRole?: 'customer' | 'tailor' | null) => {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('thy_logged_out');
+      }
       const next: TailorSession = {
         ...session,
         isAuthenticated: true,
@@ -114,19 +74,11 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
 
   const logout = useCallback(() => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('thy_session');
-      localStorage.removeItem('thy_user');
-      localStorage.removeItem('tailor_session');
-      window.dispatchEvent(new Event('thy-auth-change'));
+      localStorage.clear();
+      localStorage.setItem('thy_logged_out', 'true');
     }
-
-    const resetSession = createDefaultSession();
-    resetSession.isAuthenticated = false;
-
     setAccessToken(null);
-    setSession(resetSession);
-    persistTailorSession(resetSession);
-    void logoutAuthentication();
+    setSession(createDefaultSession());
   }, []);
 
   const value = useMemo(
