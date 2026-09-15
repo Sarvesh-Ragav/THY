@@ -43,7 +43,7 @@ export function CustomerHome() {
             Find Your Perfect Tailor
           </h2>
           <div className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {TAILORS.map((tailor) => (
+            {TAILORS.slice(0, 4).map((tailor) => (
               <Link key={tailor.id} href={`/tailors/${tailor.id}`} className="thy-card overflow-hidden hover:border-thy-brand/40 transition-colors">
                 <img src={tailor.image} alt="" className="h-36 sm:h-40 w-full object-cover" />
                 <div className="p-4">

@@ -3,7 +3,7 @@ import { c15ToStudio, getC15Garment } from '@/lib/c15-catalog';
 export const STUDIO_STEPS = [
   { id: 'design', label: 'Design', href: '/stitch-your-outfit/preview' },
   { id: 'try-on', label: 'Try On', href: '/stitch-your-outfit/try-on' },
-  { id: 'measurements', label: 'Measurements', href: '/my-measurements' },
+  { id: 'measurements', label: 'Measurements', href: '/stitch-your-outfit/measurements' },
   { id: 'tailor', label: 'Tailor', href: '/tailors' },
   { id: 'estimate', label: 'Estimate', href: '/stitch-your-outfit/estimate' },
   { id: 'cart', label: 'Cart', href: '/stitch-your-outfit/cart' },

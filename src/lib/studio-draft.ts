@@ -15,6 +15,15 @@ export interface GarmentCustomizationDetails {
   garment?: string;
 }
 
+export type MeasurementMethod = 'manual' | 'size' | 'sample' | 'saved';
+
+export interface StudioMeasurementChoice {
+  method: MeasurementMethod;
+  measurementId?: string;
+  measurementLabel?: string;
+  size?: string;
+}
+
 export interface StudioDraft {
   categoryId: string;
   fabricImage: string;
@@ -27,6 +36,7 @@ export interface StudioDraft {
   aiRender?: string;
   tryOnRender?: string;
   customization?: GarmentCustomizationDetails;
+  measurementChoice?: StudioMeasurementChoice;
 }
 
 export function readFileAsDataUrl(file: File): Promise<string> {
@@ -58,6 +68,7 @@ export function readStudioDraft(categoryId?: string | null): StudioDraft | null 
       aiRender: parsed.aiRender,
       tryOnRender: parsed.tryOnRender,
       customization: parsed.customization,
+      measurementChoice: parsed.measurementChoice,
     };
   } catch {
     return null;
@@ -87,5 +98,7 @@ export function patchStudioDraft(categoryId: string, patch: Partial<StudioDraft>
     aiRender: patch.aiRender !== undefined ? patch.aiRender : current?.aiRender,
     tryOnRender: patch.tryOnRender !== undefined ? patch.tryOnRender : current?.tryOnRender,
     customization: patch.customization !== undefined ? patch.customization : current?.customization,
+    measurementChoice:
+      patch.measurementChoice !== undefined ? patch.measurementChoice : current?.measurementChoice,
   });
 }

@@ -18,7 +18,7 @@ const PHOTO_TIPS = [
 ] as const;
 
 const ghostBtn =
-  'inline-flex items-center justify-center min-h-11 px-4 text-sm border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
+  'inline-flex items-center justify-center min-h-11 px-4 text-sm text-center leading-none border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
 
 type ViewMode = 'vto' | 'overlay' | 'original';
 
@@ -516,8 +516,8 @@ function TryOnContent() {
             Back to visualization
           </Link>
           <Link
-            href="/my-measurements"
-            className="hero-leather-btn inline-flex w-full items-center justify-center min-h-12 px-4 text-[11px] font-semibold uppercase tracking-[0.16em]"
+            href={`/stitch-your-outfit/measurements${query}`}
+            className="hero-leather-btn inline-flex w-full items-center justify-center min-h-12 px-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-center leading-none"
           >
             Next: Measurements
           </Link>

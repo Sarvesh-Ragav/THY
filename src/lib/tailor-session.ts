@@ -184,6 +184,7 @@ export const DEFAULT_ORDERS: TailorActiveOrder[] = [
   },
 ];
 
+// STEP 1 INTEGRATION: Clean default unauthenticated state
 export function createDefaultSession(): TailorSession {
   return {
     identifier: '',
@@ -200,8 +201,8 @@ export function createDefaultSession(): TailorSession {
       ...DEFAULT_AVAILABILITY,
       workingDays: { ...DEFAULT_WORKING_DAYS },
     },
-    requests: DEFAULT_REQUESTS.map((request) => ({ ...request })),
-    orders: DEFAULT_ORDERS.map((order) => ({ ...order })),
+    requests: [],
+    orders: [],
   };
 }
 
@@ -249,6 +250,7 @@ export function getCustomerFirstName(session: TailorSession): string {
   return fullName.split(/\s+/)[0];
 }
 
+// STEP 2 INTEGRATION: Accurate Post-Auth Path evaluation
 export function getPostAuthPath(session: TailorSession): string {
   if (session.role === 'customer') {
     if (!hasCustomerProfile(session)) return '/customer-registration';
@@ -256,6 +258,7 @@ export function getPostAuthPath(session: TailorSession): string {
     return '/';
   }
 
+  // Tailor Onboarding Route Guard Logic
   if (!hasTailorProfile(session)) return '/tailor-registration';
   if (!hasSubmittedVerification(session)) return '/tailor-verification';
   return '/tailor-dashboard';
@@ -299,8 +302,8 @@ export function loadTailorSession(): TailorSession {
           ...parsed.availability?.workingDays,
         },
       },
-      requests: Array.isArray(parsed.requests) ? parsed.requests : fallback.requests,
-      orders: Array.isArray(parsed.orders) ? parsed.orders : fallback.orders,
+      requests: Array.isArray(parsed.requests) ? parsed.requests : [],
+      orders: Array.isArray(parsed.orders) ? parsed.orders : [],
       profile: parsed.profile ?? null,
       verification: parsed.verification ?? null,
       customerProfile: parsed.customerProfile ?? null,

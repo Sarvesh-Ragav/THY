@@ -105,6 +105,11 @@ label {
 
 .hero-leather-btn,
 .thy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
   background-color: #00c9b7;
   background-image:
     linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(8, 80, 74, 0.2)),

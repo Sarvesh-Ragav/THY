@@ -1,72 +1,92 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+
+const NAV_LINKS = [
+  { label: 'Dashboard', href: '/tailor-dashboard' },
+  { label: 'New Requests', href: '/tailor-dashboard/new-requests' },
+  { label: 'Active Orders', href: '/tailor-dashboard/active-orders' },
+  { label: 'Portfolio & Profile', href: '/tailor-dashboard/portfolio' },
+  { label: 'Earnings', href: '/tailor-dashboard/earnings' },
+  { label: 'Availability', href: '/tailor-dashboard/availability' },
+  { label: 'Settings', href: '/tailor-dashboard/settings' }, // 👈 Added Settings here
+];
 
 export default function TailorDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { session, isReady, logout } = useTailorSession();
+  const router = useRouter();
   const pathname = usePathname();
 
-  const navLinks = [
-    { name: 'Dashboard', href: '/tailor-dashboard' },
-    { name: 'New Requests', href: '/tailor-dashboard/new-requests' },
-    { name: 'Active Orders', href: '/tailor-dashboard/active-orders' },
-    { name: 'Availability', href: '/tailor-dashboard/availability' },
-    { name: 'Chat', href: '/tailor-dashboard/chat' },
-    { name: 'Notifications', href: '/tailor-dashboard/notifications' },
-    { name: 'Portfolio', href: '/tailor-dashboard/portfolio' },
-    { name: 'Earnings & Reports', href: '/tailor-dashboard/earnings' },
-  ];
+  useEffect(() => {
+    if (isReady && !session.isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isReady, session.isAuthenticated, router]);
+
+  if (!isReady || !session.isAuthenticated) {
+    return null;
+  }
+
+  const displayName = session.identifier || session.profile?.fullName || 'Tailor Account';
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      {/* Unified Global Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Logo Branding */}
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/tailor-dashboard" className="text-xl font-black tracking-wider text-[#00c9b7]">
-              THY
-            </Link>
-            <span className="bg-teal-50 text-[#00c9b7] text-[10px] font-bold px-2 py-0.5 rounded-md">
-              kavs thy
+            <span className="font-serif font-extrabold text-xl tracking-wider text-slate-900">THY</span>
+            <span className="bg-teal-50 text-teal-700 text-xs px-3 py-1 rounded-full font-bold border border-teal-200/60">
+              {displayName}
             </span>
           </div>
 
-          {/* Single Main Navigation Bar */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              router.push('/login');
+            }}
+            className="text-xs font-bold text-rose-600 hover:text-rose-700 transition-colors"
+          >
+            Log out
+          </button>
+        </div>
+
+        {/* Horizontal Navigation Bar */}
+        <div className="border-t border-slate-100 bg-white px-6">
+          <div className="max-w-7xl mx-auto flex items-center space-x-1 overflow-x-auto">
+            {NAV_LINKS.map((link) => {
+              const isActive =
+                pathname === link.href ||
+                (link.href !== '/tailor-dashboard' && pathname.startsWith(link.href));
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-4 py-3 text-xs font-bold transition-all border-b-2 whitespace-nowrap ${
                     isActive
-                      ? 'bg-teal-50 text-[#00c9b7]'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'border-[#00c9b7] text-[#00c9b7] bg-teal-50/30'
+                      : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
                   }`}
                 >
-                  {link.name}
+                  {link.label}
                 </Link>
               );
             })}
-          </nav>
-
-          {/* User Profile Controls */}
-          <div className="flex items-center gap-3 text-xs font-semibold text-gray-700">
-            <span>kavs</span>
-            <button className="text-gray-400 hover:text-red-500 font-normal">Log out</button>
           </div>
         </div>
       </header>
 
       {/* Main Page Content */}
-      <main className="max-w-7xl mx-auto p-6">{children}</main>
+      <main className="flex-1 max-w-7xl w-full mx-auto">{children}</main>
     </div>
   );
 }
