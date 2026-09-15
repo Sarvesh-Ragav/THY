@@ -3,7 +3,8 @@
  */
 
 export interface LoginFormData {
-  identifier: string; // 10-digit mobile number or E.164 phone number
+  email: string;
+  password: string;
 }
 
 export interface ValidationError {
@@ -14,16 +15,11 @@ export interface ValidationError {
 export interface LoginApiResponse {
   success: boolean;
   message?: string;
-  data?: {
-    challengeId: string;
-    expiresAt: string;
-    mockOtp?: string;
-  };
   error?: string;
 }
 
 export interface ThyLoginCardProps {
-  initialIdentifier?: string;
+  initialEmail?: string;
   onSubmit?: (data: LoginFormData) => Promise<LoginApiResponse | void>;
   onGoogleSignIn?: (credential: string) => void;
   onNavigateSignUp?: () => void;

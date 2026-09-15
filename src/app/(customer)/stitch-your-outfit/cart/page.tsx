@@ -278,15 +278,15 @@ export default function StitchCartPage() {
   const grandTotal = cartSubtotal - discountAmount + fittingFee + estimatedTax;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased pb-16">
-      <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+    <div className="min-h-dvh bg-transparent text-thy-ink pb-16">
+      <header className="sticky top-0 z-40 bg-thy-canvas/90 border-b border-thy-burgundy/15 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('product')}>
-              <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-teal-600/30">
+              <div className="w-10 h-10 rounded-xl bg-thy-burgundy flex items-center justify-center text-white font-bold text-xl shadow-md shadow-thy-burgundy/30">
                 thy
               </div>
-              <span className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+              <span className="text-xl sm:text-2xl font-bold text-thy-ink tracking-tight">
                 {t.brandName}
               </span>
             </div>
@@ -295,7 +295,7 @@ export default function StitchCartPage() {
               <button
                 onClick={() => setActiveTab('product')}
                 className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 ${
-                  activeTab === 'product' ? 'bg-teal-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
+                  activeTab === 'product' ? 'bg-thy-burgundy text-white shadow' : 'text-slate-600 hover:text-thy-ink'
                 }`}
               >
                 <span className="w-5 h-5 rounded-full bg-white/20 text-center text-[10px] leading-5 font-bold">1</span>
@@ -305,14 +305,14 @@ export default function StitchCartPage() {
               <button
                 onClick={() => setActiveTab('cart')}
                 className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 relative ${
-                  activeTab === 'cart' || activeTab === 'quotation' ? 'bg-teal-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
+                  activeTab === 'cart' || activeTab === 'quotation' ? 'bg-thy-burgundy text-white shadow' : 'text-slate-600 hover:text-thy-ink'
                 }`}
               >
                 <span className="w-5 h-5 rounded-full bg-white/20 text-center text-[10px] leading-5 font-bold">2</span>
                 <span>{t.navCart}</span>
                 {activeCartItems.length > 0 && (
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    activeTab === 'cart' || activeTab === 'quotation' ? 'bg-white text-teal-800' : 'bg-teal-600 text-white'
+                    activeTab === 'cart' || activeTab === 'quotation' ? 'bg-white text-thy-ink' : 'bg-thy-burgundy text-white'
                   }`}>
                     {activeCartItems.reduce((acc, i) => acc + i.quantity, 0)}
                   </span>
@@ -322,7 +322,7 @@ export default function StitchCartPage() {
               <button
                 onClick={() => setActiveTab('checkout')}
                 className={`px-4 py-2 rounded-full text-xs font-semibold transition-all flex items-center gap-2 ${
-                  activeTab === 'checkout' ? 'bg-teal-600 text-white shadow' : 'text-slate-600 hover:text-slate-900'
+                  activeTab === 'checkout' ? 'bg-thy-burgundy text-white shadow' : 'text-slate-600 hover:text-thy-ink'
                 }`}
               >
                 <span className="w-5 h-5 rounded-full bg-white/20 text-center text-[10px] leading-5 font-bold">3</span>
@@ -331,7 +331,7 @@ export default function StitchCartPage() {
             </nav>
 
             <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-              <Globe className="w-4 h-4 text-teal-600" />
+              <Globe className="w-4 h-4 text-thy-burgundy" />
               <select 
                 value={lang}
                 onChange={(e) => setLang(e.target.value as 'EN')}
@@ -349,12 +349,12 @@ export default function StitchCartPage() {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
               <div>
-                <h1 className="text-2xl font-extrabold text-slate-900">{t.cartHeading}</h1>
+                <h1 className="text-2xl font-extrabold text-thy-ink">{t.cartHeading}</h1>
                 <p className="text-xs text-slate-500 mt-1">{t.cartSubheading}</p>
               </div>
               <button 
                 onClick={() => setActiveTab('product')}
-                className="text-xs text-teal-700 hover:underline flex items-center gap-1 font-bold"
+                className="text-xs text-thy-burgundy hover:underline flex items-center gap-1 font-bold"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 {t.continueCustomizing}
@@ -363,14 +363,14 @@ export default function StitchCartPage() {
 
             {activeCartItems.length === 0 ? (
               <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center space-y-4 shadow-sm">
-                <div className="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto text-teal-600">
+                <div className="w-16 h-16 bg-thy-mist rounded-full flex items-center justify-center mx-auto text-thy-burgundy">
                   <ShoppingBag className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900">{t.emptyCartTitle}</h3>
+                <h3 className="text-lg font-bold text-thy-ink">{t.emptyCartTitle}</h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto">{t.emptyCartSub}</p>
                 <button
                   onClick={() => setActiveTab('product')}
-                  className="px-6 py-3 bg-teal-600 text-white font-bold text-xs rounded-full hover:bg-teal-700 transition-all shadow-md shadow-teal-600/20"
+                  className="px-6 py-3 bg-thy-burgundy text-white font-bold text-xs rounded-full hover:bg-[#4A1520] transition-all shadow-md shadow-thy-burgundy/20"
                 >
                   {t.configureNow}
                 </button>
@@ -381,7 +381,7 @@ export default function StitchCartPage() {
                   {activeCartItems.map((item) => (
                     <div 
                       key={item.id}
-                      className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4 hover:border-teal-200/80 transition-all"
+                      className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4 hover:border-thy-burgundy/20 transition-all"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                         <div className="flex items-center gap-4">
@@ -403,18 +403,18 @@ export default function StitchCartPage() {
                           <div className="space-y-1">
                             <h2 
                               onClick={() => setActiveTab('product')}
-                              className="text-base font-bold text-slate-900 hover:text-teal-600 cursor-pointer transition-colors flex items-center gap-1.5"
+                              className="text-base font-bold text-thy-ink hover:text-thy-burgundy cursor-pointer transition-colors flex items-center gap-1.5"
                               title="Click to view Product Details"
                             >
                               <span>{item.title}</span>
                               <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                             </h2>
                             <p className="text-xs text-slate-500 flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5 text-teal-600" />
+                              <MapPin className="w-3.5 h-3.5 text-thy-burgundy" />
                               {t.fabricProvided}
                             </p>
                             <div className="inline-flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-full text-[11px] text-slate-700 font-medium">
-                              <Scissors className="w-3.5 h-3.5 text-teal-600" />
+                              <Scissors className="w-3.5 h-3.5 text-thy-burgundy" />
                               <span>{item.tailorName} ({item.tailorExperience})</span>
                             </div>
                           </div>
@@ -424,16 +424,16 @@ export default function StitchCartPage() {
                           <div className="flex items-center bg-slate-100 border border-slate-200 rounded-xl p-1">
                             <button
                               onClick={() => updateQuantity(item.id, -1)}
-                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors"
+                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-thy-ink hover:bg-white rounded-lg transition-colors"
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
-                            <span className="w-8 text-center text-xs font-bold text-slate-900">
+                            <span className="w-8 text-center text-xs font-bold text-thy-ink">
                               {item.quantity}
                             </span>
                             <button
                               onClick={() => updateQuantity(item.id, 1)}
-                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors"
+                              className="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-thy-ink hover:bg-white rounded-lg transition-colors"
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>
@@ -441,7 +441,7 @@ export default function StitchCartPage() {
 
                           <div className="text-right">
                             <span className="text-[11px] text-slate-400 block">{t.quantity} Total</span>
-                            <span className="text-xl font-extrabold text-teal-700">
+                            <span className="text-xl font-extrabold text-thy-burgundy">
                               ₹{calculateItemTotal(item)}
                             </span>
                           </div>
@@ -451,11 +451,11 @@ export default function StitchCartPage() {
                       <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                         <button
                           onClick={() => handleOpenQuotationPage(item)}
-                          className="px-4 py-2 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-sm"
+                          className="px-4 py-2 bg-thy-mist hover:bg-thy-mist text-thy-ink border border-thy-burgundy/20 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-sm"
                         >
-                          <FileText className="w-4 h-4 text-teal-700" />
+                          <FileText className="w-4 h-4 text-thy-burgundy" />
                           <span>{t.viewQuotationBtn}</span>
-                          <ChevronRight className="w-3.5 h-3.5 text-teal-600" />
+                          <ChevronRight className="w-3.5 h-3.5 text-thy-burgundy" />
                         </button>
 
                         <div className="flex items-center gap-4 text-xs">
@@ -480,13 +480,13 @@ export default function StitchCartPage() {
 
                 <div className="lg:col-span-4 space-y-5 sticky top-24">
                   <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
-                    <h2 className="text-lg font-bold text-slate-900 border-b border-slate-200 pb-3">
+                    <h2 className="text-lg font-bold text-thy-ink border-b border-slate-200 pb-3">
                       {t.orderSummary}
                     </h2>
 
                     <form onSubmit={handleApplyCoupon} className="space-y-2">
                       <label className="text-xs text-slate-600 font-semibold flex items-center gap-1.5">
-                        <Tag className="w-3.5 h-3.5 text-teal-600" />
+                        <Tag className="w-3.5 h-3.5 text-thy-burgundy" />
                         {t.promoLabel}
                       </label>
                       <div className="flex gap-2">
@@ -495,7 +495,7 @@ export default function StitchCartPage() {
                           value={couponCode}
                           onChange={(e) => setCouponCode(e.target.value)}
                           placeholder="FESTIVETHY15"
-                          className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 uppercase focus:outline-none focus:border-teal-600"
+                          className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 uppercase focus:outline-none focus:border-thy-burgundy"
                         />
                         <button 
                           type="submit"
@@ -505,7 +505,7 @@ export default function StitchCartPage() {
                         </button>
                       </div>
                       {couponMsg.text && (
-                        <p className={`text-[11px] font-semibold ${couponMsg.type === 'error' ? 'text-rose-600' : 'text-emerald-700'}`}>
+                        <p className={`text-[11px] font-semibold ${couponMsg.type === 'error' ? 'text-rose-600' : 'text-thy-burgundy'}`}>
                           {couponMsg.text}
                         </p>
                       )}
@@ -514,11 +514,11 @@ export default function StitchCartPage() {
                     <div className="space-y-2.5 text-xs text-slate-600 border-t border-b border-slate-200 py-4">
                       <div className="flex justify-between">
                         <span>{t.subtotal}:</span>
-                        <span className="font-bold text-slate-900">₹{cartSubtotal}</span>
+                        <span className="font-bold text-thy-ink">₹{cartSubtotal}</span>
                       </div>
                       
                       {appliedDiscount > 0 && (
-                        <div className="flex justify-between text-emerald-700 font-semibold">
+                        <div className="flex justify-between text-thy-burgundy font-semibold">
                           <span>{t.discount}:</span>
                           <span>- ₹{discountAmount.toFixed(0)}</span>
                         </div>
@@ -526,28 +526,28 @@ export default function StitchCartPage() {
 
                       <div className="flex justify-between">
                         <span>{t.pickupFee}:</span>
-                        <span className="font-bold text-slate-900">₹{fittingFee}</span>
+                        <span className="font-bold text-thy-ink">₹{fittingFee}</span>
                       </div>
 
                       <div className="flex justify-between">
                         <span>{t.estimatedTax}:</span>
-                        <span className="font-bold text-slate-900">₹{estimatedTax.toFixed(0)}</span>
+                        <span className="font-bold text-thy-ink">₹{estimatedTax.toFixed(0)}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="text-xs text-slate-500 block">{t.grandTotal}</span>
-                        <span className="text-2xl font-extrabold text-teal-700">₹{grandTotal.toFixed(0)}</span>
+                        <span className="text-2xl font-extrabold text-thy-burgundy">₹{grandTotal.toFixed(0)}</span>
                       </div>
-                      <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-full font-bold">
+                      <span className="text-[10px] text-thy-burgundy bg-thy-mist border border-thy-burgundy/20 px-2 py-1 rounded-full font-bold">
                         {t.guaranteedPricing}
                       </span>
                     </div>
 
                     <button
                       onClick={() => setActiveTab('checkout')}
-                      className="w-full py-4 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-full shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2 text-xs transition-all transform hover:scale-[1.01]"
+                      className="w-full py-4 bg-thy-burgundy hover:bg-[#4A1520] text-white font-bold rounded-full shadow-lg shadow-thy-burgundy/30 flex items-center justify-center gap-2 text-xs transition-all transform hover:scale-[1.01]"
                     >
                       <span>{t.proceedToCheckout}</span>
                     </button>

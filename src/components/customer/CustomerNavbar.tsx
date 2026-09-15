@@ -200,7 +200,7 @@ export function CustomerNavbar() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setProfileOpen(false)}
-                    className="block px-4 py-2 text-xs font-medium text-gray-700 hover:bg-slate-50 hover:text-[#00c9b7]"
+                    className="block px-4 py-2 text-xs font-medium text-gray-700 hover:bg-slate-50 hover:text-[#5C1A24]"
                   >
                     {item.label}
                   </Link>

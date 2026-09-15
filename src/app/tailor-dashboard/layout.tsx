@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { ThyLogo } from '@/components/auth/ThyLogo';
 
 const NAV_LINKS = [
   { label: 'Dashboard', href: '/tailor-dashboard' },
@@ -12,7 +13,7 @@ const NAV_LINKS = [
   { label: 'Portfolio & Profile', href: '/tailor-dashboard/portfolio' },
   { label: 'Earnings', href: '/tailor-dashboard/earnings' },
   { label: 'Availability', href: '/tailor-dashboard/availability' },
-  { label: 'Settings', href: '/tailor-dashboard/settings' }, // 👈 Added Settings here
+  { label: 'Settings', href: '/tailor-dashboard/settings' },
 ];
 
 export default function TailorDashboardLayout({
@@ -31,19 +32,30 @@ export default function TailorDashboardLayout({
   }, [isReady, session.isAuthenticated, router]);
 
   if (!isReady || !session.isAuthenticated) {
-    return null;
+    return (
+      <div className="min-h-dvh flex items-center justify-center text-sm text-thy-muted">
+        Loading...
+      </div>
+    );
   }
 
   const displayName = session.identifier || session.profile?.fullName || 'Tailor Account';
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-serif font-extrabold text-xl tracking-wider text-slate-900">THY</span>
-            <span className="bg-teal-50 text-teal-700 text-xs px-3 py-1 rounded-full font-bold border border-teal-200/60">
+    <div className="thy-app-glow min-h-dvh flex flex-col text-thy-ink">
+      <header className="thy-silk-bar sticky top-0 z-50 border-b border-white/20 pt-[env(safe-area-inset-top)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 lg:h-[4.5rem] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link href="/tailor-dashboard" className="shrink-0 inline-flex items-center text-white" aria-label="THY tailor home">
+              <ThyLogo size={40} />
+            </Link>
+            <span
+              className="hidden sm:inline text-white tracking-[0.18em] text-sm"
+              style={{ fontFamily: 'var(--font-cormorant), serif' }}
+            >
+              THY
+            </span>
+            <span className="truncate bg-white/12 text-white text-[10px] uppercase tracking-[0.14em] px-3 py-1 rounded-full font-semibold border border-white/20">
               {displayName}
             </span>
           </div>
@@ -54,15 +66,14 @@ export default function TailorDashboardLayout({
               logout();
               router.push('/login');
             }}
-            className="text-xs font-bold text-rose-600 hover:text-rose-700 transition-colors"
+            className="thy-nav-link text-[11px] uppercase tracking-[0.16em] shrink-0"
           >
             Log out
           </button>
         </div>
 
-        {/* Horizontal Navigation Bar */}
-        <div className="border-t border-slate-100 bg-white px-6">
-          <div className="max-w-7xl mx-auto flex items-center space-x-1 overflow-x-auto">
+        <div className="border-t border-white/15 px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto flex items-center gap-1 overflow-x-auto thy-scroll-x">
             {NAV_LINKS.map((link) => {
               const isActive =
                 pathname === link.href ||
@@ -71,10 +82,8 @@ export default function TailorDashboardLayout({
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-3 text-xs font-bold transition-all border-b-2 whitespace-nowrap ${
-                    isActive
-                      ? 'border-[#00c9b7] text-[#00c9b7] bg-teal-50/30'
-                      : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+                  className={`thy-nav-link thy-nav-link-tall px-4 py-3 text-[11px] uppercase tracking-[0.16em] whitespace-nowrap ${
+                    isActive ? 'is-active' : ''
                   }`}
                 >
                   {link.label}
@@ -85,8 +94,9 @@ export default function TailorDashboardLayout({
         </div>
       </header>
 
-      {/* Main Page Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto">{children}</main>
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        {children}
+      </main>
     </div>
   );
 }

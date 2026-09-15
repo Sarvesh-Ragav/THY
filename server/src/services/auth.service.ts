@@ -3,7 +3,8 @@ import { env } from '../config/env.js';
 import { User, type IUser } from '../models/User.js';
 import { AuthSession } from '../models/AuthSession.js';
 import { CustomerProfile } from '../models/CustomerProfile.js';
-import { generateOtp, hashValue, valuesMatch } from '../utils/crypto.js';
+import { TailorProfile } from '../models/TailorProfile.js';
+import { generateOtp, hashPassword, hashValue, valuesMatch, verifyPassword } from '../utils/crypto.js';
 import { ApiError } from '../utils/api-error.js';
 
 export interface AuthUser {
@@ -14,6 +15,7 @@ export interface AuthUser {
   avatarUrl?: string | null;
   authProvider: 'phone' | 'google' | 'both';
   role: 'customer' | 'tailor' | 'admin' | null;
+  hasPassword: boolean;
 }
 
 const googleClient = env.GOOGLE_CLIENT_ID ? new OAuth2Client(env.GOOGLE_CLIENT_ID) : null;
@@ -27,7 +29,150 @@ function toUser(doc: IUser): AuthUser {
     avatarUrl: doc.avatarUrl ?? null,
     authProvider: doc.authProvider,
     role: doc.role ?? null,
+    hasPassword: Boolean(doc.hasPassword),
   };
+}
+
+function cityFromAddress(address: string): string {
+  const parts = address
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return parts.at(-1) || 'India';
+}
+
+export type RegisterCustomerInput = {
+  role: 'customer';
+  fullName: string;
+  phoneNumber: string;
+  email: string;
+  city: string;
+  address: string;
+  password: string;
+};
+
+export type RegisterTailorInput = {
+  role: 'tailor';
+  fullName: string;
+  phoneNumber: string;
+  email: string;
+  shopName: string;
+  yearsOfExperience: number;
+  shopAddress: string;
+  password: string;
+};
+
+/**
+ * Create or complete a password-backed account during registration.
+ */
+export async function registerWithPassword(
+  input: RegisterCustomerInput | RegisterTailorInput
+): Promise<AuthUser> {
+  try {
+    const passwordHash = await hashPassword(input.password);
+    let user = await User.findOne({ phoneNumber: input.phoneNumber });
+
+    const emailOwner = await User.findOne({ email: input.email });
+    if (emailOwner && (!user || emailOwner._id.toString() !== user._id.toString())) {
+      throw new ApiError(409, 'An account with this email already exists.', 'EMAIL_IN_USE');
+    }
+
+    if (user) {
+      if (user.role && user.role !== input.role) {
+        throw new ApiError(403, 'This phone number is already registered with a different role.', 'ROLE_CONFLICT');
+      }
+      if (user.hasPassword) {
+        throw new ApiError(409, 'An account with this phone number already exists. Please log in.', 'ACCOUNT_EXISTS');
+      }
+      user.role = input.role;
+      user.name = input.fullName;
+      user.email = input.email;
+      user.passwordHash = passwordHash;
+      user.hasPassword = true;
+      user.lastLoginAt = new Date();
+      if (user.authProvider === 'google') {
+        user.authProvider = 'both';
+      }
+      await user.save();
+    } else {
+      user = await User.create({
+        phoneNumber: input.phoneNumber,
+        email: input.email,
+        name: input.fullName,
+        authProvider: 'phone',
+        role: input.role,
+        passwordHash,
+        hasPassword: true,
+        lastLoginAt: new Date(),
+      });
+    }
+
+    if (input.role === 'customer') {
+      await CustomerProfile.findOneAndUpdate(
+        { userId: user._id },
+        {
+          $set: {
+            fullName: input.fullName,
+            email: input.email,
+            city: input.city,
+            addresses: [
+              {
+                label: 'Home',
+                addressLine1: input.address,
+                city: input.city,
+                isDefault: true,
+              },
+            ],
+          },
+        },
+        { upsert: true, new: true }
+      );
+    } else {
+      await TailorProfile.findOneAndUpdate(
+        { userId: user._id },
+        {
+          $set: {
+            fullName: input.fullName,
+            shopName: input.shopName,
+            yearsOfExperience: input.yearsOfExperience,
+            shopAddress: input.shopAddress,
+            city: cityFromAddress(input.shopAddress),
+          },
+          $setOnInsert: {
+            publicId: `t-${user._id.toString()}`,
+          },
+        },
+        { upsert: true, new: true }
+      );
+    }
+
+    return toUser(user);
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    if (typeof error === 'object' && error && 'code' in error && (error as { code: number }).code === 11000) {
+      throw new ApiError(409, 'An account with these details already exists. Please log in.', 'ACCOUNT_EXISTS');
+    }
+    throw error;
+  }
+}
+
+/**
+ * Sign in with email and password stored on the User document.
+ */
+export async function loginWithPassword(email: string, password: string): Promise<AuthUser> {
+  const user = await User.findOne({ email: email.toLowerCase(), isActive: true }).select('+passwordHash');
+  if (!user?.passwordHash || !user.hasPassword) {
+    throw new ApiError(401, 'Invalid email or password.', 'INVALID_CREDENTIALS');
+  }
+
+  const matches = await verifyPassword(password, user.passwordHash);
+  if (!matches) {
+    throw new ApiError(401, 'Invalid email or password.', 'INVALID_CREDENTIALS');
+  }
+
+  user.lastLoginAt = new Date();
+  await user.save();
+  return toUser(user);
 }
 
 /**

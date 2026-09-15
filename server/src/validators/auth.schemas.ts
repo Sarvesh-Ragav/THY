@@ -22,6 +22,44 @@ export const googleAuthSchema = z.object({
   credential: z.string().min(1, 'Google credential token is required.'),
 });
 
+export const loginPasswordSchema = z.object({
+  email: z.string().trim().email('Enter a valid email address.').max(254),
+  password: z.string().min(1, 'Please enter your password.').max(128),
+});
+
 export const updateRoleSchema = z.object({
   role: z.enum(['customer', 'tailor']),
 });
+
+const passwordFields = {
+  password: z.string().min(8, 'Password must be at least 8 characters.').max(128),
+  confirmPassword: z.string().min(1, 'Please confirm your password.').max(128),
+};
+
+const passwordsMatch = <T extends { password: string; confirmPassword: string }>(value: T) =>
+  value.password === value.confirmPassword;
+
+export const registerCustomerSchema = z.object({
+  role: z.literal('customer'),
+  fullName: z.string().trim().min(1).max(120),
+  phone: phoneInput,
+  email: z.string().trim().email().max(254),
+  city: z.string().trim().min(1).max(120),
+  address: z.string().trim().min(1).max(500),
+  ...passwordFields,
+});
+
+export const registerTailorSchema = z.object({
+  role: z.literal('tailor'),
+  fullName: z.string().trim().min(1).max(120),
+  phone: phoneInput,
+  email: z.string().trim().email().max(254),
+  shopName: z.string().trim().min(1).max(160),
+  yearsOfExperience: z.coerce.number().int().min(0).max(80),
+  shopAddress: z.string().trim().min(1).max(1_000),
+  ...passwordFields,
+});
+
+export const registerAccountSchema = z
+  .discriminatedUnion('role', [registerCustomerSchema, registerTailorSchema])
+  .refine(passwordsMatch, { message: 'Passwords do not match.', path: ['confirmPassword'] });

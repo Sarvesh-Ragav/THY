@@ -4,19 +4,19 @@
   --color-thy-ink: #3F1218;
   --color-thy-muted: #7A4A52;
   --color-thy-subtle: #9A7178;
-  --color-thy-bg: #00B6AA;
+  --color-thy-bg: #F7F0E4;
   --color-thy-surface: #FBF6ED;
   --color-thy-mist: #F3E8D6;
   --color-thy-canvas: #FBF6ED;
   --color-thy-cream: #F7F0E4;
   --color-thy-burgundy: #5C1A24;
-  --color-thy-brand: #00B6AA;
-  --color-thy-brand-hover: #1ac9bd;
-  --color-thy-brand-active: #009e94;
+  --color-thy-brand: #5C1A24;
+  --color-thy-brand-hover: #7A2430;
+  --color-thy-brand-active: #4A1520;
   --color-thy-deep: #5C1A24;
-  --color-brand-teal: #00B6AA;
-  --color-brand-teal-hover: #1ac9bd;
-  --color-brand-teal-active: #009e94;
+  --color-brand-teal: #5C1A24;
+  --color-brand-teal-hover: #7A2430;
+  --color-brand-teal-active: #4A1520;
 }
 
 :root {
@@ -36,6 +36,7 @@ html {
 }
 
 body {
+  font-family: var(--font-outfit), sans-serif;
   background-color: var(--thy-cream);
   background-image:
     radial-gradient(ellipse 70% 42% at 8% -8%, rgba(255, 252, 246, 0.9), transparent 56%),
@@ -43,11 +44,23 @@ body {
     var(--thy-diamonds),
     linear-gradient(180deg, var(--thy-cream-soft) 0%, var(--thy-cream) 46%, var(--thy-cream-deep) 100%);
   background-size: auto, auto, 10px 10px, auto;
+  background-attachment: fixed;
   color: var(--thy-burgundy);
   min-height: 100dvh;
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: rgba(92, 26, 36, 0.16);
+}
+
+h1,
+h2,
+h3,
+.font-serif {
+  font-family: var(--font-cormorant), serif;
+}
+
+.font-sans {
+  font-family: var(--font-outfit), sans-serif;
 }
 
 img,
@@ -175,8 +188,8 @@ label {
 
 .thy-auth-header {
   background:
-    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.22), transparent 45%),
-    linear-gradient(165deg, #00B6AA 0%, #00A399 48%, #1ac9bd 140%);
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.16), transparent 45%),
+    linear-gradient(165deg, #6E1F2C 0%, #5C1A24 48%, #4A1520 140%);
 }
 
 .thy-input {
@@ -218,7 +231,7 @@ label {
 
 .hero-vellum {
   background-image:
-    radial-gradient(rgba(0, 182, 170, 0.08) 0.6px, transparent 0.7px),
+    radial-gradient(rgba(92, 26, 36, 0.08) 0.6px, transparent 0.7px),
     url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
   background-size: 18px 18px, 220px 220px;
 }
@@ -232,14 +245,14 @@ label {
   line-height: 1.2;
   background-color: #ffffff;
   background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(0, 182, 170, 0.08)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(92, 26, 36, 0.08)),
     url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23l)' opacity='0.28'/%3E%3C/svg%3E");
   background-size: cover, 120px 120px;
-  color: #00B6AA;
+  color: #5C1A24;
   font-weight: 700;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 12px 28px rgba(0, 70, 65, 0.18),
+    0 12px 28px rgba(60, 12, 20, 0.18),
     0 0 0 1px rgba(255, 255, 255, 0.45);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -253,10 +266,10 @@ label {
   .thy-btn:hover {
     filter: brightness(1.04);
     transform: translateY(-2px) scale(1.01);
-    background-color: #f5fffb;
+    background-color: #FBF6ED;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 251, 0.4),
-      0 16px 36px rgba(0, 70, 65, 0.22),
+      0 16px 36px rgba(60, 12, 20, 0.22),
       0 0 28px rgba(255, 255, 255, 0.35);
   }
 }
@@ -265,7 +278,7 @@ label {
   .hero-leather-btn:active,
   .thy-btn:active {
     filter: brightness(1.03);
-    background-color: #f5fffb;
+    background-color: #FBF6ED;
   }
 }
 
@@ -363,10 +376,10 @@ label {
 .thy-shimmer-text {
   background: linear-gradient(
     110deg,
-    rgba(245, 255, 251, 0.55) 0%,
-    rgba(0, 182, 170, 1) 45%,
-    rgba(245, 255, 251, 0.9) 70%,
-    rgba(245, 255, 251, 0.55) 100%
+    rgba(247, 240, 228, 0.55) 0%,
+    rgba(92, 26, 36, 1) 45%,
+    rgba(247, 240, 228, 0.9) 70%,
+    rgba(247, 240, 228, 0.55) 100%
   );
   background-size: 220% 100%;
   -webkit-background-clip: text;

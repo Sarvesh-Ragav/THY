@@ -112,6 +112,7 @@ export interface TailorSession {
   identifier: string;
   role: UserRole | null;
   isAuthenticated: boolean;
+  hasPassword: boolean;
   profile: TailorProfile | null;
   verification: TailorVerification | null;
   customerProfile: CustomerProfile | null;
@@ -190,6 +191,7 @@ export function createDefaultSession(): TailorSession {
     identifier: '',
     role: null,
     isAuthenticated: false,
+    hasPassword: false,
     profile: null,
     verification: null,
     customerProfile: null,
@@ -309,6 +311,7 @@ export function loadTailorSession(): TailorSession {
       customerProfile: parsed.customerProfile ?? null,
       customerPreferences: parsed.customerPreferences ?? null,
       selectedLocation: parsed.selectedLocation ?? null,
+      hasPassword: Boolean(parsed.hasPassword),
       customerDesigns: Array.isArray(parsed.customerDesigns) ? parsed.customerDesigns : [],
       customerOrders: Array.isArray(parsed.customerOrders) ? parsed.customerOrders : [],
     };

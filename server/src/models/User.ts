@@ -30,6 +30,15 @@ const UserSchema = new Schema(
         partialFilterExpression: { googleId: { $type: 'string' } },
       },
     },
+    passwordHash: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    hasPassword: {
+      type: Boolean,
+      default: false,
+    },
     name: {
       type: String,
       trim: true,
@@ -67,6 +76,7 @@ const UserSchema = new Schema(
       virtuals: true,
       transform: (_doc, ret: Record<string, any>) => {
         delete ret.__v;
+        delete ret.passwordHash;
         return ret;
       },
     },

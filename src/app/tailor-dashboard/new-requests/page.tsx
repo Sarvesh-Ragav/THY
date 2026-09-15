@@ -101,25 +101,25 @@ export default function NewRequestsPage() {
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">New Order Requests</h1>
-          <p className="text-xs text-gray-600">Review incoming customer custom tailoring requests and send price quotations.</p>
+          <h1 className="text-2xl font-bold text-thy-ink">New Order Requests</h1>
+          <p className="text-xs text-thy-muted">Review incoming customer custom tailoring requests and send price quotations.</p>
         </div>
-        <Link href="/tailor-dashboard" className="text-sm font-semibold text-[#00c9b7] hover:underline">
+        <Link href="/tailor-dashboard" className="text-sm font-semibold text-[#5C1A24] hover:underline">
           ← Back to Dashboard
         </Link>
       </div>
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="bg-teal-50 border border-[#00c9b7] text-teal-800 px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between animate-fade-in">
+        <div className="bg-thy-mist border border-[#5C1A24] text-thy-ink px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between animate-fade-in">
           <span>{toastMessage}</span>
-          <button onClick={() => setToastMessage(null)} className="text-teal-600 font-bold">✕</button>
+          <button onClick={() => setToastMessage(null)} className="text-thy-burgundy font-bold">✕</button>
         </div>
       )}
 
       {/* Loading Indicator */}
       {isLoading && (
-        <div className="py-6 text-center text-xs text-[#00c9b7] font-semibold animate-pulse">
+        <div className="py-6 text-center text-xs text-[#5C1A24] font-semibold animate-pulse">
           ⏳ Processing quotation update...
         </div>
       )}
@@ -130,45 +130,45 @@ export default function NewRequestsPage() {
           {requests.map((req) => (
             <div
               key={req.id}
-              className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-gray-200 transition-all"
+              className="bg-thy-canvas/90 p-5 rounded-2xl border border-thy-burgundy/10 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-gray-200 transition-all"
             >
               <div className="flex items-center gap-4">
                 <img
                   src={req.designPreview}
                   alt={req.garmentType}
-                  className="w-16 h-16 rounded-xl object-cover border border-gray-100"
+                  className="w-16 h-16 rounded-xl object-cover border border-thy-burgundy/10"
                 />
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-400">{req.id}</span>
+                    <span className="text-xs font-bold text-thy-subtle">{req.id}</span>
                     <span
                       className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                         req.status === 'Quoted'
-                          ? 'bg-teal-50 text-teal-700 border border-teal-200'
+                          ? 'bg-thy-mist text-thy-burgundy border border-thy-burgundy/20'
                           : 'bg-amber-50 text-amber-700 border border-amber-200'
                       }`}
                     >
                       {req.status}
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-gray-900">{req.garmentType}</h3>
-                  <p className="text-xs text-gray-600">
-                    Customer: <span className="font-semibold text-gray-800">{req.customerName}</span> | Estimated Budget: <span className="font-semibold text-gray-800">{req.budgetEstimate}</span>
+                  <h3 className="text-sm font-bold text-thy-ink">{req.garmentType}</h3>
+                  <p className="text-xs text-thy-muted">
+                    Customer: <span className="font-semibold text-thy-ink">{req.customerName}</span> | Estimated Budget: <span className="font-semibold text-thy-ink">{req.budgetEstimate}</span>
                   </p>
-                  <p className="text-[11px] text-gray-500">Requested on: {req.requestDate}</p>
+                  <p className="text-[11px] text-thy-subtle">Requested on: {req.requestDate}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 w-full md:w-auto justify-end">
                 <button
                   onClick={() => handleRejectRequest(req.id)}
-                  className="px-3 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold hover:bg-red-50 hover:text-red-600 transition-colors"
+                  className="px-3 py-2 bg-gray-100 text-thy-muted rounded-xl text-xs font-semibold hover:bg-red-50 hover:text-red-600 transition-colors"
                 >
                   Decline
                 </button>
                 <button
                   onClick={() => setSelectedRequest(req)}
-                  className="px-4 py-2 bg-[#00c9b7] text-white rounded-xl text-xs font-semibold hover:bg-[#00b5a4] transition-colors"
+                  className="px-4 py-2 bg-[#5C1A24] text-white rounded-xl text-xs font-semibold hover:bg-[#4A1520] transition-colors"
                 >
                   {req.status === 'Quoted' ? 'View Sent Quote' : 'Create Quotation'}
                 </button>
@@ -178,10 +178,10 @@ export default function NewRequestsPage() {
         </div>
       ) : (
         !isLoading && (
-          <div className="bg-white p-12 rounded-2xl border border-gray-100 text-center space-y-2">
+          <div className="bg-thy-canvas/90 p-12 rounded-2xl border border-thy-burgundy/10 text-center space-y-2">
             <div className="text-3xl">📋</div>
-            <h3 className="text-base font-bold text-gray-800">No new request inquiries</h3>
-            <p className="text-xs text-gray-500 max-w-sm mx-auto">
+            <h3 className="text-base font-bold text-thy-ink">No new request inquiries</h3>
+            <p className="text-xs text-thy-subtle max-w-sm mx-auto">
               New customer tailoring requests will show up here for price quotes.
             </p>
           </div>
@@ -191,19 +191,19 @@ export default function NewRequestsPage() {
       {/* CREATE QUOTATION MODAL */}
       {selectedRequest && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl space-y-5 max-h-[90vh] overflow-y-auto">
+          <div className="bg-thy-canvas/90 rounded-2xl p-6 w-full max-w-lg shadow-xl space-y-5 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b pb-3">
               <div>
-                <span className="text-[10px] font-bold text-gray-400">{selectedRequest.id}</span>
-                <h2 className="font-bold text-gray-900 text-base">Send Quotation to {selectedRequest.customerName}</h2>
+                <span className="text-[10px] font-bold text-thy-subtle">{selectedRequest.id}</span>
+                <h2 className="font-bold text-thy-ink text-base">Send Quotation to {selectedRequest.customerName}</h2>
               </div>
-              <button onClick={() => setSelectedRequest(null)} className="text-gray-400 hover:text-gray-600 font-bold text-lg">
+              <button onClick={() => setSelectedRequest(null)} className="text-thy-subtle hover:text-thy-muted font-bold text-lg">
                 ✕
               </button>
             </div>
 
             {/* Request Summary */}
-            <div className="bg-gray-50 p-4 rounded-xl space-y-2 text-xs text-gray-700">
+            <div className="bg-gray-50 p-4 rounded-xl space-y-2 text-xs text-thy-muted">
               <p><strong>Garment:</strong> {selectedRequest.garmentType} ({selectedRequest.category})</p>
               <p><strong>Fabric Details:</strong> {selectedRequest.fabricDetails}</p>
               <p><strong>Measurements:</strong> {selectedRequest.measurements}</p>
@@ -213,37 +213,37 @@ export default function NewRequestsPage() {
             {/* Quote Form */}
             <form onSubmit={handleSendQuotation} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-gray-700 mb-1">Quoted Price (₹)</label>
+                <label className="block font-semibold text-thy-muted mb-1">Quoted Price (₹)</label>
                 <input
                   type="number"
                   required
                   placeholder="e.g. 8500"
                   value={quotedAmount}
                   onChange={(e) => setQuotedAmount(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
+                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5C1A24]"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-gray-700 mb-1">Estimated Days to Complete</label>
+                <label className="block font-semibold text-thy-muted mb-1">Estimated Days to Complete</label>
                 <input
                   type="number"
                   required
                   placeholder="e.g. 10"
                   value={estimatedDays}
                   onChange={(e) => setEstimatedDays(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
+                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5C1A24]"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-gray-700 mb-1">Notes / Terms for Customer (Optional)</label>
+                <label className="block font-semibold text-thy-muted mb-1">Notes / Terms for Customer (Optional)</label>
                 <textarea
                   rows={3}
                   placeholder="e.g. Price includes fitting & alteration charges..."
                   value={quoteNotes}
                   onChange={(e) => setQuoteNotes(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00c9b7]"
+                  className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#5C1A24]"
                 />
               </div>
 
@@ -251,13 +251,13 @@ export default function NewRequestsPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedRequest(null)}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-semibold"
+                  className="px-4 py-2 bg-gray-100 text-thy-muted rounded-xl font-semibold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#00c9b7] text-white rounded-xl font-semibold hover:bg-[#00b5a4]"
+                  className="px-4 py-2 bg-[#5C1A24] text-white rounded-xl font-semibold hover:bg-[#4A1520]"
                 >
                   Send Formal Quote
                 </button>

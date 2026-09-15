@@ -9,6 +9,8 @@ import {
   verifyOtp,
   verifyGoogleCredential,
   updateUserRole,
+  registerWithPassword,
+  loginWithPassword,
   type AuthUser,
 } from '../services/auth.service.js';
 import { createAccessToken, createRefreshToken, verifyRefreshToken, type TokenPayload } from '../services/token.service.js';
@@ -20,6 +22,8 @@ import {
   verifyOtpSchema,
   googleAuthSchema,
   updateRoleSchema,
+  registerAccountSchema,
+  loginPasswordSchema,
 } from '../validators/auth.schemas.js';
 
 const refreshCookieName = 'thy_refresh_token';
@@ -122,6 +126,49 @@ export const googleAuth: RequestHandler = async (request, response, next) => {
   try {
     const body = googleAuthSchema.parse(request.body);
     const user = await verifyGoogleCredential(body.credential);
+    const accessToken = await issueTokens(user, request, response);
+    response.status(200).json({ success: true, data: { accessToken, user } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const registerAccount: RequestHandler = async (request, response, next) => {
+  try {
+    const body = registerAccountSchema.parse(request.body);
+    const phoneNumber = validatedPhoneNumber(body.phone);
+    const user =
+      body.role === 'customer'
+        ? await registerWithPassword({
+            role: 'customer',
+            fullName: body.fullName,
+            phoneNumber,
+            email: body.email.toLowerCase(),
+            city: body.city,
+            address: body.address,
+            password: body.password,
+          })
+        : await registerWithPassword({
+            role: 'tailor',
+            fullName: body.fullName,
+            phoneNumber,
+            email: body.email.toLowerCase(),
+            shopName: body.shopName,
+            yearsOfExperience: body.yearsOfExperience,
+            shopAddress: body.shopAddress,
+            password: body.password,
+          });
+    const accessToken = await issueTokens(user, request, response);
+    response.status(201).json({ success: true, data: { accessToken, user } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const loginWithEmail: RequestHandler = async (request, response, next) => {
+  try {
+    const body = loginPasswordSchema.parse(request.body);
+    const user = await loginWithPassword(body.email.toLowerCase(), body.password);
     const accessToken = await issueTokens(user, request, response);
     response.status(200).json({ success: true, data: { accessToken, user } });
   } catch (error) {

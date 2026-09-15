@@ -137,7 +137,7 @@ export default function TailorProfilePage() {
                 onClick={() => setPortfolioFilter(category)}
                 className={`px-3 min-h-8 text-xs transition-colors ${
                   portfolioFilter === category
-                    ? 'bg-thy-brand text-thy-deep'
+                    ? 'bg-thy-brand text-white'
                     : 'border border-thy-brand/25 bg-thy-mist text-thy-ink hover:border-thy-brand/50'
                 }`}
               >

@@ -162,7 +162,7 @@ function TryOnContent() {
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)] gap-4 sm:gap-5">
         {!bodyPhoto ? (
-          <section className="bg-thy-deep text-[#fbfefd] px-5 sm:px-8 pt-8 pb-7">
+          <section className="bg-thy-deep text-[#FBF6ED] px-5 sm:px-8 pt-8 pb-7">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-thy-brand/20 border border-thy-brand/40 text-thy-brand text-[10px] uppercase tracking-[0.16em] mx-auto mb-2">
               <Sparkles size={12} />
               <span>Google Virtual Try-On · virtual-try-on-001</span>
@@ -198,7 +198,7 @@ function TryOnContent() {
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="flex-1 flex items-center justify-center min-h-12 rounded-full bg-[#fbfefd] text-thy-deep text-sm font-medium hover:bg-white transition-colors cursor-pointer"
+                className="flex-1 flex items-center justify-center min-h-12 rounded-full bg-[#FBF6ED] text-thy-deep text-sm font-medium hover:bg-white transition-colors cursor-pointer"
               >
                 Upload your photo
               </button>
@@ -342,7 +342,7 @@ function TryOnContent() {
 
               {/* AI Processing Overlay */}
               {vtoGenerating && (
-                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 text-[#fbfefd] bg-thy-deep/85 backdrop-blur-sm p-6 text-center animate-in fade-in duration-200">
+                <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 text-[#FBF6ED] bg-thy-deep/85 backdrop-blur-sm p-6 text-center animate-in fade-in duration-200">
                   <div className="relative">
                     <span className="h-16 w-16 rounded-full border-3 border-white/20 border-t-thy-brand animate-spin inline-block" />
                     <Sparkles size={20} className="text-thy-brand absolute inset-0 m-auto animate-pulse" />
@@ -360,7 +360,7 @@ function TryOnContent() {
 
               {/* Quick placing animation */}
               {fitting && !vtoGenerating && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-[#fbfefd] bg-thy-deep/70">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-[#FBF6ED] bg-thy-deep/70">
                   <span className="h-10 w-10 rounded-full border-2 border-white/25 border-t-thy-brand animate-spin" />
                   <p className="text-[11px] uppercase tracking-[0.18em]">Placing garment</p>
                 </div>

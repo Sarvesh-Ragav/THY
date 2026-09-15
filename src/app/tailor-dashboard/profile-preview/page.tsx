@@ -98,7 +98,7 @@ export default function TailorProfilePreviewPage() {
     : portfolioItems.filter(item => item.category === activeFilter);
 
   return (
-    <div className="p-3 md:p-8 min-h-screen bg-slate-50 text-slate-800 space-y-6">
+    <div className="space-y-6 text-thy-ink">
       {/* Header with Route Switcher */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <div>
@@ -117,7 +117,7 @@ export default function TailorProfilePreviewPage() {
           >
             ⚙️ Tailor Management
           </Link>
-          <span className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-[#00c9b7] text-white shadow-xs text-center">
+          <span className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold rounded-xl bg-[#5C1A24] text-white shadow-xs text-center">
             👁️ Public Profile Preview
           </span>
         </div>
@@ -129,13 +129,13 @@ export default function TailorProfilePreviewPage() {
           <img
             src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80"
             alt={tailorInfo.name}
-            className="w-24 h-24 rounded-full object-cover border-4 border-teal-50 shadow-sm"
+            className="w-24 h-24 rounded-full object-cover border-4 border-thy-mist shadow-sm"
           />
           <div className="space-y-1.5 text-center md:text-left flex-1">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               <h2 className="text-xl font-extrabold text-slate-900">{tailorInfo.businessName}</h2>
               {tailorInfo.isVerified && (
-                <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                <span className="bg-thy-mist text-thy-ink text-[10px] font-bold px-2.5 py-0.5 rounded-full">
                   ✓ THY Verified
                 </span>
               )}
@@ -152,7 +152,7 @@ export default function TailorProfilePreviewPage() {
           <div className="shrink-0 space-y-2 text-center w-full md:w-auto">
             <button
               onClick={() => setIsEstimateModalOpen(true)}
-              className="w-full px-5 py-2.5 bg-[#00c9b7] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#00b5a4] transition-colors"
+              className="w-full px-5 py-2.5 bg-[#5C1A24] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#4A1520] transition-colors"
             >
               Request Estimate
             </button>
@@ -166,7 +166,7 @@ export default function TailorProfilePreviewPage() {
             {services.filter(s => s.enabled).map(service => (
               <div key={service.id} className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
                 <span className="text-xs font-bold text-slate-800">{service.name}</span>
-                <span className="text-xs font-extrabold text-[#00c9b7]">₹{service.minPrice} - ₹{service.maxPrice}</span>
+                <span className="text-xs font-extrabold text-[#5C1A24]">₹{service.minPrice} - ₹{service.maxPrice}</span>
               </div>
             ))}
           </div>
@@ -203,7 +203,7 @@ export default function TailorProfilePreviewPage() {
                   key={cat}
                   onClick={() => setActiveFilter(cat)}
                   className={`px-3 py-1 text-[11px] font-bold rounded-lg transition-colors ${
-                    activeFilter === cat ? 'bg-[#00c9b7] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    activeFilter === cat ? 'bg-[#5C1A24] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
                   {cat}
@@ -238,7 +238,7 @@ export default function TailorProfilePreviewPage() {
                   <p className="font-bold text-slate-900">
                     {rev.name}
                     {rev.isVerified && (
-                      <span className="text-[10px] font-normal text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md ml-2">
+                      <span className="text-[10px] font-normal text-thy-burgundy bg-thy-mist px-2 py-0.5 rounded-md ml-2">
                         ✓ Verified Order
                       </span>
                     )}
@@ -252,24 +252,24 @@ export default function TailorProfilePreviewPage() {
         </div>
 
         {/* Trust Card */}
-        <div className="bg-gradient-to-r from-teal-900 to-slate-900 text-white p-6 rounded-3xl shadow-sm space-y-3">
-          <h3 className="text-sm font-bold text-teal-300">Why Customers Choose Priya</h3>
+        <div className="bg-gradient-to-r from-[#3F1218] to-slate-900 text-white p-6 rounded-3xl shadow-sm space-y-3">
+          <h3 className="text-sm font-bold text-thy-cream">Why Customers Choose Priya</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center pt-2">
             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
               <p className="text-lg font-black text-white">{tailorInfo.experience}</p>
-              <p className="text-[10px] text-teal-200">Experience</p>
+              <p className="text-[10px] text-thy-cream/80">Experience</p>
             </div>
             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
               <p className="text-lg font-black text-white">{tailorInfo.completedOrders}+</p>
-              <p className="text-[10px] text-teal-200">Completed Orders</p>
+              <p className="text-[10px] text-thy-cream/80">Completed Orders</p>
             </div>
             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
               <p className="text-lg font-black text-white">{tailorInfo.rating} ★</p>
-              <p className="text-[10px] text-teal-200">User Rating</p>
+              <p className="text-[10px] text-thy-cream/80">User Rating</p>
             </div>
             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
-              <p className="text-lg font-black text-emerald-400">100%</p>
-              <p className="text-[10px] text-teal-200">THY Verified</p>
+              <p className="text-lg font-black text-thy-cream">100%</p>
+              <p className="text-[10px] text-thy-cream/80">THY Verified</p>
             </div>
           </div>
         </div>
@@ -286,7 +286,7 @@ export default function TailorProfilePreviewPage() {
                 <select
                   value={selectedEstimateService}
                   onChange={e => setSelectedEstimateService(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#00c9b7]"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#5C1A24]"
                 >
                   {services.map(s => (
                     <option key={s.id} value={s.name}>{s.name} (₹{s.minPrice} - ₹{s.maxPrice})</option>
@@ -300,7 +300,7 @@ export default function TailorProfilePreviewPage() {
                   value={estimateNotes}
                   onChange={e => setEstimateNotes(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#00c9b7]"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#5C1A24]"
                 />
               </div>
               <div className="flex gap-2 pt-2">
@@ -313,7 +313,7 @@ export default function TailorProfilePreviewPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-[#00c9b7] text-white rounded-xl text-xs font-bold hover:bg-[#00b5a4]"
+                  className="flex-1 py-2.5 bg-[#5C1A24] text-white rounded-xl text-xs font-bold hover:bg-[#4A1520]"
                 >
                   Send Request
                 </button>
