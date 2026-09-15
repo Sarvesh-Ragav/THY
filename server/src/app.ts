@@ -10,6 +10,7 @@ import { paymentRouter } from './routes/payment.routes.js';
 import { meRouter, tailorRouter } from './routes/profile.routes.js';
 import { razorpayWebhook } from './controllers/payment.controller.js';
 import { categoryRouter, designRouter, directoryTailorRouter } from './routes/catalogue.routes.js';
+import { chatRouter } from './routes/chat.routes.js';
 import { mongoose } from './db/mongo.js';
 
 function isAllowedOrigin(origin?: string): boolean {
@@ -38,7 +39,7 @@ app.use(
       callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
@@ -71,5 +72,6 @@ app.use('/api/v1/me', meRouter);
 app.use('/api/v1/tailors', tailorRouter);
 app.use('/api/v1/tailors', directoryTailorRouter);
 app.use('/api/v1/payments', paymentRouter);
+app.use('/api/v1/chat', chatRouter);
 app.use(notFound);
 app.use(errorHandler);

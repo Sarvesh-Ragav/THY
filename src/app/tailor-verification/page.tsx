@@ -41,18 +41,24 @@ export default function TailorVerificationPage() {
 
   return (
     <div className="min-h-dvh bg-transparent flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-sm border border-gray-100 space-y-6">
+      <div className="thy-card p-8 max-w-md w-full space-y-6">
         <div className="text-center space-y-1">
-          <div className="text-3xl mb-2">📜</div>
-          <h1 className="text-xl font-bold text-gray-900">Tailor Verification</h1>
-          <p className="text-xs text-gray-500">
-            Upload identity & business proofs to activate full payout and ordering features.
+          <p className="thy-section-label mb-2">THY</p>
+          <h1
+            className="text-3xl leading-[0.95] text-thy-ink"
+            style={{ fontFamily: 'var(--font-cormorant), serif' }}
+          >
+            Tailor Verification
+          </h1>
+          <p className="text-sm text-thy-muted mt-3">
+            Upload identity and business proofs to activate payouts and ordering.
           </p>
+          <div className="thy-divider-glow mt-4 mx-auto max-w-xs" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           <div>
-            <label className="block font-bold text-gray-700 mb-1">
+            <label className="block font-bold text-thy-ink mb-1">
               Government ID Proof (Aadhaar / PAN / Driving License)
             </label>
             <input
@@ -60,12 +66,12 @@ export default function TailorVerificationPage() {
               required
               accept="image/*,.pdf"
               onChange={(e) => setGovId(e.target.files?.[0] || null)}
-              className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-thy-mist file:text-[#5C1A24] hover:file:bg-thy-mist cursor-pointer"
+              className="w-full text-xs text-thy-muted file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-thy-mist file:text-thy-brand hover:file:bg-thy-mist cursor-pointer"
             />
           </div>
 
           <div>
-            <label className="block font-bold text-gray-700 mb-1">
+            <label className="block font-bold text-thy-ink mb-1">
               Shop / Studio License or Address Proof
             </label>
             <input
@@ -73,7 +79,7 @@ export default function TailorVerificationPage() {
               required
               accept="image/*,.pdf"
               onChange={(e) => setShopProof(e.target.files?.[0] || null)}
-              className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-thy-mist file:text-[#5C1A24] hover:file:bg-thy-mist cursor-pointer"
+              className="w-full text-xs text-thy-muted file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-thy-mist file:text-thy-brand hover:file:bg-thy-mist cursor-pointer"
             />
           </div>
 
@@ -87,7 +93,7 @@ export default function TailorVerificationPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-[#5C1A24] text-white rounded-xl font-bold text-xs hover:bg-[#4A1520] transition-colors shadow-sm"
+            className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors disabled:opacity-60"
           >
             {isSubmitting ? 'Submitting Documents...' : 'Submit Verification & Proceed →'}
           </button>

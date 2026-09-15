@@ -139,14 +139,19 @@ export default function TailorRegistration() {
 
   return (
     <div className="min-h-dvh bg-transparent flex items-start sm:items-center justify-center p-4 md:p-8 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
-      <div className="w-full max-w-md md:max-w-3xl bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.08)] p-6 md:p-10">
+      <div className="w-full max-w-md md:max-w-3xl thy-card p-6 md:p-10">
         <div className="text-center mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-thy-ink">
+          <p className="thy-section-label mb-2">THY</p>
+          <h1
+            className="text-3xl sm:text-4xl leading-[0.95] text-thy-ink"
+            style={{ fontFamily: 'var(--font-cormorant), serif' }}
+          >
             Tailor Registration
           </h1>
-          <p className="text-sm md:text-base text-thy-muted mt-2">
+          <p className="text-sm md:text-base text-thy-muted mt-3">
             Fill in your details and set a password to get started
           </p>
+          <div className="thy-divider-glow mt-4 mx-auto max-w-xs" />
         </div>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">

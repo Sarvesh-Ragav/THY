@@ -1,8 +1,10 @@
+import http from 'node:http';
+import dns from 'node:dns';
 import { app } from './app.js';
 import { env } from './config/env.js';
 import { pool } from './db/pool.js';
 import { connectMongo, disconnectMongo } from './db/mongo.js';
-import dns from 'node:dns';
+import { initSocket } from './socket/index.js';
 
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
@@ -11,8 +13,11 @@ connectMongo().catch((err) => {
   console.error('Initial MongoDB connection error:', err);
 });
 
-const server = app.listen(env.PORT, () =>
-  console.info(`THY API listening on http://localhost:${env.PORT}/api/v1`)
+const httpServer = http.createServer(app);
+initSocket(httpServer);
+
+const server = httpServer.listen(env.PORT, () =>
+  console.info(`THY API and Socket.IO listening on http://localhost:${env.PORT}`)
 );
 
 async function shutdown(): Promise<void> {
@@ -29,4 +34,3 @@ process.on('SIGINT', () => {
 process.on('SIGTERM', () => {
   void shutdown();
 });
-

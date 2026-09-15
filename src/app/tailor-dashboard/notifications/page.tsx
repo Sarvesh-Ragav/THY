@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { TailorPage } from '@/components/tailor/TailorPage';
 
 interface NotificationItem {
   id: string;
@@ -75,45 +76,32 @@ export default function TailorNotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <div className="space-y-6 text-thy-ink">
-      
-      {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Notifications Center</h1>
-            {unreadCount > 0 && (
-              <span className="bg-[#5C1A24] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">
-                {unreadCount} New
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Real-time updates regarding new orders, customer messages, and payouts.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {unreadCount > 0 && (
-            <button
-              onClick={markAllAsRead}
-              className="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl hover:bg-slate-200 transition-colors"
-            >
-              ✓ Mark all as read
-            </button>
-          )}
-        </div>
-      </div>
+    <TailorPage
+      title="Notifications"
+      description="Updates on new orders, customer messages, and payouts."
+      actions={
+        unreadCount > 0 ? (
+          <button
+            onClick={markAllAsRead}
+            className="inline-flex items-center justify-center min-h-10 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] border border-thy-burgundy/20 bg-thy-cream text-thy-ink hover:border-thy-burgundy/40"
+          >
+            Mark all as read
+            <span className="ml-2 bg-thy-burgundy text-white text-[10px] px-2 py-0.5">{unreadCount}</span>
+          </button>
+        ) : null
+      }
+    >
+      <div className="space-y-6 text-thy-ink">
 
       {/* Main Card */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
+      <div className="thy-card p-6 space-y-4">
         
         {/* Filter Tabs */}
-        <div className="flex gap-2 border-b border-slate-100 pb-3">
+        <div className="flex gap-2 border-b border-thy-burgundy/10 pb-3">
           <button
             onClick={() => setActiveTab('all')}
             className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all ${
-              activeTab === 'all' ? 'bg-[#5C1A24] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              activeTab === 'all' ? 'bg-thy-burgundy text-white shadow-xs' : 'text-thy-muted hover:text-thy-ink'
             }`}
           >
             All Alerts ({notifications.length})
@@ -121,7 +109,7 @@ export default function TailorNotificationsPage() {
           <button
             onClick={() => setActiveTab('unread')}
             className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all ${
-              activeTab === 'unread' ? 'bg-[#5C1A24] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              activeTab === 'unread' ? 'bg-thy-burgundy text-white shadow-xs' : 'text-thy-muted hover:text-thy-ink'
             }`}
           >
             Unread ({unreadCount})
@@ -133,7 +121,7 @@ export default function TailorNotificationsPage() {
           {filteredNotifs.length === 0 ? (
             <div className="py-12 text-center space-y-2">
               <span className="text-3xl">🔔</span>
-              <p className="text-xs font-bold text-slate-400">No notifications found.</p>
+              <p className="text-xs font-bold text-thy-subtle">No notifications found.</p>
             </div>
           ) : (
             filteredNotifs.map((n) => (
@@ -141,8 +129,8 @@ export default function TailorNotificationsPage() {
                 key={n.id}
                 className={`p-4 rounded-2xl border transition-all flex justify-between items-start gap-4 ${
                   !n.isRead
-                    ? 'bg-thy-mist/30 border-[#5C1A24]/40 shadow-xs'
-                    : 'bg-white border-slate-200/80'
+                    ? 'bg-thy-mist/30 border-thy-burgundy/40 shadow-xs'
+                    : 'bg-thy-surface border-thy-burgundy/15'
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -154,13 +142,13 @@ export default function TailorNotificationsPage() {
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-xs font-bold text-slate-900">{n.title}</h3>
+                      <h3 className="text-xs font-bold text-thy-ink">{n.title}</h3>
                       {!n.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-[#5C1A24]" />
+                        <span className="w-2 h-2 rounded-full bg-thy-burgundy" />
                       )}
                     </div>
-                    <p className="text-xs text-slate-600 leading-relaxed">{n.description}</p>
-                    <span className="text-[10px] font-medium text-slate-400 block pt-1">{n.timestamp}</span>
+                    <p className="text-xs text-thy-muted leading-relaxed">{n.description}</p>
+                    <span className="text-[10px] font-medium text-thy-subtle block pt-1">{n.timestamp}</span>
                   </div>
                 </div>
 
@@ -168,14 +156,14 @@ export default function TailorNotificationsPage() {
                   {!n.isRead && (
                     <button
                       onClick={() => markAsRead(n.id)}
-                      className="text-[10px] font-bold text-[#5C1A24] hover:underline"
+                      className="text-[10px] font-bold text-thy-burgundy hover:underline"
                     >
                       Mark read
                     </button>
                   )}
                   <button
                     onClick={() => deleteNotification(n.id)}
-                    className="text-slate-400 hover:text-rose-500 text-xs px-1"
+                    className="text-thy-subtle hover:text-rose-500 text-xs px-1"
                   >
                     ✕
                   </button>
@@ -186,7 +174,7 @@ export default function TailorNotificationsPage() {
         </div>
 
       </div>
-
-    </div>
+      </div>
+    </TailorPage>
   );
 }

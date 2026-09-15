@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { TailorPage } from '@/components/tailor/TailorPage';
 
 interface Order {
   id: string;
@@ -70,33 +71,27 @@ export default function ActiveOrdersPage() {
   };
 
   return (
-    <div className="space-y-6 text-thy-ink">
-      {/* Page Header */}
-      <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-            Active Orders & Production
-          </h1>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Manage ongoing orders and update live stitching progress stages.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl">
-          <button type="button" className="px-4 py-2 text-xs font-bold rounded-xl bg-[#5C1A24] text-white shadow-xs">
+    <TailorPage
+      title="Active Orders"
+      description="Manage ongoing orders and update live stitching progress."
+      actions={
+        <div className="flex items-center gap-2 bg-thy-mist p-1.5">
+          <button type="button" className="px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] bg-thy-burgundy text-white">
             In Progress ({orders.length})
           </button>
-          <button type="button" className="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900">
+          <button type="button" className="px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-thy-muted hover:text-thy-ink">
             Completed
           </button>
         </div>
-      </div>
+      }
+    >
+      <div className="space-y-6 text-thy-ink">
 
       {/* Main Grid: Pipeline vs Details */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left: Order Pipeline Selector */}
         <div className="lg:col-span-4 space-y-3">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block px-1">
+          <span className="text-[11px] font-bold text-thy-subtle uppercase tracking-wider block px-1">
             Order Pipeline
           </span>
 
@@ -107,21 +102,21 @@ export default function ActiveOrdersPage() {
               onClick={() => setSelectedOrderId(ord.id)}
               className={`w-full p-4 rounded-2xl border text-left transition-all ${
                 selectedOrderId === ord.id
-                  ? 'bg-white border-[#5C1A24] ring-2 ring-[#5C1A24]/20 shadow-sm'
-                  : 'bg-white border-slate-200 hover:border-slate-300'
+                  ? 'bg-thy-surface border-thy-burgundy ring-2 ring-thy-burgundy/20 shadow-sm'
+                  : 'bg-thy-surface border-thy-burgundy/15 hover:border-thy-burgundy/20'
               }`}
             >
-              <div className="flex justify-between items-center text-[11px] text-slate-400 font-bold">
+              <div className="flex justify-between items-center text-[11px] text-thy-subtle font-bold">
                 <span>{ord.id}</span>
                 <span>Due: {ord.dueDate}</span>
               </div>
-              <h3 className="text-sm font-bold text-slate-900 mt-1">{ord.title}</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Customer: {ord.customerName}</p>
-              <div className="flex justify-between items-center pt-3 mt-3 border-t border-slate-100 text-xs">
-                <span className="text-[#5C1A24] font-bold">
+              <h3 className="text-sm font-bold text-thy-ink mt-1">{ord.title}</h3>
+              <p className="text-xs text-thy-muted mt-0.5">Customer: {ord.customerName}</p>
+              <div className="flex justify-between items-center pt-3 mt-3 border-t border-thy-burgundy/10 text-xs">
+                <span className="text-thy-burgundy font-bold">
                   Stage {ord.currentStage} of 5
                 </span>
-                <span className="font-extrabold text-slate-900">₹{ord.price}</span>
+                <span className="font-extrabold text-thy-ink">₹{ord.price}</span>
               </div>
             </button>
           ))}
@@ -129,22 +124,22 @@ export default function ActiveOrdersPage() {
 
         {/* Right: Selected Order Operations Panel */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-6">
+          <div className="thy-card p-6 space-y-6">
             {/* Header Details */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-thy-burgundy/10 pb-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-extrabold text-slate-900">{selectedOrder.title}</h2>
-                  <span className="bg-slate-100 text-slate-600 text-[10px] font-mono px-2 py-0.5 rounded-md font-bold">
+                  <h2 className="text-lg font-extrabold text-thy-ink">{selectedOrder.title}</h2>
+                  <span className="bg-thy-mist text-thy-muted text-[10px] font-mono px-2 py-0.5 rounded-md font-bold">
                     {selectedOrder.id}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Customer: <span className="font-bold text-slate-800">{selectedOrder.customerName}</span> • Ordered: {selectedOrder.orderedDate}
+                <p className="text-xs text-thy-muted mt-0.5">
+                  Customer: <span className="font-bold text-thy-ink">{selectedOrder.customerName}</span> • Ordered: {selectedOrder.orderedDate}
                 </p>
               </div>
 
-              <button type="button" className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 flex items-center gap-1.5 transition-colors">
+              <button type="button" className="px-3.5 py-1.5 bg-thy-mist hover:bg-thy-mist text-thy-ink text-xs font-bold rounded-xl border border-thy-burgundy/15 flex items-center gap-1.5 transition-colors">
                 📏 View Measurements
               </button>
             </div>
@@ -152,10 +147,10 @@ export default function ActiveOrdersPage() {
             {/* Stage Stepper & Stage Control Buttons */}
             <div className="space-y-4">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+                <span className="font-bold text-thy-ink uppercase tracking-wider text-[11px]">
                   UPDATE CUSTOMER LIVE STAGE STATUS
                 </span>
-                <span className="text-[#5C1A24] font-bold">
+                <span className="text-thy-burgundy font-bold">
                   Current: Stage {selectedOrder.currentStage} - {STAGES[selectedOrder.currentStage - 1]}
                 </span>
               </div>
@@ -172,10 +167,10 @@ export default function ActiveOrdersPage() {
                       onClick={() => handleStageSelect(idx)}
                       className={`p-3 rounded-2xl border text-center transition-all ${
                         isCurrent
-                          ? 'bg-[#5C1A24] text-white border-[#5C1A24] font-bold shadow-xs'
+                          ? 'bg-thy-burgundy text-white border-thy-burgundy font-bold shadow-xs'
                           : isCompleted
                           ? 'bg-thy-mist text-thy-burgundy border-thy-burgundy/20 font-semibold'
-                          : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
+                          : 'bg-thy-surface text-thy-muted border-thy-burgundy/15 hover:bg-thy-mist'
                       }`}
                     >
                       <div className="text-[10px] opacity-80 uppercase font-bold">Step {idx + 1}</div>
@@ -193,8 +188,8 @@ export default function ActiveOrdersPage() {
                   onClick={handleRevertToPreviousStage}
                   className={`px-4 py-2.5 rounded-xl font-bold text-xs border transition-colors flex items-center gap-1.5 ${
                     selectedOrder.currentStage <= 1
-                      ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed'
-                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                      ? 'bg-thy-mist text-thy-subtle border-thy-burgundy/15 cursor-not-allowed'
+                      : 'bg-thy-surface text-thy-ink border-thy-burgundy/20 hover:bg-thy-mist'
                   }`}
                 >
                   <span>← Move to Previous Stage ({STAGES[selectedOrder.currentStage - 2] || 'Initial'})</span>
@@ -206,8 +201,8 @@ export default function ActiveOrdersPage() {
                   onClick={handleAdvanceToNextStage}
                   className={`px-6 py-2.5 rounded-xl font-bold text-xs shadow-xs transition-colors flex items-center gap-2 ${
                     selectedOrder.currentStage >= STAGES.length
-                      ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                      : 'bg-[#5C1A24] hover:bg-[#4A1520] text-white'
+                      ? 'bg-thy-mist text-thy-subtle border border-thy-burgundy/15 cursor-not-allowed'
+                      : 'bg-thy-burgundy hover:bg-thy-brand-active text-white'
                   }`}
                 >
                   {selectedOrder.currentStage >= STAGES.length ? (
@@ -231,18 +226,18 @@ export default function ActiveOrdersPage() {
             </div>
 
             {/* Order Stats */}
-            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100 text-xs text-center">
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Target Delivery Date</span>
-                <span className="font-extrabold text-slate-900">{selectedOrder.dueDate}</span>
+            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-thy-burgundy/10 text-xs text-center">
+              <div className="p-3 bg-thy-mist rounded-xl border border-thy-burgundy/10">
+                <span className="text-thy-subtle block text-[10px] uppercase font-bold">Target Delivery Date</span>
+                <span className="font-extrabold text-thy-ink">{selectedOrder.dueDate}</span>
               </div>
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Stitching Quote Price</span>
-                <span className="font-extrabold text-[#5C1A24]">₹{selectedOrder.price}</span>
+              <div className="p-3 bg-thy-mist rounded-xl border border-thy-burgundy/10">
+                <span className="text-thy-subtle block text-[10px] uppercase font-bold">Stitching Quote Price</span>
+                <span className="font-extrabold text-thy-burgundy">₹{selectedOrder.price}</span>
               </div>
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Overall Status</span>
-                <span className="font-extrabold text-slate-900">
+              <div className="p-3 bg-thy-mist rounded-xl border border-thy-burgundy/10">
+                <span className="text-thy-subtle block text-[10px] uppercase font-bold">Overall Status</span>
+                <span className="font-extrabold text-thy-ink">
                   {selectedOrder.currentStage === 5 ? 'Ready to Deliver' : 'In Progress'}
                 </span>
               </div>
@@ -250,6 +245,7 @@ export default function ActiveOrdersPage() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </TailorPage>
   );
 }
