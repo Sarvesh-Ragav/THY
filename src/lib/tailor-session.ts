@@ -184,7 +184,7 @@ export const DEFAULT_ORDERS: TailorActiveOrder[] = [
   },
 ];
 
-// STEP 1 INTEGRATION: Reset default state explicitly without forced mock active credentials
+// STEP 1 INTEGRATION: Clean default unauthenticated state
 export function createDefaultSession(): TailorSession {
   return {
     identifier: '',
@@ -250,6 +250,7 @@ export function getCustomerFirstName(session: TailorSession): string {
   return fullName.split(/\s+/)[0];
 }
 
+// STEP 2 INTEGRATION: Accurate Post-Auth Path evaluation
 export function getPostAuthPath(session: TailorSession): string {
   if (session.role === 'customer') {
     if (!hasCustomerProfile(session)) return '/customer-registration';
@@ -257,6 +258,7 @@ export function getPostAuthPath(session: TailorSession): string {
     return '/';
   }
 
+  // Tailor Onboarding Route Guard Logic
   if (!hasTailorProfile(session)) return '/tailor-registration';
   if (!hasSubmittedVerification(session)) return '/tailor-verification';
   return '/tailor-dashboard';
