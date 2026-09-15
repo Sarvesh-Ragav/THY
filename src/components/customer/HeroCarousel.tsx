@@ -54,10 +54,14 @@ export function HeroCarousel() {
       }}
     >
       {HERO_VIDEOS.map((video, videoIndex) => (
-        <img
+        <video
           key={video.id}
-          src={video.poster}
-          alt={video.label}
+          src={video.src}
+          aria-label={video.label}
+          autoPlay
+          muted
+          loop
+          playsInline
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
             videoIndex === index ? 'opacity-100' : 'opacity-0'
           }`}

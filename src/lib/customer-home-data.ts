@@ -85,8 +85,8 @@ export const TAILORS: DirectoryTailor[] = [
 ];
 
 export const HERO_VIDEOS = [
-  { id: 'video-1', poster: '/hero/hero-couple.png', label: 'Video 1' },
-  { id: 'video-2', poster: '/hero/hero-street.png', label: 'Video 2' },
+  { id: 'video-1', src: '/hero/THY%20Banner.mp4', label: 'THY banner' },
+  { id: 'video-2', src: '/hero/THY%20Video.mp4', label: 'THY video' },
 ] as const;
 
 export const NOTIFICATION_STATES = [
