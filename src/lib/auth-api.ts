@@ -9,15 +9,36 @@ export interface AuthenticatedUser {
   hasPassword?: boolean;
 }
 
-export interface OtpChallenge {
-  challengeId: string;
-  expiresAt: string;
-  mockOtp?: string;
+export interface AccountCustomerProfile {
+  fullName: string;
+  email: string;
+  city: string;
+  address: string;
+  phone?: string | null;
+  avatarUrl?: string | null;
+}
+
+export interface AccountTailorProfile {
+  fullName: string;
+  shopName: string;
+  yearsOfExperience: string;
+  shopAddress: string;
+  city: string;
+  phone?: string | null;
+  portfolio: Array<{ id: string; title: string; image: string; category: string }>;
 }
 
 export interface AuthenticationResult {
   accessToken: string;
   user: AuthenticatedUser;
+  customerProfile?: AccountCustomerProfile | null;
+  tailorProfile?: AccountTailorProfile | null;
+}
+
+export interface OtpChallenge {
+  challengeId: string;
+  expiresAt: string;
+  mockOtp?: string;
 }
 
 export class AuthApiError extends Error {
@@ -101,6 +122,19 @@ export function updateUserRole(role: 'customer' | 'tailor', accessToken?: string
 
 export function refreshAuthentication(): Promise<AuthenticationResult> {
   return request('/auth/refresh', { method: 'POST' });
+}
+
+export function requestPasswordReset(email: string): Promise<{ sent: true; resetToken?: string }> {
+  return request('/auth/password/forgot', { method: 'POST', body: JSON.stringify({ email }) });
+}
+
+export function resetPassword(payload: {
+  email: string;
+  token: string;
+  password: string;
+  confirmPassword: string;
+}): Promise<{ reset: true }> {
+  return request('/auth/password/reset', { method: 'POST', body: JSON.stringify(payload) });
 }
 
 export async function logoutAuthentication(): Promise<void> {

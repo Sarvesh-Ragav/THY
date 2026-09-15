@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   ShoppingBag,
@@ -13,6 +13,8 @@ import {
   FileText,
   ArrowLeft,
 } from 'lucide-react';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { useCustomerLocation } from '@/hooks/useCustomerLocation';
 
 const INITIAL_CART = [
   {
@@ -41,6 +43,8 @@ type CartItem = (typeof INITIAL_CART)[number];
 type Step = 'cart' | 'quotation' | 'checkout' | 'done';
 
 export default function StitchCartPage() {
+  const { session } = useTailorSession();
+  const { label } = useCustomerLocation();
   const [step, setStep] = useState<Step>('cart');
   const [cart, setCart] = useState(INITIAL_CART);
   const [quoteItem, setQuoteItem] = useState<CartItem | null>(INITIAL_CART[0] ?? null);
@@ -51,6 +55,13 @@ export default function StitchCartPage() {
   const [measurementOption, setMeasurementOption] = useState('visit');
   const [paymentMethod, setPaymentMethod] = useState('gpay');
   const [pickupAddress, setPickupAddress] = useState('');
+
+  useEffect(() => {
+    const saved = [session.customerProfile?.address, label || session.customerProfile?.city]
+      .filter(Boolean)
+      .join(', ');
+    if (saved) setPickupAddress((current) => current || saved);
+  }, [session.customerProfile, label]);
 
   const activeCartItems = cart.filter((item) => !item.savedForLater);
   const savedCartItems = cart.filter((item) => item.savedForLater);

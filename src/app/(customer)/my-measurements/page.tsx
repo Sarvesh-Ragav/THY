@@ -17,7 +17,7 @@ function MeasurementsContent() {
   const { state } = useC31();
 
   return (
-    <CustomerPage title="My Measurements">
+    <CustomerPage titleKey="pageMeasurements">
       <ul className="space-y-3 max-w-lg">
         {state.measurements.map((item) => (
           <li key={item.id} className="thy-card p-4">

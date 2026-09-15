@@ -34,16 +34,18 @@ export default function TailorProfilePreviewPage() {
   const { session } = useTailorSession();
   const [activeFilter, setActiveFilter] = useState<string>('All');
 
-  const displayName = session?.profile?.fullName || session?.identifier || 'Priya S.';
-  const displayBusinessName = session?.profile?.fullName 
-    ? `${session.profile.fullName}'s Boutique & Custom Tailoring` 
-    : "Priya's Boutique & Custom Tailoring";
+  const displayName = session.profile?.fullName || 'Tailor';
+  const displayBusinessName = session.profile?.shopName || (displayName !== 'Tailor' ? `${displayName}'s Boutique` : 'Your atelier');
+  const displayLocation = session.profile?.city || session.profile?.shopAddress || session.selectedLocation || 'India';
+  const displayExperience = session.profile?.yearsOfExperience
+    ? `${session.profile.yearsOfExperience}+ Years`
+    : 'Experience on file';
 
   const tailorInfo = {
     name: displayName,
     businessName: displayBusinessName,
-    location: "Adyar, Chennai",
-    experience: "8+ Years",
+    location: displayLocation,
+    experience: displayExperience,
     rating: 4.9,
     totalReviews: 128,
     completedOrders: 154,
@@ -51,36 +53,14 @@ export default function TailorProfilePreviewPage() {
     bio: "Specializing in designer blouses, custom Anarkalis, lehengas, and precision-fit alterations.",
   };
 
-  const portfolioItems: PortfolioItem[] = [
-    {
-      id: '1',
-      title: 'Embroidered Silk Anarkali',
-      category: 'Anarkali',
-      image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=600&q=80',
-      isFeatured: true,
-    },
-    {
-      id: '2',
-      title: 'Bridal Velvet Blouse',
-      category: 'Blouse',
-      image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=600&q=80',
-      isFeatured: true,
-    },
-    {
-      id: '3',
-      title: 'Custom Men Kurta Set',
-      category: 'Kurti',
-      image: 'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=600&q=80',
-      isFeatured: false,
-    },
-    {
-      id: '4',
-      title: 'Heavy Designer Lehenga',
-      category: 'Lehenga',
-      image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=600&q=80',
-      isFeatured: true,
-    },
-  ];
+  const savedPortfolio = (session.tailorPortfolio ?? []).map((item, index) => ({
+    id: item.id,
+    title: item.title,
+    category: item.category,
+    image: item.image,
+    isFeatured: index < 2,
+  }));
+  const portfolioItems: PortfolioItem[] = savedPortfolio;
 
   const services: ServicePrice[] = [
     { id: '1', name: 'Saree Blouse', minPrice: 800, maxPrice: 2500, enabled: true },
@@ -170,7 +150,10 @@ export default function TailorProfilePreviewPage() {
         <div className="thy-card p-6 space-y-4">
           <h3 className="text-sm font-bold text-thy-ink border-b border-thy-burgundy/10 pb-3">⭐ Featured Work</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {portfolioItems.filter(i => i.isFeatured).slice(0, 3).map(item => (
+            {portfolioItems.filter(i => i.isFeatured).slice(0, 3).length === 0 ? (
+              <p className="text-sm text-thy-muted col-span-full">Featured work will appear here once you add portfolio pieces.</p>
+            ) : (
+              portfolioItems.filter(i => i.isFeatured).slice(0, 3).map(item => (
               <div key={item.id} className="rounded-2xl overflow-hidden border border-thy-burgundy/15 group">
                 <div className="h-44 overflow-hidden">
                   <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -180,7 +163,7 @@ export default function TailorProfilePreviewPage() {
                   <p className="text-[10px] text-thy-muted font-medium">{item.category}</p>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
         </div>
 
@@ -204,7 +187,10 @@ export default function TailorProfilePreviewPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {filteredItems.map(item => (
+            {filteredItems.length === 0 ? (
+              <p className="text-sm text-thy-muted col-span-full">No portfolio pieces yet. Add finished work from Portfolio management.</p>
+            ) : (
+              filteredItems.map(item => (
               <div key={item.id} className="rounded-xl overflow-hidden border border-thy-burgundy/10 shadow-2xs">
                 <img src={item.image} alt={item.title} className="w-full h-36 object-cover" />
                 <div className="p-2 bg-thy-mist">
@@ -212,7 +198,7 @@ export default function TailorProfilePreviewPage() {
                   <p className="text-[10px] text-thy-subtle">{item.category}</p>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
         </div>
 

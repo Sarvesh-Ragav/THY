@@ -87,6 +87,7 @@ function AddressStep() {
               Saved address
             </p>
             <p className="mt-1 text-sm text-thy-muted">
+              {session.customerProfile?.fullName ? `${session.customerProfile.fullName} · ` : ''}
               {saved || 'Add a delivery address to continue.'}
             </p>
           </div>

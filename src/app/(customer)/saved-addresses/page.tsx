@@ -20,7 +20,7 @@ function SavedAddressesContent() {
   const address = session.customerProfile?.address;
 
   return (
-    <CustomerPage title="Saved Addresses">
+    <CustomerPage titleKey="pageAddresses">
       {address ? (
         <div className="max-w-lg border border-thy-ink/10 bg-thy-surface/80 p-5 text-sm text-thy-muted">
           <p>{session.customerProfile?.fullName}</p>

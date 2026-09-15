@@ -7,7 +7,8 @@ import { ThySignUpForm } from '@/components/auth/ThySignUpForm';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath } from '@/lib/tailor-session';
 import { LoginFormData } from '@/types/auth';
-import { AuthApiError, googleAuth, loginWithPassword, type AuthenticatedUser } from '@/lib/auth-api';
+import { AuthApiError, googleAuth, loginWithPassword, type AuthenticationResult } from '@/lib/auth-api';
+import { AppearanceControls } from '@/components/customer/AppearanceControls';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,20 +22,15 @@ export default function LoginPage() {
     }
   }, [isReady, session, router]);
 
-  const handleAuthenticated = (accessToken: string, user?: AuthenticatedUser) => {
-    const next = completeAuthentication(
-      accessToken,
-      user?.role ?? null,
-      user?.email || user?.phoneNumber || undefined,
-      user
-    );
+  const handleAuthenticated = (result: AuthenticationResult) => {
+    const next = completeAuthentication(result);
     router.push(getPostAuthPath(next));
   };
 
   const handleLoginContinue = async (formData: LoginFormData) => {
     try {
       const result = await loginWithPassword(formData.email, formData.password);
-      handleAuthenticated(result.accessToken, result.user);
+      handleAuthenticated(result);
       return { success: true, message: 'Logged in. Redirecting...' };
     } catch (error) {
       return {
@@ -47,7 +43,7 @@ export default function LoginPage() {
   const handleGoogleSignIn = async (credential: string) => {
     try {
       const result = await googleAuth(credential);
-      handleAuthenticated(result.accessToken, result.user);
+      handleAuthenticated(result);
     } catch (error) {
       console.error('Google Sign-In failed', error);
       alert('Google Sign-In failed. Please try again.');
@@ -66,6 +62,9 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="fixed top-3 right-3 z-50 thy-silk-bar px-2 rounded-lg">
+        <AppearanceControls />
+      </div>
       {view === 'login' && (
         <ThyLoginForm
           initialEmail={initialEmail}

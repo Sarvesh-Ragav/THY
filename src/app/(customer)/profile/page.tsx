@@ -20,11 +20,11 @@ function ProfileContent() {
   const profile = session.customerProfile;
 
   return (
-    <CustomerPage title="My Profile">
+    <CustomerPage titleKey="pageProfile">
       <div className="max-w-lg border border-thy-ink/10 bg-thy-surface/80 p-5 space-y-2 text-sm text-thy-muted">
-        <p>{profile?.fullName}</p>
+        <p>{profile?.fullName || 'Your profile'}</p>
         <p>{profile?.phone}</p>
-        <p>{profile?.email}</p>
+        <p>{profile?.email || session.identifier}</p>
         <p>{label || (detecting ? 'Detecting location…' : profile?.city)}</p>
         <p>{profile?.address}</p>
       </div>

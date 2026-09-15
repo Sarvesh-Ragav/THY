@@ -6,8 +6,11 @@ import { useSearchParams } from 'next/navigation';
 import { Check, Sparkles, AlertCircle, RotateCcw, Eye, Layers, User } from 'lucide-react';
 import { FABRIC_TREATMENTS, asFabricTreatments, getStudioGarment } from '@/lib/design-studio';
 import { patchStudioDraft, readFileAsDataUrl, readStudioDraft } from '@/lib/studio-draft';
+import { FavoriteDesignButton } from '@/components/studio/FavoriteDesignButton';
 import { GarmentVisualization } from '@/components/studio/GarmentVisualization';
 import { StudioStepper } from '@/components/studio/StudioStepper';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { generatedDesignId, isDesignFavorited, refreshFavoritedImage } from '@/lib/wishlist';
 
 const PHOTO_TIPS = [
   'Full body shot',
@@ -32,6 +35,7 @@ export default function TryOnPage() {
 
 function TryOnContent() {
   const searchParams = useSearchParams();
+  const { session, updateSession } = useTailorSession();
   const categoryId = searchParams.get('category');
   const preset = useMemo(() => getStudioGarment(categoryId), [categoryId]);
   const query = `?category=${encodeURIComponent(preset.categoryId)}`;
@@ -110,6 +114,15 @@ function TryOnContent() {
       setVtoImage(data.image);
       setViewMode('vto');
       patchStudioDraft(preset.categoryId, { tryOnRender: data.image });
+      const designId = generatedDesignId(preset.categoryId);
+      if (isDesignFavorited(session, designId)) {
+        updateSession({
+          customerDesigns: refreshFavoritedImage(session.customerDesigns, designId, data.image, {
+            fabric: fabricLabel,
+            treatments,
+          }),
+        });
+      }
     } catch (err: unknown) {
       console.error('Virtual try-on error:', err);
       const msg = err instanceof Error ? err.message : 'Virtual try-on generation failed';
@@ -364,6 +377,21 @@ function TryOnContent() {
                   <span className="h-10 w-10 rounded-full border-2 border-white/25 border-t-thy-brand animate-spin" />
                   <p className="text-[11px] uppercase tracking-[0.18em]">Placing garment</p>
                 </div>
+              )}
+
+              {(aiRender || vtoImage) && !vtoGenerating && (
+                <FavoriteDesignButton
+                  design={{
+                    id: generatedDesignId(preset.categoryId),
+                    title: `Custom ${preset.garment}`,
+                    categoryId: preset.categoryId,
+                    garment: preset.garment,
+                    fabric: fabricLabel,
+                    treatments,
+                  }}
+                  image={vtoImage || aiRender}
+                  className="absolute top-3 right-3 z-20 inline-flex h-10 w-10 items-center justify-center bg-thy-surface/95 backdrop-blur-xs border border-white/20 text-thy-brand shadow-xs cursor-pointer hover:border-thy-brand/40 transition-colors"
+                />
               )}
 
               {/* Result Indicator Badge */}

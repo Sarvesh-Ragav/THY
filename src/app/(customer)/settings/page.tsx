@@ -1,6 +1,10 @@
 'use client';
 
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { useAppearance } from '@/components/providers/AppearanceProvider';
+import { type AppLanguage } from '@/lib/i18n';
 import { 
   User, 
   Languages, 
@@ -362,44 +366,35 @@ const TRANSLATIONS = {
   }
 };
 
-const LanguageContext = createContext({
-  lang: 'en',
-  setLang: (lang: string) => {},
-  t: (key: string) => key
-});
-
-function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState('en');
-  const t = (key: string) => TRANSLATIONS[lang as keyof typeof TRANSLATIONS]?.[key as keyof typeof TRANSLATIONS['en']] || TRANSLATIONS['en'][key as keyof typeof TRANSLATIONS['en']] || key;
-  return <LanguageContext.Provider value={{ lang, setLang, t }}>{children}</LanguageContext.Provider>;
-}
-
-function useLanguage() {
-  return useContext(LanguageContext);
-}
-
-export default function CustomerSettingsPageWrapper() {
-  return (
-    <LanguageProvider>
-      <CustomerSettingsPage />
-    </LanguageProvider>
-  );
-}
-
-function CustomerSettingsPage() {
-  const { lang, setLang, t } = useLanguage();
-  const [darkMode, setDarkMode] = useState(false);
+export default function CustomerSettingsPage() {
+  const router = useRouter();
+  const { session, updateSession, logout } = useTailorSession();
+  const { language: lang, setLanguage, darkMode, setDarkMode } = useAppearance();
+  const t = (key: string) =>
+    TRANSLATIONS[lang][key as keyof typeof TRANSLATIONS['en']] || TRANSLATIONS.en[key as keyof typeof TRANSLATIONS['en']] || key;
+  const setLang = (next: string) => setLanguage(next as AppLanguage);
   const [activeTab, setActiveTab] = useState('profile'); 
   const [toastMessage, setToastMessage] = useState('');
 
   const [profile, setProfile] = useState({
-    name: 'Priya Ramanathan',
-    email: 'priya.r@example.com',
-    phone: '+91 98401 23456',
-    address: 'No. 42, TTK Road, Alwarpet, Chennai, TN - 600018',
-    studio: 'Priya Atelier - Alwarpet',
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    studio: '',
     avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80'
   });
+
+  useEffect(() => {
+    if (!session.isAuthenticated) return;
+    setProfile((current) => ({
+      ...current,
+      name: session.customerProfile?.fullName || '',
+      email: session.customerProfile?.email || (session.identifier.includes('@') ? session.identifier : ''),
+      phone: session.customerProfile?.phone || '',
+      address: session.customerProfile?.address || '',
+    }));
+  }, [session.isAuthenticated, session.customerProfile, session.identifier]);
 
   const [fontSize, setFontSize] = useState('medium');
   const [highContrast, setHighContrast] = useState(false);
@@ -441,6 +436,20 @@ function CustomerSettingsPage() {
   const triggerToast = (msgKey: string) => {
     setToastMessage(t(msgKey));
     setTimeout(() => setToastMessage(''), 3500);
+  };
+
+  const handleSaveProfile = () => {
+    updateSession({
+      identifier: profile.email || profile.phone || session.identifier,
+      customerProfile: {
+        fullName: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        city: session.customerProfile?.city || '',
+        address: profile.address,
+      },
+    });
+    triggerToast('toastSaveSuccess');
   };
 
   const handleRevokeSession = (id: string) => {
@@ -603,7 +612,7 @@ function CustomerSettingsPage() {
                   </div>
                 </div>
 
-                <button onClick={() => triggerToast('toastSaveSuccess')} className="px-6 py-3 bg-thy-burgundy hover:bg-[#4A1520] text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                <button onClick={handleSaveProfile} className="px-6 py-3 bg-thy-burgundy hover:bg-[#4A1520] text-white font-bold text-xs rounded-xl shadow-md transition-all">
                   {t('saveProfileBtn')}
                 </button>
               </div>
@@ -956,7 +965,14 @@ function CustomerSettingsPage() {
               <button onClick={() => setShowLogoutModal(false)} className="py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700">
                 {t('cancelBtn')}
               </button>
-              <button onClick={() => { setShowLogoutModal(false); triggerToast('toastSaveSuccess'); }} className="py-2.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700">
+              <button
+                onClick={() => {
+                  setShowLogoutModal(false);
+                  logout();
+                  router.push('/login');
+                }}
+                className="py-2.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700"
+              >
                 {t('confirmLogoutBtn')}
               </button>
             </div>

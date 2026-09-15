@@ -1,3 +1,9 @@
+import type {
+  AccountCustomerProfile,
+  AccountTailorProfile,
+  AuthenticatedUser,
+} from '@/lib/auth-api';
+
 export type UserRole = 'tailor' | 'customer' | 'admin';
 export type VerificationStatus = 'pending';
 export type RequestStatus = 'Pending Quotation' | 'Quotation Submitted';
@@ -21,6 +27,14 @@ export interface TailorProfile {
   shopName: string;
   yearsOfExperience: string;
   shopAddress: string;
+  city?: string;
+}
+
+export interface TailorPortfolioSave {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
 }
 
 export const CUSTOMER_SERVICES = ['Stitching', 'Alterations', 'Custom outfits'] as const;
@@ -124,6 +138,7 @@ export interface TailorSession {
   customerPreferences: CustomerPreferences | null;
   selectedLocation: string | null;
   locationCoords: LocationCoords | null;
+  tailorPortfolio: TailorPortfolioSave[];
   customerDesigns: CustomerDesignSave[];
   customerOrders: CustomerOrderSave[];
   availability: TailorAvailability;
@@ -204,6 +219,7 @@ export function createDefaultSession(): TailorSession {
     customerPreferences: null,
     selectedLocation: null,
     locationCoords: null,
+    tailorPortfolio: [],
     customerDesigns: [],
     customerOrders: [],
     availability: {
@@ -287,6 +303,90 @@ export function getTailorFirstName(session: TailorSession): string {
   return fullName.split(/\s+/)[0];
 }
 
+export function getAccountDisplayName(session: TailorSession): string {
+  if (session.role === 'tailor') {
+    return session.profile?.fullName || session.profile?.shopName || 'Tailor Account';
+  }
+  return session.customerProfile?.fullName || 'Account';
+}
+
+export function applyAccountToSession(
+  current: TailorSession,
+  user: AuthenticatedUser,
+  customerProfile?: AccountCustomerProfile | null,
+  tailorProfile?: AccountTailorProfile | null,
+  sessionPatch?: Partial<TailorSession>
+): TailorSession {
+  const merged: TailorSession = { ...current, ...sessionPatch };
+  const identifier =
+    sessionPatch?.identifier ||
+    user.email ||
+    user.phoneNumber ||
+    merged.identifier ||
+    current.identifier;
+  const role = (sessionPatch?.role ?? user.role ?? merged.role ?? current.role) as UserRole | null;
+
+  const nextCustomer =
+    sessionPatch?.customerProfile ??
+    (customerProfile
+      ? {
+          fullName: customerProfile.fullName || user.name || current.customerProfile?.fullName || '',
+          phone: customerProfile.phone || user.phoneNumber || current.customerProfile?.phone || '',
+          email: customerProfile.email || user.email || current.customerProfile?.email || '',
+          city: customerProfile.city || current.customerProfile?.city || '',
+          address: customerProfile.address || current.customerProfile?.address || '',
+        }
+      : current.customerProfile
+        ? {
+            ...current.customerProfile,
+            fullName: current.customerProfile.fullName || user.name || '',
+            phone: current.customerProfile.phone || user.phoneNumber || '',
+            email: current.customerProfile.email || user.email || '',
+          }
+        : role === 'customer'
+          ? {
+              fullName: user.name || '',
+              phone: user.phoneNumber || '',
+              email: user.email || '',
+              city: '',
+              address: '',
+            }
+          : current.customerProfile);
+
+  const nextTailor =
+    sessionPatch?.profile ??
+    (tailorProfile
+      ? {
+          fullName: tailorProfile.fullName || user.name || current.profile?.fullName || '',
+          phone: tailorProfile.phone || user.phoneNumber || current.profile?.phone || '',
+          shopName: tailorProfile.shopName,
+          yearsOfExperience: tailorProfile.yearsOfExperience,
+          shopAddress: tailorProfile.shopAddress,
+          city: tailorProfile.city || current.profile?.city,
+        }
+      : current.profile);
+
+  const nextPortfolio =
+    sessionPatch?.tailorPortfolio ??
+    (tailorProfile?.portfolio?.length ? tailorProfile.portfolio : current.tailorPortfolio ?? []);
+
+  return {
+    ...merged,
+    isAuthenticated: true,
+    hasPassword: Boolean(sessionPatch?.hasPassword ?? user.hasPassword ?? current.hasPassword),
+    role,
+    identifier,
+    customerProfile: nextCustomer,
+    profile: nextTailor,
+    tailorPortfolio: nextPortfolio,
+    selectedLocation:
+      merged.selectedLocation ||
+      customerProfile?.city ||
+      tailorProfile?.city ||
+      current.selectedLocation,
+  };
+}
+
 function isBrowser(): boolean {
   return typeof window !== 'undefined';
 }
@@ -329,6 +429,7 @@ export function loadTailorSession(): TailorSession {
       selectedLocation: parsed.selectedLocation ?? null,
       locationCoords: parseStoredCoords(parsed.locationCoords),
       hasPassword: Boolean(parsed.hasPassword),
+      tailorPortfolio: Array.isArray(parsed.tailorPortfolio) ? parsed.tailorPortfolio : [],
       customerDesigns: Array.isArray(parsed.customerDesigns) ? parsed.customerDesigns : [],
       customerOrders: Array.isArray(parsed.customerOrders) ? parsed.customerOrders : [],
     };
@@ -339,5 +440,27 @@ export function loadTailorSession(): TailorSession {
 
 export function persistTailorSession(session: TailorSession): void {
   if (!isBrowser()) return;
-  window.localStorage.setItem(TAILOR_SESSION_KEY, JSON.stringify(session));
+  try {
+    window.localStorage.setItem(TAILOR_SESSION_KEY, JSON.stringify(session));
+  } catch {
+    try {
+      const compact: TailorSession = {
+        ...session,
+        customerDesigns: session.customerDesigns.map((design) => ({
+          ...design,
+          fabricImage:
+            design.fabricImage && design.fabricImage.startsWith('data:')
+              ? undefined
+              : design.fabricImage,
+          patternImage:
+            design.patternImage && design.patternImage.startsWith('data:')
+              ? undefined
+              : design.patternImage,
+        })),
+      };
+      window.localStorage.setItem(TAILOR_SESSION_KEY, JSON.stringify(compact));
+    } catch {
+      // localStorage quota exceeded; keep the in-memory session.
+    }
+  }
 }

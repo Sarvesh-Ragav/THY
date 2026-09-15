@@ -232,10 +232,7 @@ function TailorResultCard({
   tailor: DirectoryTailor;
   distanceKm?: number | null;
 }) {
-  const portfolioPreview = [
-    ...tailor.portfolio.filter((item) => item.featured),
-    ...tailor.portfolio.filter((item) => !item.featured),
-  ].slice(0, 4);
+  const portfolioPreview = tailor.portfolio.slice(0, 4);
 
   return (
     <article className="thy-card p-4 sm:p-5">
@@ -301,18 +298,17 @@ function TailorResultCard({
             </Link>
           </div>
           <div className="grid grid-cols-4 gap-2">
-            {portfolioPreview.map((item) => (
+            {portfolioPreview.map((image, index) => (
               <Link
-                key={item.id}
+                key={`${tailor.id}-preview-${index}`}
                 href={`/tailors/${tailor.id}`}
                 className="group overflow-hidden border border-thy-ink/10 bg-thy-mist/40"
               >
                 <img
-                  src={item.image}
-                  alt={item.title}
+                  src={image}
+                  alt=""
                   className="h-16 sm:h-20 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-                <p className="hidden sm:block px-1.5 py-1 text-[10px] text-thy-muted truncate">{item.title}</p>
               </Link>
             ))}
           </div>

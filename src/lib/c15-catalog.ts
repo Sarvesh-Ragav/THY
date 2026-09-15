@@ -1,7 +1,7 @@
 import type { GarmentSilhouette, StudioGarment } from '@/lib/design-studio';
 
-export const C15_AUDIENCES = ['women', 'men', 'girls', 'boys'] as const;
-export type C15Audience = (typeof C15_AUDIENCES)[number];
+export const C15_AUDIENCES = ['women', 'boys'] as const;
+export type C15Audience = 'women' | 'men' | 'girls' | 'boys';
 
 export interface C15Garment {
   id: string;
@@ -15,48 +15,26 @@ export const C15_AUDIENCE_LABELS: Record<C15Audience, string> = {
   women: 'Women',
   men: 'Men',
   girls: 'Girls',
-  boys: 'Boys',
+  boys: 'Gents',
 };
 
+const categoryImage = (file: string) => `/garment_categories/${encodeURIComponent(file)}`;
+
 export const C15_GARMENTS: C15Garment[] = [
-  { id: 'saree-blouse', label: 'Saree Blouse', audience: 'women', silhouette: 'kurti', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'kurti', label: 'Kurti', audience: 'women', silhouette: 'kurti', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'salwar-suit', label: 'Salwar Suit', audience: 'women', silhouette: 'kurti', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'anarkali', label: 'Anarkali', audience: 'women', silhouette: 'kurti', fabricImage: '/hero/fabric-olive.png' },
-  { id: 'lehenga', label: 'Lehenga', audience: 'women', silhouette: 'lehenga', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'dress', label: 'Dress', audience: 'women', silhouette: 'kurti', fabricImage: '/hero/hero-couple.png' },
-  { id: 'gown', label: 'Gown', audience: 'women', silhouette: 'lehenga', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'bridal-wear', label: 'Bridal Wear', audience: 'women', silhouette: 'lehenga', fabricImage: '/hero/hero-couple.png' },
-  { id: 'shirt', label: 'Shirt', audience: 'men', silhouette: 'sherwani', fabricImage: '/hero/fabric-olive.png' },
-  { id: 't-shirt', label: 'T-Shirt', audience: 'men', silhouette: 'sherwani', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'kurta', label: 'Kurta', audience: 'men', silhouette: 'sherwani', fabricImage: '/hero/fabric-olive.png' },
-  { id: 'kurta-pajama', label: 'Kurta Pajama', audience: 'men', silhouette: 'sherwani', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'nehru-jacket', label: 'Nehru Jacket', audience: 'men', silhouette: 'sherwani', fabricImage: '/hero/fabric-olive.png' },
-  { id: 'waistcoat', label: 'Waistcoat', audience: 'men', silhouette: 'sherwani', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'sherwani', label: 'Sherwani', audience: 'men', silhouette: 'sherwani', fabricImage: '/hero/fabric-olive.png' },
-  { id: 'suit', label: 'Suit', audience: 'men', silhouette: 'sherwani', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'trousers', label: 'Trousers', audience: 'men', silhouette: 'sherwani', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'frock', label: 'Frock', audience: 'girls', silhouette: 'kurti', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'girls-dress', label: 'Girls Dress', audience: 'girls', silhouette: 'kurti', fabricImage: '/hero/hero-couple.png' },
-  { id: 'girls-lehenga', label: 'Lehenga', audience: 'girls', silhouette: 'lehenga', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'pavada', label: 'Pavadal / Pavada', audience: 'girls', silhouette: 'lehenga', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'girls-salwar', label: 'Salwar Suit', audience: 'girls', silhouette: 'kurti', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'girls-anarkali', label: 'Anarkali', audience: 'girls', silhouette: 'kurti', fabricImage: '/hero/fabric-olive.png' },
-  { id: 'skirt-top', label: 'Skirt & Top', audience: 'girls', silhouette: 'kurti', fabricImage: '/hero/hero-couple.png' },
-  { id: 'girls-gown', label: 'Gown', audience: 'girls', silhouette: 'lehenga', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'boys-shirt', label: 'Shirt', audience: 'boys', silhouette: 'sherwani', fabricImage: '/hero/fabric-olive.png' },
-  { id: 'boys-tshirt', label: 'T-Shirt', audience: 'boys', silhouette: 'sherwani', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'boys-kurta', label: 'Kurta', audience: 'boys', silhouette: 'sherwani', fabricImage: '/hero/fabric-olive.png' },
-  { id: 'boys-kurta-pajama', label: 'Kurta Pajama', audience: 'boys', silhouette: 'sherwani', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'boys-waistcoat', label: 'Waistcoat', audience: 'boys', silhouette: 'sherwani', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'boys-sherwani', label: 'Sherwani', audience: 'boys', silhouette: 'sherwani', fabricImage: '/hero/fabric-olive.png' },
-  { id: 'boys-suit', label: 'Suit', audience: 'boys', silhouette: 'sherwani', fabricImage: '/hero/fabric-charcoal.png' },
-  { id: 'boys-trousers', label: 'Trousers', audience: 'boys', silhouette: 'sherwani', fabricImage: '/hero/fabric-beige.png' },
-  { id: 'shorts', label: 'Shorts', audience: 'boys', silhouette: 'sherwani', fabricImage: '/hero/fabric-beige.png' },
+  { id: 'blouse', label: 'Blouse', audience: 'women', silhouette: 'kurti', fabricImage: categoryImage('blouse.jpg') },
+  { id: 'kurti', label: 'Kurti', audience: 'women', silhouette: 'kurti', fabricImage: categoryImage('kurti.jpg') },
+  { id: 'salwar-suit', label: 'Salwar Suit', audience: 'women', silhouette: 'kurti', fabricImage: categoryImage('salwar suit.jpg') },
+  { id: 'frock', label: 'Frock', audience: 'women', silhouette: 'kurti', fabricImage: categoryImage('frock.jpg') },
+  { id: 'top', label: 'Top', audience: 'women', silhouette: 'kurti', fabricImage: categoryImage('top.jpg') },
+  { id: 'boys-shirt', label: 'Shirt', audience: 'boys', silhouette: 'sherwani', fabricImage: categoryImage('shirt.jpg') },
+  { id: 'boys-blazer', label: 'Blazer', audience: 'boys', silhouette: 'sherwani', fabricImage: categoryImage('blazer.jpg') },
+  { id: 'boys-kurta', label: 'Kurta', audience: 'boys', silhouette: 'sherwani', fabricImage: categoryImage('kurta.jpg') },
+  { id: 'boys-sherwani', label: 'Sherwani', audience: 'boys', silhouette: 'sherwani', fabricImage: categoryImage('sherwani.jpg') },
+  { id: 'boys-pant', label: 'Pant', audience: 'boys', silhouette: 'sherwani', fabricImage: categoryImage('pant.jpg') },
 ];
 
 export function isC15Audience(value?: string | null): value is C15Audience {
-  return Boolean(value && (C15_AUDIENCES as readonly string[]).includes(value));
+  return Boolean(value && ['women', 'men', 'girls', 'boys'].includes(value));
 }
 
 export function garmentsForAudience(audience: C15Audience) {

@@ -14,6 +14,7 @@ import {
   AlertCircle,
   Package,
 } from 'lucide-react';
+import { useAppearance } from '@/components/providers/AppearanceProvider';
 
 interface OrderItem {
   name: string;
@@ -121,6 +122,7 @@ function statusClass(status: Order['status']) {
 }
 
 export default function MyOrdersPage() {
+  const { t } = useAppearance();
   const [orders] = useState<Order[]>(INITIAL_ORDERS);
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -148,15 +150,15 @@ export default function MyOrdersPage() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <p className="text-[11px] uppercase tracking-[0.22em] text-thy-burgundy font-semibold">Atelier</p>
+      <p className="text-[11px] uppercase tracking-[0.22em] text-thy-burgundy font-semibold">{t('ordersKicker')}</p>
       <h1
         className="mt-2 text-3xl sm:text-4xl md:text-5xl leading-[0.95] text-thy-ink"
         style={{ fontFamily: 'var(--font-cormorant), serif' }}
       >
-        My Orders
+        {t('ordersTitle')}
       </h1>
       <p className="mt-3 max-w-xl text-sm text-thy-muted">
-        Follow stitching progress, open a quotation summary, and keep past fittings in one place.
+        {t('ordersSub')}
       </p>
       <div className="thy-divider-glow mt-4 max-w-md" />
 
@@ -165,7 +167,7 @@ export default function MyOrdersPage() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-thy-subtle" />
           <input
             type="text"
-            placeholder="Search order ID, atelier, or fabric"
+            placeholder={t('ordersSearch')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="thy-input !pl-11"
@@ -196,9 +198,9 @@ export default function MyOrdersPage() {
         <div className="thy-card mt-8 p-10 text-center max-w-lg mx-auto space-y-3">
           <Package className="w-8 h-8 mx-auto text-thy-burgundy" />
           <h2 className="text-2xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-            No matching orders
+            {t('ordersEmpty')}
           </h2>
-          <p className="text-sm text-thy-muted">Try another filter, or start a new custom stitch.</p>
+          <p className="text-sm text-thy-muted">{t('ordersEmptySub')}</p>
           <div className="flex flex-wrap justify-center gap-3 pt-2">
             <button type="button" className={ghostBtn} onClick={() => { setActiveTab('All'); setSearchQuery(''); }}>
               Reset filters

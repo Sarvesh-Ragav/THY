@@ -8,7 +8,7 @@ import { NOTIFICATION_STATES } from '@/lib/customer-home-data';
 export default function NotificationsPage() {
   return (
     <RequireCustomerAuth>
-      <CustomerPage title="Notifications">
+      <CustomerPage titleKey="pageNotifications">
         <ul className="space-y-3">
           {NOTIFICATION_STATES.map((item) => (
             <li key={item.id} className="border border-thy-ink/10 bg-thy-surface/80 p-4">

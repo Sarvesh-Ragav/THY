@@ -5,7 +5,6 @@ export const MAIN_NAV = [
   { label: 'Explore', href: '/explore' },
   { label: 'Categories', href: '/categories' },
   { label: 'Tailors', href: '/tailors' },
-  { label: 'My Designs', href: '/my-designs' },
   { label: 'My Orders', href: '/my-orders' },
 ] as const;
 

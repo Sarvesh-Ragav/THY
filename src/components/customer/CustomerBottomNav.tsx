@@ -6,32 +6,34 @@ import { Compass, Home, Scissors, User, Users } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { AUTH_PATHS } from '@/lib/customer-home-data';
 import { isCustomerOnboardingComplete } from '@/lib/tailor-session';
+import { useAppearance } from '@/components/providers/AppearanceProvider';
+import type { UiKey } from '@/lib/i18n';
 
 const TABS = [
-  { href: '/', label: 'Home', icon: Home, match: (path: string) => path === '/' },
+  { href: '/', labelKey: 'navHome', icon: Home, match: (path: string) => path === '/' },
   {
     href: '/explore',
-    label: 'Explore',
+    labelKey: 'navExplore',
     icon: Compass,
     match: (path: string) =>
       path.startsWith('/explore') || path.startsWith('/search') || path.startsWith('/categories'),
   },
   {
     href: '/stitch-your-outfit',
-    label: 'Stitch',
+    labelKey: 'navStitch',
     icon: Scissors,
     featured: true,
     match: (path: string) => path.startsWith('/stitch-your-outfit'),
   },
   {
     href: '/tailors',
-    label: 'Tailors',
+    labelKey: 'navTailors',
     icon: Users,
     match: (path: string) => path.startsWith('/tailors'),
   },
   {
     href: '/profile',
-    label: 'You',
+    labelKey: 'navYou',
     icon: User,
     match: (path: string) =>
       path.startsWith('/profile') ||
@@ -50,6 +52,7 @@ export function CustomerBottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const { session, isReady } = useTailorSession();
+  const { t } = useAppearance();
   const loggedIn = isReady && session.isAuthenticated && isCustomerOnboardingComplete(session);
 
   const go = (href: string) => {
@@ -89,7 +92,7 @@ export function CustomerBottomNav() {
               >
                 <Icon size={featured ? 18 : 20} strokeWidth={active ? 2.4 : 1.8} />
               </span>
-              <span className="text-[10px] uppercase tracking-[0.12em] font-medium">{tab.label}</span>
+              <span className="text-[10px] uppercase tracking-[0.12em] font-medium">{t(tab.labelKey as UiKey)}</span>
             </button>
           );
         })}

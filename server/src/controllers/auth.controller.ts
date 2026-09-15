@@ -11,6 +11,9 @@ import {
   updateUserRole,
   registerWithPassword,
   loginWithPassword,
+  getAccountBundle,
+  requestPasswordReset,
+  resetPasswordWithToken,
   type AuthUser,
 } from '../services/auth.service.js';
 import { createAccessToken, createRefreshToken, verifyRefreshToken, type TokenPayload } from '../services/token.service.js';
@@ -24,6 +27,8 @@ import {
   updateRoleSchema,
   registerAccountSchema,
   loginPasswordSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../validators/auth.schemas.js';
 
 const refreshCookieName = 'thy_refresh_token';
@@ -116,7 +121,8 @@ export const confirmOtp: RequestHandler = async (request, response, next) => {
     const body = verifyOtpSchema.parse(request.body);
     const user = await verifyOtp(validatedPhoneNumber(body.phoneNumber), body.challengeId, body.otp);
     const accessToken = await issueTokens(user, request, response);
-    response.status(200).json({ success: true, data: { accessToken, user } });
+    const account = await getAccountBundle(user);
+    response.status(200).json({ success: true, data: { accessToken, ...account } });
   } catch (error) {
     next(error);
   }
@@ -127,7 +133,8 @@ export const googleAuth: RequestHandler = async (request, response, next) => {
     const body = googleAuthSchema.parse(request.body);
     const user = await verifyGoogleCredential(body.credential);
     const accessToken = await issueTokens(user, request, response);
-    response.status(200).json({ success: true, data: { accessToken, user } });
+    const account = await getAccountBundle(user);
+    response.status(200).json({ success: true, data: { accessToken, ...account } });
   } catch (error) {
     next(error);
   }
@@ -159,7 +166,8 @@ export const registerAccount: RequestHandler = async (request, response, next) =
             password: body.password,
           });
     const accessToken = await issueTokens(user, request, response);
-    response.status(201).json({ success: true, data: { accessToken, user } });
+    const account = await getAccountBundle(user);
+    response.status(201).json({ success: true, data: { accessToken, ...account } });
   } catch (error) {
     next(error);
   }
@@ -170,7 +178,8 @@ export const loginWithEmail: RequestHandler = async (request, response, next) =>
     const body = loginPasswordSchema.parse(request.body);
     const user = await loginWithPassword(body.email.toLowerCase(), body.password);
     const accessToken = await issueTokens(user, request, response);
-    response.status(200).json({ success: true, data: { accessToken, user } });
+    const account = await getAccountBundle(user);
+    response.status(200).json({ success: true, data: { accessToken, ...account } });
   } catch (error) {
     next(error);
   }
@@ -198,7 +207,8 @@ export const refresh: RequestHandler = async (request, response, next) => {
     const payload = verifyRefreshToken(currentToken);
     const user = await findUserById(payload.userId);
     const accessToken = await issueTokens(user, request, response, currentToken);
-    return response.status(200).json({ success: true, data: { accessToken, user } });
+    const account = await getAccountBundle(user);
+    return response.status(200).json({ success: true, data: { accessToken, ...account } });
   } catch (error) {
     return next(error);
   }
@@ -223,7 +233,36 @@ export const logout: RequestHandler = async (request, response, next) => {
 export const me: RequestHandler = async (request, response, next) => {
   try {
     const user = await findUserById(request.auth!.userId);
-    response.json({ success: true, data: { user } });
+    const account = await getAccountBundle(user);
+    response.json({ success: true, data: account });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const forgotPassword: RequestHandler = async (request, response, next) => {
+  try {
+    const body = forgotPasswordSchema.parse(request.body);
+    const result = await requestPasswordReset(body.email.toLowerCase());
+    response.status(200).json({
+      success: true,
+      message: 'If an account exists for that email, a reset link is available.',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPassword: RequestHandler = async (request, response, next) => {
+  try {
+    const body = resetPasswordSchema.parse(request.body);
+    await resetPasswordWithToken(body.email.toLowerCase(), body.token, body.password);
+    response.status(200).json({
+      success: true,
+      message: 'Password updated. You can log in with your new password.',
+      data: { reset: true },
+    });
   } catch (error) {
     next(error);
   }

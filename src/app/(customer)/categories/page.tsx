@@ -4,7 +4,7 @@ import { CustomerPage } from '@/components/customer/CustomerPage';
 
 export default function CategoriesPage() {
   return (
-    <CustomerPage title="Categories">
+    <CustomerPage titleKey="pageCategories">
       <CategoryGrid />
     </CustomerPage>
   );

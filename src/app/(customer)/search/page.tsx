@@ -12,7 +12,7 @@ function SearchResults() {
   const { designs, tailors } = searchCatalog(query);
 
   return (
-    <CustomerPage title="Search Results">
+    <CustomerPage titleKey="pageSearch">
       {!query.trim() ? (
         <p className="text-sm text-thy-muted">Search designs, styles or tailors...</p>
       ) : designs.length === 0 && tailors.length === 0 ? (
@@ -37,10 +37,7 @@ function SearchResults() {
               <h2 className="text-2xl mb-4" style={{ fontFamily: 'var(--font-cormorant), serif' }}>Tailors</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 {tailors.map((tailor) => {
-                  const samples = [
-                    ...tailor.portfolio.filter((item) => item.featured),
-                    ...tailor.portfolio.filter((item) => !item.featured),
-                  ].slice(0, 3);
+                  const samples = tailor.portfolio.slice(0, 3);
                   return (
                     <Link key={tailor.id} href={`/tailors/${tailor.id}`} className="thy-card overflow-hidden">
                       <img src={tailor.image} alt="" className="h-36 sm:h-40 w-full object-cover" />
@@ -49,11 +46,11 @@ function SearchResults() {
                         <p className="text-sm text-thy-muted">{tailor.specialty}</p>
                         {samples.length > 0 && (
                           <div className="mt-3 grid grid-cols-3 gap-1.5">
-                            {samples.map((item) => (
+                            {samples.map((image, index) => (
                               <img
-                                key={item.id}
-                                src={item.image}
-                                alt={item.title}
+                                key={`${tailor.id}-sample-${index}`}
+                                src={image}
+                                alt=""
                                 className="h-12 w-full object-cover border border-thy-ink/10"
                               />
                             ))}
@@ -74,7 +71,7 @@ function SearchResults() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<CustomerPage title="Search Results"><p className="text-sm text-thy-subtle">Loading...</p></CustomerPage>}>
+    <Suspense fallback={<CustomerPage titleKey="pageSearch"><p className="text-sm text-thy-subtle">Loading...</p></CustomerPage>}>
       <SearchResults />
     </Suspense>
   );

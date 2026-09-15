@@ -5,7 +5,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Bell, LogOut, User } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { useAppearance } from '@/components/providers/AppearanceProvider';
 import { ThyLogo } from '@/components/auth/ThyLogo';
+import { AppearanceControls } from '@/components/customer/AppearanceControls';
+import { TAILOR_NAV_I18N } from '@/lib/i18n';
 
 const NAV_LINKS = [
   { label: 'Dashboard', href: '/tailor-dashboard' },
@@ -24,6 +27,7 @@ export default function TailorDashboardLayout({
   children: React.ReactNode;
 }) {
   const { session, isReady, logout } = useTailorSession();
+  const { t } = useAppearance();
   const router = useRouter();
   const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -52,12 +56,13 @@ export default function TailorDashboardLayout({
   if (!isReady || !session.isAuthenticated) {
     return (
       <div className="min-h-dvh flex items-center justify-center text-sm text-thy-muted font-sans">
-        Loading...
+        {t('loading')}
       </div>
     );
   }
 
-  const displayName = session.profile?.fullName || session.identifier || 'Tailor Account';
+  const displayName = session.profile?.fullName || 'Tailor Account';
+  const displayEmail = session.identifier.includes('@') ? session.identifier : session.profile?.phone || '';
 
   return (
     <div
@@ -75,10 +80,11 @@ export default function TailorDashboardLayout({
           </Link>
 
           <p className="hidden sm:block text-[11px] uppercase tracking-[0.18em] text-white/70">
-            Tailor workspace
+            {t('tailorWorkspace')}
           </p>
 
           <div className="ml-auto flex items-center gap-1">
+            <AppearanceControls />
             <Link
               href="/tailor-dashboard/notifications"
               aria-label="Notifications"
@@ -102,27 +108,30 @@ export default function TailorDashboardLayout({
                   <div className="px-4 py-3 border-b border-thy-burgundy/10">
                     <p className="text-xs font-semibold text-thy-ink truncate">{displayName}</p>
                     <p className="text-[10px] text-thy-subtle uppercase tracking-[0.14em] mt-0.5">
-                      Tailor partner
+                      {session.profile?.shopName || t('tailorPartner')}
                     </p>
+                    {displayEmail ? (
+                      <p className="text-[10px] text-thy-subtle truncate mt-0.5">{displayEmail}</p>
+                    ) : null}
                   </div>
                   <div className="py-1">
                     <Link
                       href="/tailor-dashboard/profile-preview"
                       className="block px-4 py-2.5 text-xs font-medium text-thy-ink hover:bg-thy-mist"
                     >
-                      My atelier profile
+                      {t('tailorProfile')}
                     </Link>
                     <Link
                       href="/tailor-dashboard/portfolio"
                       className="block px-4 py-2.5 text-xs font-medium text-thy-ink hover:bg-thy-mist"
                     >
-                      Work portfolio
+                      {t('tailorWork')}
                     </Link>
                     <Link
                       href="/tailor-dashboard/settings"
                       className="block px-4 py-2.5 text-xs font-medium text-thy-ink hover:bg-thy-mist"
                     >
-                      Settings
+                      {t('tailorSettings')}
                     </Link>
                   </div>
                   <div className="border-t border-thy-burgundy/10 pt-1 mt-1">
@@ -136,7 +145,7 @@ export default function TailorDashboardLayout({
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-thy-brand hover:bg-thy-mist text-left"
                     >
                       <LogOut size={12} />
-                      Logout
+                      {t('navLogout')}
                     </button>
                   </div>
                 </div>
@@ -159,7 +168,7 @@ export default function TailorDashboardLayout({
                     isActive ? 'is-active' : ''
                   }`}
                 >
-                  {link.label}
+                  {t(TAILOR_NAV_I18N[link.href])}
                 </Link>
               );
             })}

@@ -66,8 +66,8 @@ function PaymentStep() {
         description: order.garmentName,
         order_id: checkout.razorpayOrderId,
         prefill: {
-          contact: session.identifier,
-          email: session.customerProfile?.email,
+          contact: session.customerProfile?.phone || session.identifier,
+          email: session.customerProfile?.email || (session.identifier.includes('@') ? session.identifier : undefined),
           name: session.customerProfile?.fullName,
         },
         theme: { color: '#5C1A24' },

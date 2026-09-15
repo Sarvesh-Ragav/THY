@@ -7,7 +7,7 @@ import { RequireCustomerAuth } from '@/components/customer/RequireCustomerAuth';
 export default function PaymentMethodsPage() {
   return (
     <RequireCustomerAuth>
-      <CustomerPage title="Payment Methods">
+      <CustomerPage titleKey="pagePayments">
         <p className="text-sm text-thy-muted">No payment methods saved yet.</p>
       </CustomerPage>
     </RequireCustomerAuth>

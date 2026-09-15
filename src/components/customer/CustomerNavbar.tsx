@@ -5,9 +5,14 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Bell, Heart, Menu, Search, ShoppingBag, User, X, LogOut } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { getAccountDisplayName, getCustomerFirstName } from '@/lib/tailor-session';
 import { AUTH_PATHS, MAIN_NAV, PROFILE_MENU } from '@/lib/customer-home-data';
+import { NAV_I18N, PROFILE_I18N } from '@/lib/i18n';
 import { ThyLogo } from '@/components/auth/ThyLogo';
 import { CustomerLocationControl } from '@/components/customer/CustomerLocationControl';
+import { AppearanceControls } from '@/components/customer/AppearanceControls';
+import { favoritedDesigns } from '@/lib/wishlist';
+import { useAppearance } from '@/components/providers/AppearanceProvider';
 
 const iconBtn =
   'thy-nav-icon inline-flex items-center justify-center h-11 w-11';
@@ -16,6 +21,7 @@ export function CustomerNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { session, isReady, logout } = useTailorSession();
+  const { t } = useAppearance();
   const [query, setQuery] = useState('');
   const [profileOpen, setProfileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,7 +31,14 @@ export function CustomerNavbar() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const loggedIn = isReady && session.isAuthenticated;
-  const displayName = session.identifier || 'Account';
+  const wishlistCount = favoritedDesigns(session).length;
+  const fullName = getAccountDisplayName(session);
+  const displayName = session.customerProfile?.fullName
+    ? getCustomerFirstName(session)
+    : fullName === 'Account'
+      ? 'Account'
+      : fullName.split(/\s+/)[0];
+  const accountEmail = session.customerProfile?.email || (session.identifier.includes('@') ? session.identifier : '');
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -105,7 +118,7 @@ export function CustomerNavbar() {
                 pathname === item.href ? 'is-active' : ''
               }`}
             >
-              {item.label}
+              {t(NAV_I18N[item.href])}
             </button>
           ))}
         </nav>
@@ -119,22 +132,22 @@ export function CustomerNavbar() {
             ref={searchInputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search designs, styles or tailors..."
+            placeholder={t('navSearchPlaceholder')}
             className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/70"
           />
         </form>
 
         <div className="hidden lg:flex items-center gap-1 shrink-0">
-
-          <button type="button" aria-label="Notifications" className={iconBtn} onClick={() => goAuthPath('/notifications')}>
+          <AppearanceControls />
+          <button type="button" aria-label={t('navNotifications')} className={iconBtn} onClick={() => goAuthPath('/notifications')}>
             <Bell size={18} />
           </button>
-          <button type="button" aria-label="Wishlist" className={iconBtn} onClick={() => goAuthPath('/wishlist')}>
-            <Heart size={18} />
+          <button type="button" aria-label={t('navWishlist')} className={iconBtn} onClick={() => goAuthPath('/wishlist')}>
+            <Heart size={18} className={wishlistCount > 0 ? 'fill-current' : undefined} />
           </button>
           <button
             type="button"
-            aria-label="Cart"
+            aria-label={t('navCart')}
             className={iconBtn}
             onClick={() => goAuthPath('/stitch-your-outfit/cart')}
           >
@@ -154,32 +167,32 @@ export function CustomerNavbar() {
               className="thy-nav-link thy-nav-link-tall inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] min-h-11 px-2"
             >
               <User size={14} />
-              <span>{loggedIn ? displayName : 'Profile'}</span>
+              <span>{loggedIn ? displayName : t('navProfile')}</span>
             </button>
 
             {profileOpen && loggedIn && (
-              <div className="absolute right-0 mt-2 w-52 bg-white border border-thy-ink/10 shadow-xl py-2 z-50 rounded-xl">
-                <div className="px-4 py-2 border-b border-gray-100">
-                  <p className="text-xs font-bold text-gray-900 truncate">{displayName}</p>
-                  <p className="text-[10px] text-gray-400 truncate">Customer Account</p>
+              <div className="absolute right-0 mt-2 w-52 bg-thy-surface border border-thy-ink/10 shadow-xl py-2 z-50 rounded-xl">
+                <div className="px-4 py-2 border-b border-thy-burgundy/10">
+                  <p className="text-xs font-bold text-thy-ink truncate">{fullName}</p>
+                  <p className="text-[10px] text-thy-subtle truncate">{accountEmail || t('customerAccount')}</p>
                 </div>
                 {PROFILE_MENU.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setProfileOpen(false)}
-                    className="block px-4 py-2 text-xs font-medium text-gray-700 hover:bg-slate-50 hover:text-[#5C1A24]"
+                    className="block px-4 py-2 text-xs font-medium text-thy-ink hover:bg-thy-mist hover:text-thy-burgundy"
                   >
-                    {item.label}
+                    {t(PROFILE_I18N[item.href])}
                   </Link>
                 ))}
                 <button
                   type="button"
-                  className="w-full text-left px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-1.5 border-t border-gray-100 mt-1"
+                  className="w-full text-left px-4 py-2 text-xs font-semibold text-thy-brand hover:bg-thy-mist flex items-center gap-1.5 border-t border-thy-burgundy/10 mt-1"
                   onClick={handleLogout}
                 >
                   <LogOut size={12} />
-                  Logout
+                  {t('navLogout')}
                 </button>
               </div>
             )}
@@ -187,15 +200,16 @@ export function CustomerNavbar() {
         </div>
 
         <div className="flex lg:hidden items-center gap-0.5 ml-auto shrink-0">
-          <button type="button" aria-label="Notifications" className={iconBtn} onClick={() => goAuthPath('/notifications')}>
+          <AppearanceControls />
+          <button type="button" aria-label={t('navNotifications')} className={iconBtn} onClick={() => goAuthPath('/notifications')}>
             <Bell size={18} />
           </button>
-          <button type="button" aria-label="Wishlist" className={iconBtn} onClick={() => goAuthPath('/wishlist')}>
-            <Heart size={18} />
+          <button type="button" aria-label={t('navWishlist')} className={iconBtn} onClick={() => goAuthPath('/wishlist')}>
+            <Heart size={18} className={wishlistCount > 0 ? 'fill-current' : undefined} />
           </button>
           <button
             type="button"
-            aria-label="Cart"
+            aria-label={t('navCart')}
             className={iconBtn}
             onClick={() => goAuthPath('/stitch-your-outfit/cart')}
           >

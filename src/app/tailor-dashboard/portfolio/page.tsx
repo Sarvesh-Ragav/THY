@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { TailorPage } from '@/components/tailor/TailorPage';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 
 interface PortfolioItem {
   id: string;
@@ -21,6 +22,7 @@ interface ServicePrice {
 }
 
 export default function TailorPortfolioManagementPage() {
+  const { session, updateSession } = useTailorSession();
   const [isAddWorkOpen, setIsAddWorkOpen] = useState(false);
   const [isEditServicesOpen, setIsEditServicesOpen] = useState(false);
 
@@ -38,36 +40,24 @@ export default function TailorPortfolioManagementPage() {
   const categories = ['All', 'Blouse', 'Kurti', 'Anarkali', 'Lehenga', 'Dress', 'Bridal'];
 
   // Portfolio Items State
-  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([
-    {
-      id: '1',
-      title: 'Embroidered Silk Anarkali',
-      category: 'Anarkali',
-      image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=600&q=80',
-      isFeatured: true,
-    },
-    {
-      id: '2',
-      title: 'Bridal Velvet Blouse',
-      category: 'Blouse',
-      image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=600&q=80',
-      isFeatured: true,
-    },
-    {
-      id: '3',
-      title: 'Custom Men Kurta Set',
-      category: 'Kurti',
-      image: 'https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=600&q=80',
-      isFeatured: false,
-    },
-    {
-      id: '4',
-      title: 'Heavy Designer Lehenga',
-      category: 'Lehenga',
-      image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=600&q=80',
-      isFeatured: true,
-    },
-  ]);
+  const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
+
+  useEffect(() => {
+    setPortfolioItems((current) => {
+      if (current.length) return current;
+      return (session.tailorPortfolio ?? []).map((item, index) => ({
+        ...item,
+        isFeatured: index < 2,
+      }));
+    });
+  }, [session.tailorPortfolio]);
+
+  const persistPortfolio = (items: PortfolioItem[]) => {
+    setPortfolioItems(items);
+    updateSession({
+      tailorPortfolio: items.map(({ id, title, image, category }) => ({ id, title, image, category })),
+    });
+  };
 
   // Services & Pricing State
   const [services, setServices] = useState<ServicePrice[]>([
@@ -103,7 +93,7 @@ export default function TailorPortfolioManagementPage() {
       isFeatured: newIsFeatured,
     };
 
-    setPortfolioItems([newItem, ...portfolioItems]);
+    persistPortfolio([newItem, ...portfolioItems]);
     setIsAddWorkOpen(false);
     setNewTitle('');
     setNewImage('');
@@ -134,13 +124,13 @@ export default function TailorPortfolioManagementPage() {
   };
 
   const toggleFeature = (id: string) => {
-    setPortfolioItems(items =>
-      items.map(item => (item.id === id ? { ...item, isFeatured: !item.isFeatured } : item))
+    persistPortfolio(
+      portfolioItems.map((item) => (item.id === id ? { ...item, isFeatured: !item.isFeatured } : item))
     );
   };
 
   const deleteItem = (id: string) => {
-    setPortfolioItems(items => items.filter(item => item.id !== id));
+    persistPortfolio(portfolioItems.filter((item) => item.id !== id));
   };
 
   return (

@@ -159,6 +159,11 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
+            <div className="flex justify-end mt-1.5">
+              <Link href="/forgot-password" className="text-xs font-semibold text-thy-brand hover:underline">
+                Forgot password?
+              </Link>
+            </div>
           </div>
 
           {errorMessage ? (

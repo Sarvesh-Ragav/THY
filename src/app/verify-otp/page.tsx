@@ -24,7 +24,7 @@ export default function VerifyOtpPage() {
         onVerifyOtp={async (otp) => {
           if (!challengeId) throw new Error('Request a verification code before continuing.');
           const result = await verifyOtp(session.identifier, challengeId, otp);
-          const next = completeAuthentication(result.accessToken);
+          const next = completeAuthentication(result);
           router.push(getPostAuthPath(next));
           return true;
         }}

@@ -99,6 +99,7 @@ export default function TailorRegistration() {
         shopName: trimmedShop,
         yearsOfExperience: trimmedExperience,
         shopAddress: trimmedAddress,
+        city: trimmedAddress.split(',').map((part) => part.trim()).filter(Boolean).at(-1),
       };
       const result = await registerAccount({
         role: 'tailor',
@@ -111,10 +112,10 @@ export default function TailorRegistration() {
         password,
         confirmPassword,
       });
-      completeAuthentication(result.accessToken, 'tailor', trimmedPhone, result.user, {
+      completeAuthentication(result, {
         role: 'tailor',
         hasPassword: true,
-        identifier: trimmedPhone,
+        identifier: trimmedEmail,
         profile,
       });
       router.push('/tailor-verification');

@@ -4,7 +4,7 @@ import { User, type IUser } from '../models/User.js';
 import { AuthSession } from '../models/AuthSession.js';
 import { CustomerProfile } from '../models/CustomerProfile.js';
 import { TailorProfile } from '../models/TailorProfile.js';
-import { generateOtp, hashPassword, hashValue, valuesMatch, verifyPassword } from '../utils/crypto.js';
+import { generateOtp, generateResetToken, hashPassword, hashValue, valuesMatch, verifyPassword } from '../utils/crypto.js';
 import { ApiError } from '../utils/api-error.js';
 
 export interface AuthUser {
@@ -20,6 +20,38 @@ export interface AuthUser {
 
 const googleClient = env.GOOGLE_CLIENT_ID ? new OAuth2Client(env.GOOGLE_CLIENT_ID) : null;
 
+export interface AuthCustomerProfile {
+  fullName: string;
+  email: string;
+  city: string;
+  address: string;
+  phone: string | null;
+  avatarUrl: string | null;
+}
+
+export interface AuthTailorPortfolioItem {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+}
+
+export interface AuthTailorProfile {
+  fullName: string;
+  shopName: string;
+  yearsOfExperience: string;
+  shopAddress: string;
+  city: string;
+  phone: string | null;
+  portfolio: AuthTailorPortfolioItem[];
+}
+
+export interface AccountBundle {
+  user: AuthUser;
+  customerProfile: AuthCustomerProfile | null;
+  tailorProfile: AuthTailorProfile | null;
+}
+
 function toUser(doc: IUser): AuthUser {
   return {
     id: doc._id.toString(),
@@ -31,6 +63,86 @@ function toUser(doc: IUser): AuthUser {
     role: doc.role ?? null,
     hasPassword: Boolean(doc.hasPassword),
   };
+}
+
+export async function getAccountBundle(user: AuthUser): Promise<AccountBundle> {
+  const [customer, tailor] = await Promise.all([
+    CustomerProfile.findOne({ userId: user.id }),
+    TailorProfile.findOne({ userId: user.id }),
+  ]);
+
+  const defaultAddress = customer?.addresses?.find((entry) => entry.isDefault) ?? customer?.addresses?.[0];
+
+  return {
+    user,
+    customerProfile: customer
+      ? {
+          fullName: customer.fullName,
+          email: customer.email || user.email || '',
+          city: customer.city,
+          address: defaultAddress?.addressLine1 || '',
+          phone: user.phoneNumber ?? null,
+          avatarUrl: customer.avatarUrl ?? user.avatarUrl ?? null,
+        }
+      : null,
+    tailorProfile: tailor
+      ? {
+          fullName: tailor.fullName,
+          shopName: tailor.shopName,
+          yearsOfExperience: String(tailor.yearsOfExperience ?? ''),
+          shopAddress: tailor.shopAddress,
+          city: tailor.city,
+          phone: user.phoneNumber ?? null,
+          portfolio: (tailor.portfolio ?? [])
+            .filter((item) => item.isActive !== false)
+            .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+            .map((item) => ({
+              id: item._id?.toString?.() || `${item.title}-${item.imageUrl}`,
+              title: item.title,
+              image: item.imageUrl,
+              category: item.category || 'general',
+            })),
+        }
+      : null,
+  };
+}
+
+export async function requestPasswordReset(email: string): Promise<{ sent: true; resetToken?: string }> {
+  const user = await User.findOne({ email: email.toLowerCase(), isActive: true });
+  if (!user?.hasPassword) {
+    return { sent: true };
+  }
+
+  const token = generateResetToken();
+  user.passwordResetTokenHash = hashValue(token);
+  user.passwordResetExpiresAt = new Date(Date.now() + 30 * 60 * 1000);
+  await user.save();
+
+  return {
+    sent: true,
+    ...(env.NODE_ENV !== 'production' ? { resetToken: token } : {}),
+  };
+}
+
+export async function resetPasswordWithToken(email: string, token: string, password: string): Promise<AuthUser> {
+  const user = await User.findOne({ email: email.toLowerCase(), isActive: true }).select(
+    '+passwordHash +passwordResetTokenHash'
+  );
+  if (
+    !user?.passwordResetTokenHash ||
+    !user.passwordResetExpiresAt ||
+    user.passwordResetExpiresAt.getTime() < Date.now() ||
+    !valuesMatch(token, user.passwordResetTokenHash)
+  ) {
+    throw new ApiError(400, 'This reset link is invalid or has expired.', 'RESET_INVALID');
+  }
+
+  user.passwordHash = await hashPassword(password);
+  user.hasPassword = true;
+  user.passwordResetTokenHash = null;
+  user.passwordResetExpiresAt = null;
+  await user.save();
+  return toUser(user);
 }
 
 function cityFromAddress(address: string): string {

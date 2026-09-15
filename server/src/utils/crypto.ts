@@ -8,8 +8,12 @@ export function hashValue(value: string): string {
   return createHash('sha256').update(value).digest('hex');
 }
 
+export function generateResetToken(): string {
+  return randomBytes(32).toString('hex');
+}
+
 export function generateOtp(): string {
-  return randomInt(0, 1_000_000).toString().padStart(6, '0');
+  return String(randomInt(0, 1_000_000)).padStart(6, '0');
 }
 
 export function valuesMatch(value: string, expectedHash: string): boolean {

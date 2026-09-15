@@ -113,18 +113,12 @@ export default function CustomerRegistration() {
         password,
         confirmPassword,
       });
-      const next = completeAuthentication(
-        result.accessToken,
-        'customer',
-        trimmedPhone,
-        result.user,
-        {
-          role: 'customer',
-          hasPassword: true,
-          identifier: trimmedPhone,
-          customerProfile,
-        }
-      );
+      const next = completeAuthentication(result, {
+        role: 'customer',
+        hasPassword: true,
+        identifier: trimmedEmail,
+        customerProfile,
+      });
       router.push(getPostAuthPath(next));
     } catch (error) {
       setErrorMessage(

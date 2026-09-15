@@ -10,11 +10,16 @@ import React, {
 } from 'react';
 import {
   TailorSession,
+  applyAccountToSession,
   createDefaultSession,
   loadTailorSession,
   persistTailorSession,
 } from '@/lib/tailor-session';
-import { logoutAuthentication, refreshAuthentication, type AuthenticatedUser } from '@/lib/auth-api';
+import {
+  logoutAuthentication,
+  refreshAuthentication,
+  type AuthenticationResult,
+} from '@/lib/auth-api';
 
 interface TailorSessionContextValue {
   session: TailorSession;
@@ -22,10 +27,7 @@ interface TailorSessionContextValue {
   accessToken: string | null;
   updateSession: (partial: Partial<TailorSession>) => TailorSession;
   completeAuthentication: (
-    accessToken: string,
-    role?: 'customer' | 'tailor' | 'admin' | null,
-    identifier?: string,
-    user?: AuthenticatedUser | null,
+    result: AuthenticationResult,
     sessionPatch?: Partial<TailorSession>
   ) => TailorSession;
   logout: () => void;
@@ -43,29 +45,15 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
     // Browser storage is retained for onboarding only; it is never proof of authentication.
     setSession({ ...localSession, isAuthenticated: false });
     refreshAuthentication()
-      .then(({ accessToken, user }) => {
-        setAccessToken(accessToken);
+      .then((result) => {
+        setAccessToken(result.accessToken);
         setSession((current) => {
-          const existing = current.customerProfile ?? localSession.customerProfile;
-          const resolvedIdentifier = user.phoneNumber || user.email || current.identifier || localSession.identifier;
-          const isPhone = Boolean(resolvedIdentifier && /^\+?\d{10,15}$/.test(resolvedIdentifier));
-          const isEmail = Boolean(resolvedIdentifier && resolvedIdentifier.includes('@'));
-          const next = {
-            ...localSession,
-            ...current,
-            isAuthenticated: true,
-            role: user.role ?? current.role ?? localSession.role,
-            identifier: resolvedIdentifier,
-            selectedLocation: current.selectedLocation ?? localSession.selectedLocation,
-            locationCoords: current.locationCoords ?? localSession.locationCoords,
-            customerProfile: {
-              fullName: existing?.fullName || user.name || '',
-              phone: existing?.phone || user.phoneNumber || (isPhone ? resolvedIdentifier : ''),
-              email: existing?.email || user.email || (isEmail ? resolvedIdentifier : ''),
-              city: existing?.city || '',
-              address: existing?.address || '',
-            },
-          };
+          const next = applyAccountToSession(
+            { ...localSession, ...current },
+            result.user,
+            result.customerProfile,
+            result.tailorProfile
+          );
           persistTailorSession(next);
           return next;
         });
@@ -85,33 +73,15 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
   }, []);
 
   const completeAuthentication = useCallback(
-    (
-      accessToken: string,
-      authenticatedRole?: 'customer' | 'tailor' | 'admin' | null,
-      identifier?: string,
-      user?: AuthenticatedUser | null,
-      sessionPatch?: Partial<TailorSession>
-    ) => {
-      const existing = sessionPatch?.customerProfile ?? session.customerProfile;
-      const resolvedIdentifier = identifier ?? user?.phoneNumber ?? user?.email ?? session.identifier;
-      const isPhone = Boolean(resolvedIdentifier && /^\+?\d{10,15}$/.test(resolvedIdentifier));
-      const isEmail = Boolean(resolvedIdentifier && resolvedIdentifier.includes('@'));
-      const next: TailorSession = {
-        ...session,
-        ...sessionPatch,
-        isAuthenticated: true,
-        hasPassword: Boolean(sessionPatch?.hasPassword ?? user?.hasPassword ?? session.hasPassword),
-        role: authenticatedRole ?? user?.role ?? sessionPatch?.role ?? session.role,
-        identifier: resolvedIdentifier,
-        customerProfile: sessionPatch?.customerProfile ?? {
-          fullName: existing?.fullName || user?.name || '',
-          phone: existing?.phone || user?.phoneNumber || (isPhone ? resolvedIdentifier : ''),
-          email: existing?.email || user?.email || (isEmail ? resolvedIdentifier : ''),
-          city: existing?.city || '',
-          address: existing?.address || '',
-        },
-      };
-      setAccessToken(accessToken);
+    (result: AuthenticationResult, sessionPatch?: Partial<TailorSession>) => {
+      const next = applyAccountToSession(
+        session,
+        result.user,
+        result.customerProfile,
+        result.tailorProfile,
+        sessionPatch
+      );
+      setAccessToken(result.accessToken);
       setSession(next);
       persistTailorSession(next);
       return next;

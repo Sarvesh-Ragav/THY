@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { useAppearance } from '@/components/providers/AppearanceProvider';
 import { HeroCarousel } from '@/components/customer/HeroCarousel';
 import { CategoryGrid } from '@/components/customer/CategoryGrid';
 import { DESIGNS, TAILORS } from '@/lib/customer-home-data';
@@ -12,6 +13,7 @@ import { NEAR_ME_RADIUS_KM, distanceToCity, nearestCity } from '@/lib/geo';
 
 export function CustomerHome() {
   const { session, isReady } = useTailorSession();
+  const { t } = useAppearance();
   const { coords, label } = useCustomerLocation();
   const loggedIn = isReady && session.isAuthenticated && isCustomerOnboardingComplete(session);
   const activity = loggedIn && hasCustomerActivity(session);
@@ -34,16 +36,16 @@ export function CustomerHome() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[68dvh] sm:min-h-[74dvh] md:min-h-[78vh] flex items-end pb-14 sm:pb-16 pointer-events-none">
           <div className="max-w-xl text-thy-canvas pointer-events-auto">
             <h1 className="text-[clamp(2.4rem,12vw,6.4rem)] leading-[0.9] drop-shadow-[0_2px_18px_rgba(0,0,0,0.28)]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-              Stitch Your Desire
+              {t('homeHeroTitle')}
             </h1>
             <p className="mt-3 sm:mt-4 text-sm md:text-base tracking-[0.04em] text-thy-canvas/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.25)]">
-              Your Fabric. Your Style. Your Tailor.
+              {t('homeHeroSub')}
             </p>
             <Link
               href="/stitch-your-outfit"
               className="hero-leather-btn inline-flex items-center justify-center mt-6 sm:mt-8 w-full sm:w-auto px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em]"
             >
-              Stitch Your Outfit
+              {t('homeCta')}
             </Link>
           </div>
         </div>
@@ -51,17 +53,14 @@ export function CustomerHome() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 space-y-14 md:space-y-20">
         <div>
-          <p className="thy-section-kicker">Artisans</p>
+          <p className="thy-section-kicker">{t('homeArtisans')}</p>
           <h2 className="thy-section-title text-2xl sm:text-3xl md:text-4xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-            Find Your Perfect Tailor
+            {t('homeFindTailor')}
           </h2>
-          {label && <p className="mt-1 text-sm text-thy-muted">Near {label}</p>}
+          {label && <p className="mt-1 text-sm text-thy-muted">{t('homeNear')} {label}</p>}
           <div className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {nearbyTailors.map((tailor) => {
-              const samples = [
-                ...tailor.portfolio.filter((item) => item.featured),
-                ...tailor.portfolio.filter((item) => !item.featured),
-              ].slice(0, 3);
+              const samples = tailor.portfolio.slice(0, 3);
               return (
                 <Link key={tailor.id} href={`/tailors/${tailor.id}`} className="thy-card overflow-hidden hover:border-black transition-colors">
                   <img src={tailor.image} alt="" className="h-36 sm:h-40 w-full object-cover" />
@@ -70,11 +69,11 @@ export function CustomerHome() {
                     <p className="text-sm text-thy-muted">{tailor.specialty} · {tailor.city}</p>
                     {samples.length > 0 && (
                       <div className="mt-3 grid grid-cols-3 gap-1.5">
-                        {samples.map((item) => (
+                        {samples.map((image, index) => (
                           <img
-                            key={item.id}
-                            src={item.image}
-                            alt={item.title}
+                            key={`${tailor.id}-sample-${index}`}
+                            src={image}
+                            alt=""
                             className="h-12 w-full object-cover border border-black"
                           />
                         ))}
@@ -88,9 +87,9 @@ export function CustomerHome() {
         </div>
 
         <div>
-          <p className="thy-section-kicker">For you</p>
+          <p className="thy-section-kicker">{t('homeForYou')}</p>
           <h2 className="thy-section-title text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-            Picked Just for You
+            {t('homePicked')}
           </h2>
           <div className="mt-5 sm:mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {picked.map((design) => (
@@ -103,9 +102,9 @@ export function CustomerHome() {
         </div>
 
         <div>
-          <p className="thy-section-kicker">Collections</p>
+          <p className="thy-section-kicker">{t('homeCollections')}</p>
           <h2 className="thy-section-title text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-            Find Your Style
+            {t('homeFindStyle')}
           </h2>
           <div className="mt-5 sm:mt-6">
             <CategoryGrid />
@@ -113,9 +112,9 @@ export function CustomerHome() {
         </div>
 
         <div>
-          <p className="thy-section-kicker">Now</p>
+          <p className="thy-section-kicker">{t('homeNow')}</p>
           <h2 className="thy-section-title text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-            Trending Now
+            {t('homeTrending')}
           </h2>
           <div className="mt-5 sm:mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {trending.map((design) => (
@@ -126,30 +125,29 @@ export function CustomerHome() {
             ))}
           </div>
           <Link href="/explore" className="inline-block mt-4 text-[11px] uppercase tracking-[0.18em] text-thy-burgundy border-b border-thy-burgundy/40">
-            Explore Relevant Trending Designs
+            {t('homeExploreTrending')}
           </Link>
         </div>
 
         <div className="thy-card p-5 sm:p-6">
-          <p className="thy-section-kicker">Continue</p>
+          <p className="thy-section-kicker">{t('homeContinue')}</p>
           <h2 className="thy-section-title text-2xl sm:text-3xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-            Continue Your Style Journey
+            {t('homeContinueTitle')}
           </h2>
           {activity ? (
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
-              <Link href="/my-designs" className="border-b border-thy-burgundy/40 text-thy-burgundy">My Designs</Link>
-              <Link href="/my-orders" className="border-b border-thy-burgundy/40 text-thy-burgundy">My Orders</Link>
-              <Link href="/my-measurements" className="border-b border-thy-burgundy/40 text-thy-burgundy">My Measurements</Link>
+              <Link href="/my-orders" className="border-b border-thy-burgundy/40 text-thy-burgundy">{t('homeMyOrders')}</Link>
+              <Link href="/my-measurements" className="border-b border-thy-burgundy/40 text-thy-burgundy">{t('homeMyMeasurements')}</Link>
             </div>
           ) : (
             <div className="mt-4">
-              <p className="text-sm text-thy-muted">Ready to Stitch Something You Love?</p>
-              <p className="text-sm text-thy-subtle mt-1">Start your style journey with THY.</p>
+              <p className="text-sm text-thy-muted">{t('homeReady')}</p>
+              <p className="text-sm text-thy-subtle mt-1">{t('homeStart')}</p>
               <Link
                 href="/stitch-your-outfit"
                 className="inline-flex items-center justify-center mt-5 w-full sm:w-auto px-6 py-3 text-[11px] uppercase tracking-[0.18em] font-semibold bg-thy-burgundy text-thy-cream hover:bg-[#4A1520]"
               >
-                Stitch Your Outfit
+                {t('homeCta')}
               </Link>
             </div>
           )}

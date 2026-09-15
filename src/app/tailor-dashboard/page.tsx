@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { TailorPage } from '@/components/tailor/TailorPage';
+import { getTailorFirstName } from '@/lib/tailor-session';
 
 export default function TailorDashboardPage() {
   const [isAvailable, setIsAvailable] = useState(true);
   const { session } = useTailorSession();
 
-  const displayName = session?.profile?.fullName || session?.identifier || 'Priya S!';
+  const displayName = getTailorFirstName(session);
 
   return (
     <TailorPage

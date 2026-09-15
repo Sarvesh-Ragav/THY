@@ -29,6 +29,7 @@ import {
   Bookmark
 } from 'lucide-react';
 import { useCustomerLocation } from '@/hooks/useCustomerLocation';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 
 const CUSTOMER_DATA = {
   name: "Sarah Jenkins",
@@ -221,12 +222,19 @@ const CUSTOMER_DATA = {
 };
 
 export default function App() {
+  const { session } = useTailorSession();
   const { label, detecting } = useCustomerLocation({ autoDetect: true });
   const [activeTab, setActiveTab] = useState('orders');
   const [selectedProfileId, setSelectedProfileId] = useState('self');
   const [selectedOrderModal, setSelectedOrderModal] = useState<(typeof CUSTOMER_DATA.orders)[number] | null>(null);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [showAddWishlistModal, setShowAddWishlistModal] = useState(false);
+
+  const profileName = session.customerProfile?.fullName || 'Your profile';
+  const profileHandle = session.customerProfile?.email
+    ? `@${session.customerProfile.email.split('@')[0]}`
+    : session.customerProfile?.phone || '';
+  const profileLocation = label || (detecting ? 'Detecting location…' : session.customerProfile?.city || CUSTOMER_DATA.location);
 
   // Get active measurement object
   const currentMeasurementObj = CUSTOMER_DATA.measurementProfiles.find(p => p.id === selectedProfileId) || CUSTOMER_DATA.measurementProfiles[0];
@@ -281,7 +289,7 @@ export default function App() {
                 <div className="relative">
                   <img 
                     src={CUSTOMER_DATA.avatar} 
-                    alt={CUSTOMER_DATA.name} 
+                    alt={profileName} 
                     className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-white shadow-md object-cover bg-white"
                   />
                   <span className="absolute bottom-1 right-1 bg-[#5C1A24] text-white p-1 rounded-full border-2 border-white shadow" title="Verified THY Member">
@@ -291,17 +299,17 @@ export default function App() {
 
                 <div className="pt-2 sm:pt-0">
                   <div className="flex items-center justify-center sm:justify-start gap-2">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{CUSTOMER_DATA.name}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">{profileName}</h1>
                     <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#F3E8D6] text-[#5C1A24] border border-[#5C1A24]/20">
                       THY Member
                     </span>
                   </div>
-                  <p className="text-sm font-medium text-slate-500 mt-0.5">{CUSTOMER_DATA.handle}</p>
+                  <p className="text-sm font-medium text-slate-500 mt-0.5">{profileHandle}</p>
                   
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-2 text-xs text-slate-500">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 text-[#5C1A24]" />
-                      {label || (detecting ? 'Detecting location…' : CUSTOMER_DATA.location)}
+                      {profileLocation}
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1">

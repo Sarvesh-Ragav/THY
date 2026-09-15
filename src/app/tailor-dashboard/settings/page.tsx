@@ -1,7 +1,11 @@
 'use client';
 
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { TailorPage } from '@/components/tailor/TailorPage';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { useAppearance } from '@/components/providers/AppearanceProvider';
+import { type AppLanguage } from '@/lib/i18n';
 import { 
   User, 
   Languages, 
@@ -362,44 +366,36 @@ const TRANSLATIONS = {
   }
 };
 
-const LanguageContext = createContext({
-  lang: 'en',
-  setLang: (lang: string) => {},
-  t: (key: string) => key
-});
-
-function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState('en');
-  const t = (key: string) => TRANSLATIONS[lang as keyof typeof TRANSLATIONS]?.[key as keyof typeof TRANSLATIONS['en']] || TRANSLATIONS['en'][key as keyof typeof TRANSLATIONS['en']] || key;
-  return <LanguageContext.Provider value={{ lang, setLang, t }}>{children}</LanguageContext.Provider>;
-}
-
-function useLanguage() {
-  return useContext(LanguageContext);
-}
-
-export default function TailorSettingsPageWrapper() {
-  return (
-    <LanguageProvider>
-      <TailorSettingsPage />
-    </LanguageProvider>
-  );
-}
-
-function TailorSettingsPage() {
-  const { lang, setLang, t } = useLanguage();
-  const [darkMode, setDarkMode] = useState(false);
+export default function TailorSettingsPage() {
+  const router = useRouter();
+  const { session, updateSession, logout } = useTailorSession();
+  const { language: lang, setLanguage, darkMode, setDarkMode } = useAppearance();
+  const t = (key: string) =>
+    TRANSLATIONS[lang][key as keyof typeof TRANSLATIONS['en']] || TRANSLATIONS.en[key as keyof typeof TRANSLATIONS['en']] || key;
+  const setLang = (next: string) => setLanguage(next as AppLanguage);
   const [activeTab, setActiveTab] = useState('profile'); 
   const [toastMessage, setToastMessage] = useState('');
 
   const [profile, setProfile] = useState({
-    name: 'Priya S. (Master Cutter)',
-    email: 'priya.tailors@example.com',
-    phone: '+91 98401 23456',
-    address: 'No. 12, Canal Bank Road, Adyar, Chennai, TN - 600020',
-    studio: "Priya's Boutique & Custom Tailoring Atelier",
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    studio: '',
     avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80'
   });
+
+  useEffect(() => {
+    if (!session.isAuthenticated) return;
+    setProfile((current) => ({
+      ...current,
+      name: session.profile?.fullName || '',
+      email: session.identifier.includes('@') ? session.identifier : '',
+      phone: session.profile?.phone || '',
+      address: session.profile?.shopAddress || '',
+      studio: session.profile?.shopName || '',
+    }));
+  }, [session.isAuthenticated, session.profile, session.identifier]);
 
   const [fontSize, setFontSize] = useState('medium');
   const [highContrast, setHighContrast] = useState(false);
@@ -441,6 +437,21 @@ function TailorSettingsPage() {
   const triggerToast = (msgKey: string) => {
     setToastMessage(t(msgKey));
     setTimeout(() => setToastMessage(''), 3500);
+  };
+
+  const handleSaveProfile = () => {
+    updateSession({
+      identifier: profile.email || profile.phone || session.identifier,
+      profile: {
+        fullName: profile.name,
+        phone: profile.phone,
+        shopName: profile.studio,
+        yearsOfExperience: session.profile?.yearsOfExperience || '',
+        shopAddress: profile.address,
+        city: session.profile?.city,
+      },
+    });
+    triggerToast('toastSaveSuccess');
   };
 
   const handleRevokeSession = (id: string) => {
@@ -581,7 +592,7 @@ function TailorSettingsPage() {
                   </div>
                 </div>
 
-                <button onClick={() => triggerToast('toastSaveSuccess')} className="px-6 py-3 bg-thy-burgundy hover:bg-thy-brand-active text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                <button onClick={handleSaveProfile} className="px-6 py-3 bg-thy-burgundy hover:bg-thy-brand-active text-white font-bold text-xs rounded-xl shadow-md transition-all">
                   {t('saveProfileBtn')}
                 </button>
               </div>
@@ -933,7 +944,14 @@ function TailorSettingsPage() {
               <button onClick={() => setShowLogoutModal(false)} className="py-2.5 rounded-xl text-xs font-bold border border-thy-burgundy/20 dark:border-white/15">
                 {t('cancelBtn')}
               </button>
-              <button onClick={() => { setShowLogoutModal(false); triggerToast('toastSaveSuccess'); }} className="py-2.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700">
+              <button
+                onClick={() => {
+                  setShowLogoutModal(false);
+                  logout();
+                  router.push('/login');
+                }}
+                className="py-2.5 rounded-xl text-xs font-bold bg-rose-600 text-white hover:bg-rose-700"
+              >
                 {t('confirmLogoutBtn')}
               </button>
             </div>

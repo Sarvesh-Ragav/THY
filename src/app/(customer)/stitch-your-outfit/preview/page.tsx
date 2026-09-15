@@ -14,7 +14,10 @@ import {
   readStudioDraft,
   type GarmentCustomizationDetails,
 } from '@/lib/studio-draft';
+import { FavoriteDesignButton } from '@/components/studio/FavoriteDesignButton';
 import { StudioStepper } from '@/components/studio/StudioStepper';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { generatedDesignId, isDesignFavorited, refreshFavoritedImage } from '@/lib/wishlist';
 
 export default function DesignPreviewPage() {
   return (
@@ -45,6 +48,7 @@ function isUploadedFabric(src: string | null | undefined) {
 function DesignPreviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { session, updateSession } = useTailorSession();
   const categoryId = searchParams.get('category') ?? 'salwars';
   const preset = useMemo(() => getStudioGarment(categoryId), [categoryId]);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -202,7 +206,16 @@ function DesignPreviewContent() {
       setAiRender(data.image);
       setShowAiRender(true);
       persistDraft({ aiRender: data.image });
-      setMessage('Dress visualization ready.');
+      const designId = generatedDesignId(preset.categoryId);
+      if (isDesignFavorited(session, designId)) {
+        updateSession({
+          customerDesigns: refreshFavoritedImage(session.customerDesigns, designId, data.image, {
+            fabric: fabricLabel,
+            treatments,
+          }),
+        });
+      }
+      setMessage('Dress visualization ready. Tap the heart to save it to your wishlist.');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'AI generation failed';
       setAiError(msg);
@@ -224,6 +237,16 @@ function DesignPreviewContent() {
 
   const previewImage = showAiRender && aiRender ? aiRender : fabricImage;
   const previewLabel = showAiRender && aiRender ? `${preset.garment} AI render` : fabricLabel;
+  const favoriteDesign = {
+    id: generatedDesignId(preset.categoryId),
+    title: `Custom ${preset.garment}`,
+    categoryId: preset.categoryId,
+    garment: preset.garment,
+    fabric: fabricLabel,
+    treatments,
+    patternImage: currentPatternImage,
+    patternLabel: currentPatternLabel,
+  };
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -327,6 +350,14 @@ function DesignPreviewContent() {
                 <ImagePlus size={14} />
                 Change image
               </button>
+            )}
+
+            {aiRender && hasUserFabric && !aiGenerating && (
+              <FavoriteDesignButton
+                design={favoriteDesign}
+                image={aiRender}
+                className="absolute top-3 left-3 z-20 inline-flex h-10 w-10 items-center justify-center bg-thy-surface/95 backdrop-blur-xs border border-thy-ink/15 text-thy-brand shadow-xs cursor-pointer hover:border-thy-brand/40 transition-colors disabled:opacity-50"
+              />
             )}
 
             {aiRender && hasUserFabric && !aiGenerating && (

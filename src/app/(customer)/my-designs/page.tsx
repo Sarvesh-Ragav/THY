@@ -20,7 +20,7 @@ function MyDesignsContent() {
   const { session } = useTailorSession();
 
   return (
-    <CustomerPage title="My Designs">
+    <CustomerPage titleKey="pageDesigns">
       {session.customerDesigns.length === 0 ? (
         <div className="space-y-4">
           <p className="text-sm text-thy-muted">No saved designs yet.</p>

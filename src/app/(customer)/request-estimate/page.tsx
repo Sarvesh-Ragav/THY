@@ -1,9 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 export default function RequestEstimatePage() {
+  return (
+    <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading...</p>}>
+      <RequestEstimateContent />
+    </Suspense>
+  );
+}
+
+function RequestEstimateContent() {
+  const searchParams = useSearchParams();
+  const tailorName = searchParams.get('tailor') || searchParams.get('shop') || 'your selected tailor';
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedService, setSelectedService] = useState('Saree Blouse');
   const [garmentType, setGarmentType] = useState('Bridal Blouse');
@@ -40,7 +51,7 @@ export default function RequestEstimatePage() {
           </div>
           <h2 className="text-xl font-extrabold text-slate-900">Estimate Request Sent!</h2>
           <p className="text-xs text-slate-500 leading-relaxed">
-            Your request for <span className="font-bold text-slate-800">{garmentType}</span> has been submitted to <span className="font-bold text-slate-800">Priya&apos;s Boutique</span>. You will receive an estimate update in your active requests within 24 hours.
+            Your request for <span className="font-bold text-slate-800">{garmentType}</span> has been submitted to <span className="font-bold text-slate-800">{tailorName}</span>. You will receive an estimate update in your active requests within 24 hours.
           </p>
           <div className="pt-2">
             <Link
@@ -62,7 +73,7 @@ export default function RequestEstimatePage() {
         {/* Header */}
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-2">
           <h1 className="text-xl font-black text-slate-900 tracking-tight">Request Custom Garment Estimate</h1>
-          <p className="text-xs text-slate-500">Provide design specifications and measurements to receive a precise quote from Priya&apos;s Boutique.</p>
+          <p className="text-xs text-slate-500">Provide design specifications and measurements to receive a precise quote from {tailorName}.</p>
           
           {/* Progress Tracker */}
           <div className="flex items-center gap-2 pt-4">

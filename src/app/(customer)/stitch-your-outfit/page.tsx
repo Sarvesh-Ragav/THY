@@ -12,8 +12,10 @@ import {
   type C15Audience,
   type C15Garment,
 } from '@/lib/c15-catalog';
+import { useAppearance } from '@/components/providers/AppearanceProvider';
 
 export default function StitchYourOutfitPage() {
+  const { t } = useAppearance();
   const [audience, setAudience] = useState<C15Audience | null>(null);
   const [garmentId, setGarmentId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -40,14 +42,14 @@ export default function StitchYourOutfitPage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       <Link href="/" className="inline-flex text-sm text-thy-brand border-b border-thy-brand">
-        Back
+        {t('stitchBack')}
       </Link>
-      <p className="mt-5 text-[11px] uppercase tracking-[0.22em] text-thy-brand font-semibold">C15 · Category discovery</p>
+      <p className="mt-5 text-[11px] uppercase tracking-[0.22em] text-thy-brand font-semibold">{t('stitchKicker')}</p>
       <h1 className="mt-2 text-3xl sm:text-4xl md:text-5xl leading-[0.95]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-        What would you like to stitch?
+        {t('stitchTitle')}
       </h1>
       <p className="mt-3 max-w-xl text-sm text-thy-muted">
-        Choose who the outfit is for and select a garment category.
+        {t('stitchSub')}
       </p>
 
       <form
@@ -58,26 +60,26 @@ export default function StitchYourOutfitPage() {
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search categories"
+          placeholder={t('stitchSearch')}
           className="w-full bg-transparent text-sm outline-none placeholder:text-thy-subtle"
         />
         {searching && (
           <button type="button" onClick={clearSearch} className="text-xs text-thy-brand shrink-0">
-            Clear search
+            {t('stitchClear')}
           </button>
         )}
       </form>
 
       <section className="mt-8">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle">Select audience</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle">{t('stitchAudience')}</p>
           {searching && (
             <button type="button" onClick={clearSearch} className="text-xs text-thy-muted">
-              Browse audiences
+              {t('stitchBrowse')}
             </button>
           )}
         </div>
-        <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2 max-w-md">
           {C15_AUDIENCES.map((item) => {
             const active = audience === item;
             return (
@@ -100,7 +102,7 @@ export default function StitchYourOutfitPage() {
 
       <section className="mt-8">
         <p className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle">
-          {searching ? 'Matching categories' : audience ? `${C15_AUDIENCE_LABELS[audience]}’s wear` : 'Garment category'}
+          {searching ? 'Matching categories' : audience ? `${C15_AUDIENCE_LABELS[audience]}${audience === 'women' ? '’s' : '’'} wear` : 'Garment category'}
         </p>
 
         {!searching && !audience && (
@@ -112,10 +114,10 @@ export default function StitchYourOutfitPage() {
             <p className="text-sm text-thy-ink">No categories found. Try another category.</p>
             <div className="flex flex-wrap gap-2">
               <button type="button" onClick={clearSearch} className="min-h-11 px-4 text-sm border border-thy-ink/15">
-                Clear search
+                {t('stitchClear')}
               </button>
               <button type="button" onClick={clearSearch} className="min-h-11 px-4 text-sm text-thy-brand">
-                Browse audiences
+                {t('stitchBrowse')}
               </button>
             </div>
           </div>
@@ -137,11 +139,15 @@ export default function StitchYourOutfitPage() {
                     selected ? 'border-thy-brand' : 'border-thy-ink/10'
                   }`}
                 >
-                  <div className="relative min-h-[8.5rem]">
-                    <img src={garment.fabricImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                    <div className="absolute inset-0 bg-thy-deep/40" />
+                  <div className="relative aspect-[4/5] w-full overflow-hidden bg-thy-mist">
+                    <img
+                      src={garment.fabricImage}
+                      alt={garment.label}
+                      className="absolute inset-0 h-full w-full object-contain object-center"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-thy-deep/70 to-transparent" />
                     <p
-                      className="relative z-10 p-3 text-xl text-thy-canvas"
+                      className="absolute inset-x-0 bottom-0 z-10 p-3 text-xl text-thy-canvas"
                       style={{ fontFamily: 'var(--font-cormorant), serif' }}
                     >
                       {garment.label}

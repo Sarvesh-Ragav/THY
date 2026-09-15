@@ -22,15 +22,6 @@ export const googleAuthSchema = z.object({
   credential: z.string().min(1, 'Google credential token is required.'),
 });
 
-export const loginPasswordSchema = z.object({
-  email: z.string().trim().email('Enter a valid email address.').max(254),
-  password: z.string().min(1, 'Please enter your password.').max(128),
-});
-
-export const updateRoleSchema = z.object({
-  role: z.enum(['customer', 'tailor']),
-});
-
 const passwordFields = {
   password: z.string().min(8, 'Password must be at least 8 characters.').max(128),
   confirmPassword: z.string().min(1, 'Please confirm your password.').max(128),
@@ -38,6 +29,27 @@ const passwordFields = {
 
 const passwordsMatch = <T extends { password: string; confirmPassword: string }>(value: T) =>
   value.password === value.confirmPassword;
+
+export const loginPasswordSchema = z.object({
+  email: z.string().trim().email('Enter a valid email address.').max(254),
+  password: z.string().min(1, 'Password is required.').max(128),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().email('Enter a valid email address.').max(254),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    email: z.string().trim().email('Enter a valid email address.').max(254),
+    token: z.string().trim().min(16).max(128),
+    ...passwordFields,
+  })
+  .refine(passwordsMatch, { message: 'Passwords do not match.', path: ['confirmPassword'] });
+
+export const updateRoleSchema = z.object({
+  role: z.enum(['customer', 'tailor']),
+});
 
 export const registerCustomerSchema = z.object({
   role: z.literal('customer'),
