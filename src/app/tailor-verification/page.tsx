@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 
 export default function TailorVerificationPage() {
   const router = useRouter();
+  const { updateSession } = useTailorSession();
   const [govId, setGovId] = useState<File | null>(null);
   const [shopProof, setShopProof] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -12,6 +14,22 @@ export default function TailorVerificationPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    // Step 1: Update session state with authentication & verification data before redirecting
+    updateSession({
+      isAuthenticated: true,
+      role: 'tailor',
+      verification: {
+        idType: 'Aadhaar / PAN',
+        idNumber: 'VERIFIED-DOC-123',
+        documentName: govId?.name || 'Identity Proof',
+        status: 'pending',
+      },
+    });
+
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('thy_logged_out');
+    }
 
     // Simulating document upload API call
     setTimeout(() => {
