@@ -1,7 +1,11 @@
 export interface AuthenticatedUser {
   id: string;
-  phoneNumber: string;
-  role: 'customer' | 'tailor' | null;
+  phoneNumber?: string | null;
+  email?: string | null;
+  name?: string | null;
+  avatarUrl?: string | null;
+  authProvider?: 'phone' | 'google' | 'both';
+  role: 'customer' | 'tailor' | 'admin' | null;
 }
 
 export interface OtpChallenge {
@@ -30,7 +34,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       ...options,
     });
   } catch {
-    throw new AuthApiError('Unable to reach the authentication service. Please try again.');
+    throw new AuthApiError('Unable to reach the authentication service. Please ensure the server is running.');
   }
   const body = await response.json().catch(() => ({}));
   if (!response.ok || !body.success) throw new AuthApiError(body.error?.message ?? 'Authentication request failed.', body.error?.code);
@@ -47,6 +51,18 @@ export function resendOtp(phoneNumber: string): Promise<OtpChallenge> {
 
 export function verifyOtp(phoneNumber: string, challengeId: string, otp: string): Promise<AuthenticationResult> {
   return request('/auth/otp/verify', { method: 'POST', body: JSON.stringify({ phoneNumber, challengeId, otp }) });
+}
+
+export function googleAuth(credential: string): Promise<AuthenticationResult> {
+  return request('/auth/google/verify', { method: 'POST', body: JSON.stringify({ credential }) });
+}
+
+export function updateUserRole(role: 'customer' | 'tailor', accessToken?: string): Promise<{ user: AuthenticatedUser }> {
+  return request('/auth/role', {
+    method: 'PATCH',
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+    body: JSON.stringify({ role }),
+  });
 }
 
 export function refreshAuthentication(): Promise<AuthenticationResult> {

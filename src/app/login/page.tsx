@@ -8,7 +8,7 @@ import { ThyOtpVerificationForm } from '@/components/auth/ThyOtpVerificationForm
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath } from '@/lib/tailor-session';
 import { LoginFormData } from '@/types/auth';
-import { requestOtp, resendOtp, verifyOtp } from '@/lib/auth-api';
+import { requestOtp, resendOtp, verifyOtp, googleAuth } from '@/lib/auth-api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,6 +33,16 @@ export default function LoginPage() {
     return { success: true, message: 'Verification code sent.', data: result };
   };
 
+  const handleGoogleSignIn = async (credential: string) => {
+    try {
+      const result = await googleAuth(credential);
+      handleAuthenticated(result.accessToken);
+    } catch (error) {
+      console.error('Google Sign-In failed', error);
+      alert('Google Sign-In failed. Please try again.');
+    }
+  };
+
   const handleAuthenticated = (accessToken: string) => {
     const next = completeAuthentication(accessToken);
     router.push(getPostAuthPath(next));
@@ -52,6 +62,7 @@ export default function LoginPage() {
         <ThyLoginForm
           initialIdentifier={session.identifier}
           onSubmit={handleLoginContinue}
+          onGoogleSignIn={handleGoogleSignIn}
           onNavigateSignUp={() => setView('signup')}
         />
       )}
@@ -76,6 +87,7 @@ export default function LoginPage() {
       {view === 'signup' && (
         <ThySignUpForm
           onNavigateLogin={() => setView('login')}
+          onGoogleSignIn={handleGoogleSignIn}
         />
       )}
     </main>

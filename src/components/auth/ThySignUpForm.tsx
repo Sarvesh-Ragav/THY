@@ -4,16 +4,19 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ThyLogo } from './ThyLogo';
+import { GoogleAuthButton } from './GoogleAuthButton';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 
 export interface ThySignUpFormProps {
   onSelectRole?: (role: 'customer' | 'tailor') => void;
   onNavigateLogin?: () => void;
+  onGoogleSignIn?: (credential: string) => void;
 }
 
 export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
   onSelectRole,
   onNavigateLogin,
+  onGoogleSignIn,
 }) => {
   const router = useRouter();
   const { updateSession } = useTailorSession();
@@ -89,10 +92,33 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
         <button
           type="button"
           onClick={handleContinue}
-          className="w-full bg-thy-brand hover:bg-thy-brand-hover active:bg-thy-brand-active text-white font-bold py-3 px-4 rounded-xl shadow-sm transition duration-200 cursor-pointer active:scale-[0.99] mb-6"
+          className="w-full bg-thy-brand hover:bg-thy-brand-hover active:bg-thy-brand-active text-white font-bold py-3 px-4 rounded-xl shadow-sm transition duration-200 cursor-pointer active:scale-[0.99] mb-4"
         >
           Continue
         </button>
+
+        {/* Divider Line */}
+        <div className="relative my-6 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-thy-ink/10"></div>
+          </div>
+          <div className="relative bg-thy-surface px-3 text-xs uppercase font-medium text-thy-subtle tracking-wider">
+            OR
+          </div>
+        </div>
+
+        {/* Secondary Social Sign-Up Button — Real Google Identity Services */}
+        {onGoogleSignIn ? (
+          <GoogleAuthButton onCredential={onGoogleSignIn} text="signup_with" />
+        ) : (
+          <button
+            type="button"
+            onClick={() => alert('Google sign-in is not available yet.')}
+            className="w-full border border-thy-ink/15 hover:border-thy-ink/25 bg-thy-surface hover:bg-thy-mist text-thy-ink font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition-colors duration-200 cursor-pointer active:scale-[0.99] mb-6"
+          >
+            <span className="text-sm text-thy-ink font-semibold">Sign up with Google</span>
+          </button>
+        )}
 
         {/* Footer Link */}
         <div className="text-center">

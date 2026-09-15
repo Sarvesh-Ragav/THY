@@ -14,6 +14,14 @@ export function normalizePhoneNumber(input: string): string {
 export const requestOtpSchema = z.object({ phoneNumber: phoneInput });
 export const verifyOtpSchema = z.object({
   phoneNumber: phoneInput,
-  challengeId: z.string().uuid(),
+  challengeId: z.string().min(1),
   otp: z.string().regex(/^\d{6}$/, 'OTP must be exactly 6 digits.'),
+});
+
+export const googleAuthSchema = z.object({
+  credential: z.string().min(1, 'Google credential token is required.'),
+});
+
+export const updateRoleSchema = z.object({
+  role: z.enum(['customer', 'tailor']),
 });

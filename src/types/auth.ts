@@ -25,7 +25,7 @@ export interface LoginApiResponse {
 export interface ThyLoginCardProps {
   initialIdentifier?: string;
   onSubmit?: (data: LoginFormData) => Promise<LoginApiResponse | void>;
-  onGoogleSignIn?: () => void;
+  onGoogleSignIn?: (credential: string) => void;
   onNavigateSignUp?: () => void;
   isLoading?: boolean;
 }

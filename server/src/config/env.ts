@@ -6,8 +6,9 @@ const booleanFromString = z.enum(['true', 'false']).transform((value) => value =
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(4000),
-  DATABASE_URL: z.string().url(),
-  FRONTEND_ORIGIN: z.string().url(),
+  DATABASE_URL: z.string().url().optional(),
+  MONGODB_URI: z.string().default('mongodb://127.0.0.1:27017/thy_db'),
+  FRONTEND_ORIGIN: z.string().url().default('http://localhost:3000'),
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),
   ACCESS_TOKEN_TTL: z.string().default('15m'),
@@ -20,6 +21,8 @@ const envSchema = z.object({
   RAZORPAY_KEY_ID: z.string().min(1),
   RAZORPAY_KEY_SECRET: z.string().min(1),
   RAZORPAY_WEBHOOK_SECRET: z.string().min(1),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

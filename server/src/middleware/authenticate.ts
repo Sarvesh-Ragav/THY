@@ -2,7 +2,9 @@ import type { NextFunction, Request, Response } from 'express';
 import { verifyAccessToken } from '../services/token.service.js';
 import { ApiError } from '../utils/api-error.js';
 
-declare global { namespace Express { interface Request { auth?: { userId: string; phoneNumber: string }; } } }
+import type { TokenPayload } from '../services/token.service.js';
+
+declare global { namespace Express { interface Request { auth?: TokenPayload; } } }
 
 export function authenticate(request: Request, _response: Response, next: NextFunction): void {
   try {

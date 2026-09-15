@@ -1,4 +1,4 @@
-export type UserRole = 'tailor' | 'customer';
+export type UserRole = 'tailor' | 'customer' | 'admin';
 export type VerificationStatus = 'pending';
 export type RequestStatus = 'Pending Quotation' | 'Quotation Submitted';
 export type OrderStatus = 'In Progress' | 'Fitting Scheduled' | 'Ready to Stitch/Deliver';

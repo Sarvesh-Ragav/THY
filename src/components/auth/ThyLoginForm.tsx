@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { ThyLogo } from './ThyLogo';
-import { GoogleIcon } from './GoogleIcon';
+import { GoogleAuthButton } from './GoogleAuthButton';
 import { ThyLoginCardProps, LoginFormData, LoginApiResponse } from '@/types/auth';
 
 export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
@@ -180,18 +180,18 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
           </div>
         </div>
 
-        {/* Secondary Social Login Button */}
-        <button
-          type="button"
-          onClick={() => {
-            if (onGoogleSignIn) onGoogleSignIn();
-            else setErrorMessage('Google sign-in is not available yet. Please continue with your mobile number.');
-          }}
-          className="w-full border border-thy-ink/15 hover:border-thy-ink/25 bg-thy-surface hover:bg-thy-mist text-thy-ink font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition-colors duration-200 cursor-pointer active:scale-[0.99]"
-        >
-          <GoogleIcon size={18} />
-          <span className="text-sm text-thy-ink font-semibold">Continue with Google</span>
-        </button>
+        {/* Secondary Social Login Button — Real Google Identity Services */}
+        {onGoogleSignIn ? (
+          <GoogleAuthButton onCredential={onGoogleSignIn} text="continue_with" />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setErrorMessage('Google sign-in is not available yet. Please continue with your mobile number.')}
+            className="w-full border border-thy-ink/15 hover:border-thy-ink/25 bg-thy-surface hover:bg-thy-mist text-thy-ink font-semibold py-3 px-4 rounded-xl flex items-center justify-center gap-3 transition-colors duration-200 cursor-pointer active:scale-[0.99]"
+          >
+            <span className="text-sm text-thy-ink font-semibold">Continue with Google</span>
+          </button>
+        )}
 
         {/* Navigation Link */}
         <div className="text-center mt-6">
