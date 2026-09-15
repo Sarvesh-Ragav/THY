@@ -34,13 +34,13 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     const localSession = loadTailorSession();
-    // Browser storage is retained for onboarding only; it is never proof of authentication.
     setSession({ ...localSession, isAuthenticated: false });
+
     refreshAuthentication()
       .then(({ accessToken, user }) => {
         setAccessToken(accessToken);
         setSession((current) => {
-          const next = {
+          const next: TailorSession = {
             ...current,
             isAuthenticated: true,
             role: user.role ?? current.role ?? 'tailor',
@@ -55,34 +55,54 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
   }, []);
 
   const updateSession = useCallback((partial: Partial<TailorSession>) => {
-    const next = { ...session, ...partial };
-    setSession(next);
-    persistTailorSession(next);
-    return next;
+    setSession((current) => {
+      const next = { ...current, ...partial };
+      persistTailorSession(next);
+      return next;
+    });
+    return session;
   }, [session]);
 
-  const completeAuthentication = useCallback((accessToken: string, authenticatedRole?: 'customer' | 'tailor' | null) => {
-    const next: TailorSession = {
-      ...session,
-      isAuthenticated: true,
-      role: authenticatedRole ?? session.role ?? 'tailor',
-    };
-    setAccessToken(accessToken);
-    setSession(next);
-    persistTailorSession(next);
-    return next;
-  }, [session]);
+  const completeAuthentication = useCallback(
+    (accessToken: string, authenticatedRole?: 'customer' | 'tailor' | null) => {
+      const next: TailorSession = {
+        ...session,
+        isAuthenticated: true,
+        role: authenticatedRole ?? session.role ?? 'tailor',
+      };
+      setAccessToken(accessToken);
+      setSession(next);
+      persistTailorSession(next);
+      return next;
+    },
+    [session]
+  );
 
   const logout = useCallback(() => {
-    const next = { ...session, isAuthenticated: false };
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('thy_session');
+      localStorage.removeItem('thy_user');
+      localStorage.removeItem('tailor_session');
+    }
+
+    const resetSession = createDefaultSession();
+    resetSession.isAuthenticated = false;
+
     setAccessToken(null);
-    setSession(next);
-    persistTailorSession(next);
+    setSession(resetSession);
+    persistTailorSession(resetSession);
     void logoutAuthentication();
-  }, [session]);
+  }, []);
 
   const value = useMemo(
-    () => ({ session, isReady, accessToken, updateSession, completeAuthentication, logout }),
+    () => ({
+      session,
+      isReady,
+      accessToken,
+      updateSession,
+      completeAuthentication,
+      logout,
+    }),
     [session, isReady, accessToken, updateSession, completeAuthentication, logout]
   );
 
