@@ -231,7 +231,7 @@ export function CustomerChatView({
                 key={message.id}
                 className={`max-w-[85%] p-3 text-sm ${
                   message.sender === 'customer'
-                    ? 'ml-auto bg-thy-deep text-[#fbfefd]'
+                    ? 'ml-auto bg-thy-deep text-[#FBF6ED]'
                     : 'bg-thy-mist text-thy-ink'
                 }`}
               >

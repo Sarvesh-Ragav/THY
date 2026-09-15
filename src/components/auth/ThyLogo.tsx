@@ -14,7 +14,8 @@ export const ThyLogo: React.FC<ThyLogoProps> = ({ className = '', size = 64 }) =
         viewBox="0 0 100 100"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="text-white drop-shadow-sm transition-transform hover:scale-105 duration-200"
+        className="drop-shadow-sm transition-transform hover:scale-105 duration-200"
+        aria-hidden
       >
         {/* Infinity Loop (Top horizontal bar of the 'T' emblem) */}
         <path
@@ -23,7 +24,7 @@ export const ThyLogo: React.FC<ThyLogoProps> = ({ className = '', size = 64 }) =
              C 18 52, 38 52, 50 36 
              C 62 20, 82 20, 82 36 
              C 82 52, 62 52, 50 36 Z"
-          stroke="white"
+          stroke="currentColor"
           strokeWidth="6.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -42,7 +43,7 @@ export const ThyLogo: React.FC<ThyLogoProps> = ({ className = '', size = 64 }) =
              M 50 73 
              C 51.6 73, 51.6 83, 50 83 
              C 48.4 83, 48.4 73, 50 73 Z"
-          fill="white"
+          fill="currentColor"
         />
       </svg>
     </div>

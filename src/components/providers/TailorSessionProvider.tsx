@@ -25,7 +25,8 @@ interface TailorSessionContextValue {
     accessToken: string,
     role?: 'customer' | 'tailor' | 'admin' | null,
     identifier?: string,
-    user?: AuthenticatedUser | null
+    user?: AuthenticatedUser | null,
+    sessionPatch?: Partial<TailorSession>
   ) => TailorSession;
   logout: () => void;
 }
@@ -82,18 +83,21 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
       accessToken: string,
       authenticatedRole?: 'customer' | 'tailor' | 'admin' | null,
       identifier?: string,
-      user?: AuthenticatedUser | null
+      user?: AuthenticatedUser | null,
+      sessionPatch?: Partial<TailorSession>
     ) => {
-      const existing = session.customerProfile;
+      const existing = sessionPatch?.customerProfile ?? session.customerProfile;
       const resolvedIdentifier = identifier ?? user?.phoneNumber ?? user?.email ?? session.identifier;
       const isPhone = Boolean(resolvedIdentifier && /^\+?\d{10,15}$/.test(resolvedIdentifier));
       const isEmail = Boolean(resolvedIdentifier && resolvedIdentifier.includes('@'));
       const next: TailorSession = {
         ...session,
+        ...sessionPatch,
         isAuthenticated: true,
-        role: authenticatedRole ?? user?.role ?? session.role,
+        hasPassword: Boolean(sessionPatch?.hasPassword ?? user?.hasPassword ?? session.hasPassword),
+        role: authenticatedRole ?? user?.role ?? sessionPatch?.role ?? session.role,
         identifier: resolvedIdentifier,
-        customerProfile: {
+        customerProfile: sessionPatch?.customerProfile ?? {
           fullName: existing?.fullName || user?.name || '',
           phone: existing?.phone || user?.phoneNumber || (isPhone ? resolvedIdentifier : ''),
           email: existing?.email || user?.email || (isEmail ? resolvedIdentifier : ''),

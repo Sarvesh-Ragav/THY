@@ -18,7 +18,7 @@ export default function VerifyOtpPage() {
   }, [session.identifier, challengeId]);
 
   return (
-    <main className="min-h-dvh bg-thy-bg flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <main className="min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
       <ThyOtpVerificationForm
         identifier={session.identifier}
         onVerifyOtp={async (otp) => {

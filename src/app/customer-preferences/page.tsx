@@ -89,14 +89,14 @@ export default function CustomerPreferences() {
 
   if (!isReady) {
     return (
-      <div className="min-h-dvh bg-thy-bg flex items-center justify-center">
+      <div className="min-h-dvh bg-transparent flex items-center justify-center">
         <p className="text-sm text-thy-muted">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-thy-bg flex items-start sm:items-center justify-center p-4 md:p-8 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="min-h-dvh bg-transparent flex items-start sm:items-center justify-center p-4 md:p-8 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md md:max-w-2xl bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.08)] p-6 md:p-10">
         <div className="text-center mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-thy-ink">

@@ -6,6 +6,7 @@ export interface AuthenticatedUser {
   avatarUrl?: string | null;
   authProvider?: 'phone' | 'google' | 'both';
   role: 'customer' | 'tailor' | 'admin' | null;
+  hasPassword?: boolean;
 }
 
 export interface OtpChallenge {
@@ -55,6 +56,39 @@ export function verifyOtp(phoneNumber: string, challengeId: string, otp: string)
 
 export function googleAuth(credential: string): Promise<AuthenticationResult> {
   return request('/auth/google/verify', { method: 'POST', body: JSON.stringify({ credential }) });
+}
+
+export function loginWithPassword(email: string, password: string): Promise<AuthenticationResult> {
+  return request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+}
+
+export interface RegisterCustomerPayload {
+  role: 'customer';
+  fullName: string;
+  phone: string;
+  email: string;
+  city: string;
+  address: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface RegisterTailorPayload {
+  role: 'tailor';
+  fullName: string;
+  phone: string;
+  email: string;
+  shopName: string;
+  yearsOfExperience: number;
+  shopAddress: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export function registerAccount(
+  payload: RegisterCustomerPayload | RegisterTailorPayload
+): Promise<AuthenticationResult> {
+  return request('/auth/register', { method: 'POST', body: JSON.stringify(payload) });
 }
 
 export function updateUserRole(role: 'customer' | 'tailor', accessToken?: string): Promise<{ user: AuthenticatedUser }> {

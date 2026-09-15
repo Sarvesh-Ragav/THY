@@ -3,9 +3,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Bell, MapPin, Menu, Search, User, X, LogOut } from 'lucide-react';
+import { Bell, Heart, MapPin, Menu, Search, ShoppingBag, User, X, LogOut } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { AUTH_PATHS, CITIES, MAIN_NAV, PROFILE_MENU } from '@/lib/customer-home-data';
+import { ThyLogo } from '@/components/auth/ThyLogo';
+
+const iconBtn =
+  'thy-nav-icon inline-flex items-center justify-center h-11 w-11';
 
 export function CustomerNavbar() {
   const pathname = usePathname();
@@ -19,10 +23,8 @@ export function CustomerNavbar() {
 
   const profileRef = useRef<HTMLDivElement>(null);
   const desktopLocationRef = useRef<HTMLDivElement>(null);
-  const mobileLocationRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Directly evaluate session state managed by TailorSessionProvider
   const loggedIn = isReady && session.isAuthenticated;
   const displayName = session.identifier || 'Account';
 
@@ -32,9 +34,7 @@ export function CustomerNavbar() {
       if (profileRef.current && !profileRef.current.contains(target)) {
         setProfileOpen(false);
       }
-      const inDesktopLocation = desktopLocationRef.current?.contains(target);
-      const inMobileLocation = mobileLocationRef.current?.contains(target);
-      if (!inDesktopLocation && !inMobileLocation) {
+      if (desktopLocationRef.current && !desktopLocationRef.current.contains(target)) {
         setLocationOpen(false);
       }
     };
@@ -64,7 +64,6 @@ export function CustomerNavbar() {
     }
   }, [searchOpen]);
 
-  // Handle logout with global context state update & smooth SPA redirection
   const handleLogout = () => {
     logout();
     setProfileOpen(false);
@@ -95,24 +94,20 @@ export function CustomerNavbar() {
   const locationLabel = session.selectedLocation || 'Location';
 
   return (
-    <header className="sticky top-0 z-50 border-b border-thy-ink/10 bg-thy-bg/90 backdrop-blur-md pt-[env(safe-area-inset-top)]">
+    <header className="thy-silk-bar sticky top-0 z-50 border-b border-white/20 pt-[env(safe-area-inset-top)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 lg:h-[4.5rem] flex items-center gap-2 sm:gap-3">
-        <Link
-          href="/"
-          className="text-xl sm:text-2xl tracking-[0.16em] text-thy-deep shrink-0 font-serif"
-          style={{ fontFamily: 'var(--font-cormorant), serif' }}
-        >
-          THY
+        <Link href="/" className="shrink-0 inline-flex items-center text-white" aria-label="THY home">
+          <ThyLogo size={40} />
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-5 ml-4">
+        <nav className="hidden lg:flex items-center gap-5 ml-2">
           {MAIN_NAV.map((item) => (
             <button
               key={item.href}
               type="button"
               onClick={() => goAuthPath(item.href)}
-              className={`text-[11px] uppercase tracking-[0.18em] ${
-                pathname === item.href ? 'text-thy-brand font-semibold' : 'text-thy-muted hover:text-thy-ink'
+              className={`thy-nav-link text-[11px] uppercase tracking-[0.18em] pb-1 ${
+                pathname === item.href ? 'is-active' : ''
               }`}
             >
               {item.label}
@@ -121,25 +116,25 @@ export function CustomerNavbar() {
         </nav>
 
         <form
-          className="hidden lg:flex items-center ml-auto flex-1 max-w-sm border border-thy-ink/15 bg-thy-surface/80 px-3 py-2 rounded-lg"
+          className="hidden lg:flex items-center ml-auto flex-1 max-w-sm border border-white/35 bg-white/18 backdrop-blur-md px-3 py-2 rounded-lg shadow-[inset_0_1px_0_rgba(255,255,255,0.28)]"
           onSubmit={submitSearch}
         >
-          <Search size={16} className="text-thy-subtle shrink-0 mr-2" />
+          <Search size={16} className="text-white/80 shrink-0 mr-2" />
           <input
             ref={searchInputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search designs, styles or tailors..."
-            className="w-full bg-transparent text-sm outline-none placeholder:text-thy-subtle"
+            className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/70"
           />
         </form>
 
-        <div className="hidden lg:flex items-center gap-3 ml-auto shrink-0">
+        <div className="hidden lg:flex items-center gap-1 shrink-0">
           <div className="relative" ref={desktopLocationRef}>
             <button
               type="button"
               onClick={() => setLocationOpen((open) => !open)}
-              className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-thy-muted min-h-11 hover:text-thy-ink"
+              className="thy-nav-link thy-nav-link-tall inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] min-h-11 px-2"
             >
               <MapPin size={14} />
               {locationLabel}
@@ -163,13 +158,19 @@ export function CustomerNavbar() {
             )}
           </div>
 
+          <button type="button" aria-label="Notifications" className={iconBtn} onClick={() => goAuthPath('/notifications')}>
+            <Bell size={18} />
+          </button>
+          <button type="button" aria-label="Wishlist" className={iconBtn} onClick={() => goAuthPath('/wishlist')}>
+            <Heart size={18} />
+          </button>
           <button
             type="button"
-            onClick={() => goAuthPath('/notifications')}
-            className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-thy-muted min-h-11 hover:text-thy-ink"
+            aria-label="Cart"
+            className={iconBtn}
+            onClick={() => goAuthPath('/stitch-your-outfit/cart')}
           >
-            <Bell size={14} />
-            Notifications
+            <ShoppingBag size={18} />
           </button>
 
           <div className="relative" ref={profileRef}>
@@ -182,7 +183,7 @@ export function CustomerNavbar() {
                 }
                 setProfileOpen((open) => !open);
               }}
-              className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-thy-muted min-h-11 hover:text-thy-ink"
+              className="thy-nav-link thy-nav-link-tall inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] min-h-11 px-2"
             >
               <User size={14} />
               <span>{loggedIn ? displayName : 'Profile'}</span>
@@ -199,7 +200,7 @@ export function CustomerNavbar() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setProfileOpen(false)}
-                    className="block px-4 py-2 text-xs font-medium text-gray-700 hover:bg-slate-50 hover:text-[#00c9b7]"
+                    className="block px-4 py-2 text-xs font-medium text-gray-700 hover:bg-slate-50 hover:text-[#5C1A24]"
                   >
                     {item.label}
                   </Link>
@@ -217,21 +218,26 @@ export function CustomerNavbar() {
           </div>
         </div>
 
-        {/* Mobile Navigation Controls */}
         <div className="flex lg:hidden items-center gap-0.5 ml-auto shrink-0">
+          <button type="button" aria-label="Notifications" className={iconBtn} onClick={() => goAuthPath('/notifications')}>
+            <Bell size={18} />
+          </button>
+          <button type="button" aria-label="Wishlist" className={iconBtn} onClick={() => goAuthPath('/wishlist')}>
+            <Heart size={18} />
+          </button>
           <button
             type="button"
-            aria-label="Notifications"
-            className="inline-flex items-center justify-center h-11 w-11 text-thy-muted"
-            onClick={() => goAuthPath('/notifications')}
+            aria-label="Cart"
+            className={iconBtn}
+            onClick={() => goAuthPath('/stitch-your-outfit/cart')}
           >
-            <Bell size={18} />
+            <ShoppingBag size={18} />
           </button>
 
           <button
             type="button"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            className="inline-flex items-center justify-center h-11 w-11 text-thy-ink"
+            className="inline-flex items-center justify-center h-11 w-11 text-white"
             onClick={() => {
               setSearchOpen(false);
               setLocationOpen(false);

@@ -4,18 +4,23 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath, isCustomerOnboardingComplete } from '@/lib/tailor-session';
+import { AuthApiError, registerAccount } from '@/lib/auth-api';
+import { PasswordField, validatePasswordPair } from '@/components/auth/PasswordField';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function CustomerRegistration() {
   const router = useRouter();
-  const { session, isReady, updateSession } = useTailorSession();
+  const { session, isReady, completeAuthentication } = useTailorSession();
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isReady) return;
@@ -50,7 +55,7 @@ export default function CustomerRegistration() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const trimmedName = fullName.trim();
@@ -74,38 +79,70 @@ export default function CustomerRegistration() {
       return;
     }
 
-    const next = updateSession({
-      role: 'customer',
-      identifier: session.identifier || trimmedPhone,
-      customerProfile: {
+    const passwordError = validatePasswordPair(password, confirmPassword);
+    if (passwordError) {
+      setErrorMessage(passwordError);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const customerProfile = {
         fullName: trimmedName,
         phone: trimmedPhone,
         email: trimmedEmail,
         city: trimmedCity,
         address: trimmedAddress,
-      },
-    });
-
-    router.push(getPostAuthPath(next));
+      };
+      const result = await registerAccount({
+        role: 'customer',
+        ...customerProfile,
+        password,
+        confirmPassword,
+      });
+      const next = completeAuthentication(
+        result.accessToken,
+        'customer',
+        trimmedPhone,
+        result.user,
+        {
+          role: 'customer',
+          hasPassword: true,
+          identifier: trimmedPhone,
+          customerProfile,
+        }
+      );
+      router.push(getPostAuthPath(next));
+    } catch (error) {
+      setErrorMessage(
+        error instanceof AuthApiError
+          ? error.message
+          : 'Unable to create your account. Please try again.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isReady) {
     return (
-      <div className="min-h-dvh bg-thy-bg flex items-center justify-center">
+      <div className="min-h-dvh bg-transparent flex items-center justify-center">
         <p className="text-sm text-thy-muted">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-thy-bg flex items-start sm:items-center justify-center p-4 md:p-8 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="min-h-dvh bg-transparent flex items-start sm:items-center justify-center p-4 md:p-8 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md md:max-w-3xl bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.08)] p-6 md:p-10">
         <div className="text-center mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-thy-ink">
             Customer Registration
           </h1>
           <p className="text-sm md:text-base text-thy-muted mt-2">
-            Tell us where to reach you and deliver your outfits
+            Tell us where to reach you and set a password for your account
           </p>
         </div>
 
@@ -180,6 +217,22 @@ export default function CustomerRegistration() {
             />
           </div>
 
+          <PasswordField
+            id="password"
+            label="Password"
+            value={password}
+            onChange={setPassword}
+            placeholder="Create a password"
+          />
+
+          <PasswordField
+            id="confirmPassword"
+            label="Confirm Password"
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            placeholder="Re-enter your password"
+          />
+
           {errorMessage && (
             <p className="md:col-span-2 text-sm text-red-600">{errorMessage}</p>
           )}
@@ -187,9 +240,10 @@ export default function CustomerRegistration() {
           <div className="md:col-span-2 mt-4">
             <button
               type="submit"
-              className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors"
+              disabled={isSubmitting}
+              className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors disabled:opacity-60"
             >
-              Continue
+              {isSubmitting ? 'Creating account...' : 'Continue'}
             </button>
           </div>
         </form>

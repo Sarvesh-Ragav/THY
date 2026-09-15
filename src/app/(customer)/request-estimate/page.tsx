@@ -33,9 +33,9 @@ export default function RequestEstimatePage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-dvh bg-transparent flex items-center justify-center p-4">
         <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-md max-w-md w-full text-center space-y-4">
-          <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
+          <div className="w-16 h-16 bg-thy-mist text-thy-burgundy rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
             ✓
           </div>
           <h2 className="text-xl font-extrabold text-slate-900">Estimate Request Sent!</h2>
@@ -45,7 +45,7 @@ export default function RequestEstimatePage() {
           <div className="pt-2">
             <Link
               href="/chat?tailor=t1&from=estimate"
-              className="inline-block px-6 py-3 bg-[#00c9b7] text-white font-extrabold text-xs rounded-2xl hover:bg-[#00b5a4] transition-all"
+              className="inline-block px-6 py-3 bg-[#5C1A24] text-white font-extrabold text-xs rounded-2xl hover:bg-[#4A1520] transition-all"
             >
               Open chat
             </Link>
@@ -56,7 +56,7 @@ export default function RequestEstimatePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 p-4 md:p-8">
+    <div className="min-h-dvh bg-transparent text-thy-ink p-4 md:p-8">
       <div className="max-w-2xl mx-auto space-y-6">
         
         {/* Header */}
@@ -66,14 +66,14 @@ export default function RequestEstimatePage() {
           
           {/* Progress Tracker */}
           <div className="flex items-center gap-2 pt-4">
-            <div className={`flex-1 h-2 rounded-full ${step >= 1 ? 'bg-[#00c9b7]' : 'bg-slate-200'}`} />
-            <div className={`flex-1 h-2 rounded-full ${step >= 2 ? 'bg-[#00c9b7]' : 'bg-slate-200'}`} />
-            <div className={`flex-1 h-2 rounded-full ${step >= 3 ? 'bg-[#00c9b7]' : 'bg-slate-200'}`} />
+            <div className={`flex-1 h-2 rounded-full ${step >= 1 ? 'bg-[#5C1A24]' : 'bg-slate-200'}`} />
+            <div className={`flex-1 h-2 rounded-full ${step >= 2 ? 'bg-[#5C1A24]' : 'bg-slate-200'}`} />
+            <div className={`flex-1 h-2 rounded-full ${step >= 3 ? 'bg-[#5C1A24]' : 'bg-slate-200'}`} />
           </div>
           <div className="flex justify-between text-[10px] font-bold text-slate-400 px-1">
-            <span className={step >= 1 ? 'text-[#00c9b7]' : ''}>1. Service Details</span>
-            <span className={step >= 2 ? 'text-[#00c9b7]' : ''}>2. Measurements</span>
-            <span className={step >= 3 ? 'text-[#00c9b7]' : ''}>3. Review & Submit</span>
+            <span className={step >= 1 ? 'text-[#5C1A24]' : ''}>1. Service Details</span>
+            <span className={step >= 2 ? 'text-[#5C1A24]' : ''}>2. Measurements</span>
+            <span className={step >= 3 ? 'text-[#5C1A24]' : ''}>3. Review & Submit</span>
           </div>
         </div>
 
@@ -87,7 +87,7 @@ export default function RequestEstimatePage() {
               <select
                 value={selectedService}
                 onChange={(e) => setSelectedService(e.target.value)}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:border-[#00c9b7]"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:border-[#5C1A24]"
               >
                 <option value="Saree Blouse">Saree Blouse (₹800 - ₹2500)</option>
                 <option value="Salwar / Kurti">Salwar / Kurti (₹600 - ₹1800)</option>
@@ -103,7 +103,7 @@ export default function RequestEstimatePage() {
                 value={garmentType}
                 onChange={(e) => setGarmentType(e.target.value)}
                 placeholder="e.g. Deep Neck Velvet Bridal Blouse"
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:border-[#00c9b7]"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:border-[#5C1A24]"
                 required
               />
             </div>
@@ -113,7 +113,7 @@ export default function RequestEstimatePage() {
               <select
                 value={urgency}
                 onChange={(e) => setUrgency(e.target.value)}
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:border-[#00c9b7]"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:border-[#5C1A24]"
               >
                 <option value="Standard (5-7 days)">Standard (5-7 business days)</option>
                 <option value="Express (2-3 days)">Express Delivery (2-3 business days)</option>
@@ -128,14 +128,14 @@ export default function RequestEstimatePage() {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
                 placeholder="Mention preferred piping work, lining materials, back hook vs side zip preference..."
-                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:border-[#00c9b7]"
+                className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:border-[#5C1A24]"
               />
             </div>
 
             <div className="pt-2 flex justify-end">
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-[#00c9b7] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#00b5a4]"
+                className="px-6 py-2.5 bg-[#5C1A24] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#4A1520]"
               >
                 Next: Measurements →
               </button>
@@ -153,7 +153,7 @@ export default function RequestEstimatePage() {
                 type="button"
                 onClick={() => setMeasurementType('profile')}
                 className={`flex-1 p-3 rounded-2xl border text-left text-xs font-bold transition-all ${
-                  measurementType === 'profile' ? 'border-[#00c9b7] bg-teal-50/50 text-[#00c9b7]' : 'border-slate-200 text-slate-600'
+                  measurementType === 'profile' ? 'border-[#5C1A24] bg-thy-mist/50 text-[#5C1A24]' : 'border-slate-200 text-slate-600'
                 }`}
               >
                 <p className="font-extrabold text-slate-900">👤 Saved Profile</p>
@@ -164,7 +164,7 @@ export default function RequestEstimatePage() {
                 type="button"
                 onClick={() => setMeasurementType('manual')}
                 className={`flex-1 p-3 rounded-2xl border text-left text-xs font-bold transition-all ${
-                  measurementType === 'manual' ? 'border-[#00c9b7] bg-teal-50/50 text-[#00c9b7]' : 'border-slate-200 text-slate-600'
+                  measurementType === 'manual' ? 'border-[#5C1A24] bg-thy-mist/50 text-[#5C1A24]' : 'border-slate-200 text-slate-600'
                 }`}
               >
                 <p className="font-extrabold text-slate-900">✏️ Custom Input</p>
@@ -206,7 +206,7 @@ export default function RequestEstimatePage() {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-[#00c9b7] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#00b5a4]"
+                className="px-6 py-2.5 bg-[#5C1A24] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#4A1520]"
               >
                 Next: Review Request →
               </button>
@@ -230,7 +230,7 @@ export default function RequestEstimatePage() {
               </div>
               <div className="flex justify-between border-b border-slate-200/60 pb-2">
                 <span className="text-slate-500 font-medium">Measurement Source</span>
-                <span className="font-bold text-[#00c9b7]">{measurementType === 'profile' ? 'Saved Size Profile' : 'Custom Input'}</span>
+                <span className="font-bold text-[#5C1A24]">{measurementType === 'profile' ? 'Saved Size Profile' : 'Custom Input'}</span>
               </div>
               {description && (
                 <div className="pt-1">
@@ -250,7 +250,7 @@ export default function RequestEstimatePage() {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-[#00c9b7] text-white font-extrabold text-xs rounded-xl shadow-sm hover:bg-[#00b5a4]"
+                className="px-6 py-2.5 bg-[#5C1A24] text-white font-extrabold text-xs rounded-xl shadow-sm hover:bg-[#4A1520]"
               >
                 Submit Estimate Request
               </button>

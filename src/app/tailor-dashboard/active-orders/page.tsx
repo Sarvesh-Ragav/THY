@@ -70,7 +70,7 @@ export default function ActiveOrdersPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 min-h-screen bg-slate-50 text-slate-800 space-y-6">
+    <div className="space-y-6 text-thy-ink">
       {/* Page Header */}
       <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -83,7 +83,7 @@ export default function ActiveOrdersPage() {
         </div>
 
         <div className="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl">
-          <button type="button" className="px-4 py-2 text-xs font-bold rounded-xl bg-[#00c9b7] text-white shadow-xs">
+          <button type="button" className="px-4 py-2 text-xs font-bold rounded-xl bg-[#5C1A24] text-white shadow-xs">
             In Progress ({orders.length})
           </button>
           <button type="button" className="px-4 py-2 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-900">
@@ -107,7 +107,7 @@ export default function ActiveOrdersPage() {
               onClick={() => setSelectedOrderId(ord.id)}
               className={`w-full p-4 rounded-2xl border text-left transition-all ${
                 selectedOrderId === ord.id
-                  ? 'bg-white border-[#00c9b7] ring-2 ring-[#00c9b7]/20 shadow-sm'
+                  ? 'bg-white border-[#5C1A24] ring-2 ring-[#5C1A24]/20 shadow-sm'
                   : 'bg-white border-slate-200 hover:border-slate-300'
               }`}
             >
@@ -118,7 +118,7 @@ export default function ActiveOrdersPage() {
               <h3 className="text-sm font-bold text-slate-900 mt-1">{ord.title}</h3>
               <p className="text-xs text-slate-500 mt-0.5">Customer: {ord.customerName}</p>
               <div className="flex justify-between items-center pt-3 mt-3 border-t border-slate-100 text-xs">
-                <span className="text-[#00c9b7] font-bold">
+                <span className="text-[#5C1A24] font-bold">
                   Stage {ord.currentStage} of 5
                 </span>
                 <span className="font-extrabold text-slate-900">₹{ord.price}</span>
@@ -155,7 +155,7 @@ export default function ActiveOrdersPage() {
                 <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
                   UPDATE CUSTOMER LIVE STAGE STATUS
                 </span>
-                <span className="text-[#00c9b7] font-bold">
+                <span className="text-[#5C1A24] font-bold">
                   Current: Stage {selectedOrder.currentStage} - {STAGES[selectedOrder.currentStage - 1]}
                 </span>
               </div>
@@ -172,9 +172,9 @@ export default function ActiveOrdersPage() {
                       onClick={() => handleStageSelect(idx)}
                       className={`p-3 rounded-2xl border text-center transition-all ${
                         isCurrent
-                          ? 'bg-[#00c9b7] text-white border-[#00c9b7] font-bold shadow-xs'
+                          ? 'bg-[#5C1A24] text-white border-[#5C1A24] font-bold shadow-xs'
                           : isCompleted
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold'
+                          ? 'bg-thy-mist text-thy-burgundy border-thy-burgundy/20 font-semibold'
                           : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'
                       }`}
                     >
@@ -207,7 +207,7 @@ export default function ActiveOrdersPage() {
                   className={`px-6 py-2.5 rounded-xl font-bold text-xs shadow-xs transition-colors flex items-center gap-2 ${
                     selectedOrder.currentStage >= STAGES.length
                       ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
-                      : 'bg-[#00c9b7] hover:bg-[#00b5a4] text-white'
+                      : 'bg-[#5C1A24] hover:bg-[#4A1520] text-white'
                   }`}
                 >
                   {selectedOrder.currentStage >= STAGES.length ? (
@@ -238,7 +238,7 @@ export default function ActiveOrdersPage() {
               </div>
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span className="text-slate-400 block text-[10px] uppercase font-bold">Stitching Quote Price</span>
-                <span className="font-extrabold text-[#00c9b7]">₹{selectedOrder.price}</span>
+                <span className="font-extrabold text-[#5C1A24]">₹{selectedOrder.price}</span>
               </div>
               <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span className="text-slate-400 block text-[10px] uppercase font-bold">Overall Status</span>

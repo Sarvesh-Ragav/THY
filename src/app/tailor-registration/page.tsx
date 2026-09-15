@@ -4,16 +4,22 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath, isTailorOnboardingComplete } from '@/lib/tailor-session';
+import { AuthApiError, registerAccount } from '@/lib/auth-api';
+import { PasswordField, validatePasswordPair } from '@/components/auth/PasswordField';
 
 export default function TailorRegistration() {
   const router = useRouter();
-  const { session, isReady, updateSession } = useTailorSession();
+  const { session, isReady, completeAuthentication } = useTailorSession();
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [shopName, setShopName] = useState('');
   const [yearsOfExperience, setYearsOfExperience] = useState('');
   const [shopAddress, setShopAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isReady) return;
@@ -34,27 +40,30 @@ export default function TailorRegistration() {
       setShopName(session.profile.shopName);
       setYearsOfExperience(session.profile.yearsOfExperience);
       setShopAddress(session.profile.shopAddress);
-      return;
     }
 
-    const digits = session.identifier.replace(/\D/g, '');
+    const trimmed = session.identifier.trim();
+    const digits = trimmed.replace(/\D/g, '');
     if (digits.length === 10) {
       setPhone(digits);
+    } else if (trimmed.includes('@')) {
+      setEmail(trimmed);
     }
     // Prefill once after session hydrates so typing is not reset.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const trimmedName = fullName.trim();
     const trimmedPhone = phone.replace(/\D/g, '');
+    const trimmedEmail = email.trim().toLowerCase();
     const trimmedShop = shopName.trim();
     const trimmedExperience = yearsOfExperience.trim();
     const trimmedAddress = shopAddress.trim();
 
-    if (!trimmedName || !trimmedPhone || !trimmedShop || !trimmedExperience || !trimmedAddress) {
+    if (!trimmedName || !trimmedPhone || !trimmedEmail || !trimmedShop || !trimmedExperience || !trimmedAddress) {
       setErrorMessage('Please fill in all registration details to continue.');
       return;
     }
@@ -64,44 +73,79 @@ export default function TailorRegistration() {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setErrorMessage('Please enter a valid email address.');
+      return;
+    }
+
     if (Number(trimmedExperience) < 0) {
       setErrorMessage('Years of experience cannot be negative.');
       return;
     }
 
-    updateSession({
-      role: 'tailor',
-      identifier: session.identifier || trimmedPhone,
-      profile: {
+    const passwordError = validatePasswordPair(password, confirmPassword);
+    if (passwordError) {
+      setErrorMessage(passwordError);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const profile = {
         fullName: trimmedName,
         phone: trimmedPhone,
         shopName: trimmedShop,
         yearsOfExperience: trimmedExperience,
         shopAddress: trimmedAddress,
-      },
-    });
-
-    // Directly route user to verification upload page after saving profile details
-    router.push('/tailor-verification');
+      };
+      const result = await registerAccount({
+        role: 'tailor',
+        fullName: trimmedName,
+        phone: trimmedPhone,
+        email: trimmedEmail,
+        shopName: trimmedShop,
+        yearsOfExperience: Number(trimmedExperience),
+        shopAddress: trimmedAddress,
+        password,
+        confirmPassword,
+      });
+      completeAuthentication(result.accessToken, 'tailor', trimmedPhone, result.user, {
+        role: 'tailor',
+        hasPassword: true,
+        identifier: trimmedPhone,
+        profile,
+      });
+      router.push('/tailor-verification');
+    } catch (error) {
+      setErrorMessage(
+        error instanceof AuthApiError
+          ? error.message
+          : 'Unable to create your account. Please try again.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isReady) {
     return (
-      <div className="min-h-dvh bg-thy-bg flex items-center justify-center">
+      <div className="min-h-dvh bg-transparent flex items-center justify-center">
         <p className="text-sm text-thy-muted">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-thy-bg flex items-start sm:items-center justify-center p-4 md:p-8 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="min-h-dvh bg-transparent flex items-start sm:items-center justify-center p-4 md:p-8 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
       <div className="w-full max-w-md md:max-w-3xl bg-thy-surface rounded-2xl border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.08)] p-6 md:p-10">
         <div className="text-center mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-thy-ink">
             Tailor Registration
           </h1>
           <p className="text-sm md:text-base text-thy-muted mt-2">
-            Fill in your details to get started
+            Fill in your details and set a password to get started
           </p>
         </div>
 
@@ -130,6 +174,20 @@ export default function TailorRegistration() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Enter phone number"
+              className="thy-input"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-thy-ink mb-1" htmlFor="email">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
               className="thy-input"
             />
           </div>
@@ -177,6 +235,22 @@ export default function TailorRegistration() {
             />
           </div>
 
+          <PasswordField
+            id="password"
+            label="Password"
+            value={password}
+            onChange={setPassword}
+            placeholder="Create a password"
+          />
+
+          <PasswordField
+            id="confirmPassword"
+            label="Confirm Password"
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            placeholder="Re-enter your password"
+          />
+
           {errorMessage && (
             <p className="md:col-span-2 text-sm text-red-600">{errorMessage}</p>
           )}
@@ -184,9 +258,10 @@ export default function TailorRegistration() {
           <div className="md:col-span-2 mt-4">
             <button
               type="submit"
-              className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors"
+              disabled={isSubmitting}
+              className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors disabled:opacity-60"
             >
-              Continue
+              {isSubmitting ? 'Creating account...' : 'Continue'}
             </button>
           </div>
         </form>

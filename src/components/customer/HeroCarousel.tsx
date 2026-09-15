@@ -32,15 +32,14 @@ export function HeroCarousel() {
   if (!available) {
     return (
       <div className="absolute inset-0 bg-thy-mist">
-        <img src="/hero/fabric-olive.png" alt="" className="h-full w-full object-cover opacity-70" />
-        <div className="absolute inset-0 bg-thy-deep/40" />
+        <img src="/hero/fabric-olive.png" alt="" className="h-full w-full object-cover" />
       </div>
     );
   }
 
   return (
     <div
-      className="absolute inset-0 bg-thy-deep cursor-pointer"
+      className="absolute inset-0 bg-black cursor-pointer"
       onClick={goNext}
       onTouchStart={(event) => {
         startX.current = event.touches[0].clientX;
@@ -62,12 +61,11 @@ export function HeroCarousel() {
           muted
           loop
           playsInline
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
-            videoIndex === index ? 'opacity-100' : 'opacity-0'
+          className={`absolute inset-0 h-full w-full object-cover transition-all duration-1000 ease-out ${
+            videoIndex === index ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
           }`}
         />
       ))}
-      <div className="absolute inset-0 bg-gradient-to-t from-thy-deep/75 via-thy-deep/20 to-thy-deep/30 pointer-events-none" />
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-1">
         {HERO_VIDEOS.map((video, videoIndex) => (
           <button
@@ -80,7 +78,13 @@ export function HeroCarousel() {
             }}
             className="h-11 px-1.5 flex items-center"
           >
-            <span className={`h-1.5 w-8 ${videoIndex === index ? 'bg-thy-brand' : 'bg-thy-canvas/40'}`} />
+            <span
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                videoIndex === index
+                  ? 'w-10 bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]'
+                  : 'w-6 bg-white/35'
+              }`}
+            />
           </button>
         ))}
       </div>

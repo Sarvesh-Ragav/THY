@@ -75,7 +75,7 @@ export default function TailorNotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <div className="p-4 md:p-8 min-h-screen bg-slate-50 text-slate-800 space-y-6">
+    <div className="space-y-6 text-thy-ink">
       
       {/* Header */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -83,7 +83,7 @@ export default function TailorNotificationsPage() {
           <div className="flex items-center gap-2">
             <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Notifications Center</h1>
             {unreadCount > 0 && (
-              <span className="bg-[#00c9b7] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+              <span className="bg-[#5C1A24] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">
                 {unreadCount} New
               </span>
             )}
@@ -113,7 +113,7 @@ export default function TailorNotificationsPage() {
           <button
             onClick={() => setActiveTab('all')}
             className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all ${
-              activeTab === 'all' ? 'bg-[#00c9b7] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              activeTab === 'all' ? 'bg-[#5C1A24] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
             }`}
           >
             All Alerts ({notifications.length})
@@ -121,7 +121,7 @@ export default function TailorNotificationsPage() {
           <button
             onClick={() => setActiveTab('unread')}
             className={`px-4 py-1.5 text-xs font-bold rounded-xl transition-all ${
-              activeTab === 'unread' ? 'bg-[#00c9b7] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              activeTab === 'unread' ? 'bg-[#5C1A24] text-white shadow-xs' : 'text-slate-500 hover:text-slate-800'
             }`}
           >
             Unread ({unreadCount})
@@ -141,7 +141,7 @@ export default function TailorNotificationsPage() {
                 key={n.id}
                 className={`p-4 rounded-2xl border transition-all flex justify-between items-start gap-4 ${
                   !n.isRead
-                    ? 'bg-teal-50/30 border-[#00c9b7]/40 shadow-xs'
+                    ? 'bg-thy-mist/30 border-[#5C1A24]/40 shadow-xs'
                     : 'bg-white border-slate-200/80'
                 }`}
               >
@@ -156,7 +156,7 @@ export default function TailorNotificationsPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="text-xs font-bold text-slate-900">{n.title}</h3>
                       {!n.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-[#00c9b7]" />
+                        <span className="w-2 h-2 rounded-full bg-[#5C1A24]" />
                       )}
                     </div>
                     <p className="text-xs text-slate-600 leading-relaxed">{n.description}</p>
@@ -168,7 +168,7 @@ export default function TailorNotificationsPage() {
                   {!n.isRead && (
                     <button
                       onClick={() => markAsRead(n.id)}
-                      className="text-[10px] font-bold text-[#00c9b7] hover:underline"
+                      className="text-[10px] font-bold text-[#5C1A24] hover:underline"
                     >
                       Mark read
                     </button>

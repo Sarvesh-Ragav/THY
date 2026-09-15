@@ -17,9 +17,9 @@ export function GarmentVisualization({
   const embroidery = treatments.includes('Embroidery');
   const texture = treatments.includes('Texture');
   const colors = treatments.includes('Colors');
-  const fill = fabricImage ? `url(#${patternId})` : colors ? '#00c9b7' : '#0d5c55';
-  const stripe = colors ? 'rgba(251,254,253,0.38)' : 'rgba(0,201,183,0.45)';
-  const stroke = embroidery ? '#d4b56a' : '#0B332F';
+  const fill = fabricImage ? `url(#${patternId})` : colors ? '#5C1A24' : '#4A1520';
+  const stripe = colors ? 'rgba(251,254,253,0.38)' : 'rgba(92,26,36,0.45)';
+  const stroke = embroidery ? '#d4b56a' : '#3F1218';
 
   return (
     <svg viewBox="0 0 320 380" className="w-full h-full" role="img" aria-label="AI-generated garment visualization">
@@ -34,7 +34,7 @@ export function GarmentVisualization({
         <g opacity="0.18">
           {Array.from({ length: 18 }).map((_, row) =>
             Array.from({ length: 16 }).map((__, col) => (
-              <circle key={`${row}-${col}`} cx={12 + col * 20} cy={14 + row * 21} r="1.2" fill="#0B332F" />
+              <circle key={`${row}-${col}`} cx={12 + col * 20} cy={14 + row * 21} r="1.2" fill="#3F1218" />
             )),
           )}
         </g>
@@ -56,7 +56,7 @@ export function GarmentVisualization({
           {motifs &&
             [0, 1, 2, 3, 4].flatMap((col) =>
               [0, 1, 2, 3, 4].map((row) => (
-                <circle key={`${col}-${row}`} cx={35 + col * 28} cy={92 + row * 42} r="4.5" fill="#FBFEFD" />
+                <circle key={`${col}-${row}`} cx={35 + col * 28} cy={92 + row * 42} r="4.5" fill="#FBF6ED" />
               )),
             )}
         </g>
@@ -64,7 +64,7 @@ export function GarmentVisualization({
 
       {silhouette === 'saree' && (
         <g transform="translate(58 36)">
-          <path d="M86 8 C108 8 128 28 128 58 C128 82 112 100 86 104 C60 100 44 82 44 58 C44 28 64 8 86 8 Z" fill="#0B332F" />
+          <path d="M86 8 C108 8 128 28 128 58 C128 82 112 100 86 104 C60 100 44 82 44 58 C44 28 64 8 86 8 Z" fill="#3F1218" />
           <path
             d="M28 108 C70 92 150 96 188 118 L176 332 C120 318 70 322 24 338 Z"
             fill={fill}
@@ -75,7 +75,7 @@ export function GarmentVisualization({
           {prints && <path d="M188 118 C160 180 168 270 176 332" fill="none" stroke={stripe} strokeWidth="14" />}
           {motifs &&
             [0, 1, 2, 3].map((i) => (
-              <circle key={i} cx={70 + i * 22} cy={160 + i * 36} r="5" fill="#FBFEFD" />
+              <circle key={i} cx={70 + i * 22} cy={160 + i * 36} r="5" fill="#FBF6ED" />
             ))}
         </g>
       )}
@@ -95,7 +95,7 @@ export function GarmentVisualization({
             ))}
           {motifs &&
             [0, 1, 2, 3, 4, 5].map((i) => (
-              <circle key={i} cx="82" cy={96 + i * 34} r="5" fill="#FBFEFD" />
+              <circle key={i} cx="82" cy={96 + i * 34} r="5" fill="#FBF6ED" />
             ))}
         </g>
       )}
@@ -104,7 +104,7 @@ export function GarmentVisualization({
         <g transform="translate(50 28)">
           <path
             d="M86 8 C104 8 118 24 118 46 C118 62 108 74 86 78 C64 74 54 62 54 46 C54 24 68 8 86 8 Z"
-            fill="#0B332F"
+            fill="#3F1218"
           />
           <path d="M54 86 C72 80 100 80 118 86 L132 150 C110 144 62 144 40 150 Z" fill={fill} stroke={stroke} strokeWidth="2" />
           <path
@@ -120,7 +120,7 @@ export function GarmentVisualization({
           {motifs &&
             [0, 1, 2].flatMap((row) =>
               [0, 1, 2, 3].map((col) => (
-                <circle key={`${row}-${col}`} cx={56 + col * 36} cy={190 + row * 48} r="5" fill="#FBFEFD" />
+                <circle key={`${row}-${col}`} cx={56 + col * 36} cy={190 + row * 48} r="5" fill="#FBF6ED" />
               )),
             )}
         </g>

@@ -35,7 +35,7 @@ function PaymentStep() {
       if (!window.Razorpay) throw new Error('Razorpay Checkout did not load.');
       new window.Razorpay({
         key: checkout.keyId, amount: checkout.amountPaise, currency: checkout.currency, name: 'THY', description: order.garmentName, order_id: checkout.razorpayOrderId,
-        prefill: { contact: session.identifier, email: session.customerProfile?.email, name: session.customerProfile?.fullName }, theme: { color: '#0B332F' },
+        prefill: { contact: session.identifier, email: session.customerProfile?.email, name: session.customerProfile?.fullName }, theme: { color: '#3F1218' },
         modal: { ondismiss: () => { setStatus('cancelled'); setMessage('Payment was cancelled. Your order remains pending and has not been marked paid.'); } },
         handler: async (response) => { setStatus('verifying'); try { const verified = await verifyPayment(accessToken, order.id, response); router.push(`/checkout/confirmation?order=${encodeURIComponent(verified.order.id)}`); } catch (error) { setStatus('failed'); setMessage(error instanceof Error ? error.message : 'Payment could not be verified. Your order remains pending.'); } },
       }).open();

@@ -37,6 +37,7 @@ const TABS = [
       path.startsWith('/profile') ||
       path.startsWith('/my-orders') ||
       path.startsWith('/my-designs') ||
+      path.startsWith('/wishlist') ||
       path.startsWith('/my-measurements') ||
       path.startsWith('/saved-addresses') ||
       path.startsWith('/payment-methods') ||
@@ -61,7 +62,7 @@ export function CustomerBottomNav() {
 
   return (
     <nav
-      className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-thy-ink/10 bg-thy-bg/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]"
+      className="thy-silk-bar lg:hidden fixed bottom-0 inset-x-0 z-50 border-t border-white/20 pb-[env(safe-area-inset-bottom)]"
       aria-label="Primary"
     >
       <div className="grid grid-cols-5 h-16">
@@ -76,13 +77,13 @@ export function CustomerBottomNav() {
               type="button"
               onClick={() => go(tab.href)}
               className={`flex flex-col items-center justify-center gap-0.5 min-h-11 ${
-                active ? 'text-thy-brand' : 'text-thy-muted'
+                active ? 'text-white font-semibold' : 'text-white/80'
               }`}
             >
               <span
                 className={`inline-flex items-center justify-center ${
                   featured
-                    ? `h-9 w-9 rounded-full ${active ? 'bg-thy-brand text-thy-canvas' : 'bg-thy-mist text-thy-deep'}`
+                    ? `h-9 w-9 rounded-full ${active ? 'bg-white text-thy-burgundy' : 'bg-white/20 text-white'}`
                     : ''
                 }`}
               >

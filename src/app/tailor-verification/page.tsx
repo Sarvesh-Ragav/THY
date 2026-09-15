@@ -40,7 +40,7 @@ export default function TailorVerificationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-dvh bg-transparent flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-sm border border-gray-100 space-y-6">
         <div className="text-center space-y-1">
           <div className="text-3xl mb-2">📜</div>
@@ -60,7 +60,7 @@ export default function TailorVerificationPage() {
               required
               accept="image/*,.pdf"
               onChange={(e) => setGovId(e.target.files?.[0] || null)}
-              className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-[#00c9b7] hover:file:bg-teal-100 cursor-pointer"
+              className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-thy-mist file:text-[#5C1A24] hover:file:bg-thy-mist cursor-pointer"
             />
           </div>
 
@@ -73,7 +73,7 @@ export default function TailorVerificationPage() {
               required
               accept="image/*,.pdf"
               onChange={(e) => setShopProof(e.target.files?.[0] || null)}
-              className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-teal-50 file:text-[#00c9b7] hover:file:bg-teal-100 cursor-pointer"
+              className="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-thy-mist file:text-[#5C1A24] hover:file:bg-thy-mist cursor-pointer"
             />
           </div>
 
@@ -87,7 +87,7 @@ export default function TailorVerificationPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-[#00c9b7] text-white rounded-xl font-bold text-xs hover:bg-[#00b5a4] transition-colors shadow-sm"
+            className="w-full py-3 bg-[#5C1A24] text-white rounded-xl font-bold text-xs hover:bg-[#4A1520] transition-colors shadow-sm"
           >
             {isSubmitting ? 'Submitting Documents...' : 'Submit Verification & Proceed →'}
           </button>

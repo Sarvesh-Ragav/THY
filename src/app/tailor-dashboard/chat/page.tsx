@@ -78,7 +78,7 @@ export default function TailorChatPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 min-h-screen bg-thy-bg text-thy-ink space-y-4">
+    <div className="space-y-4 text-thy-ink">
       <div className="thy-card p-5 flex justify-between items-center">
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] text-thy-brand font-semibold">C31</p>
@@ -124,7 +124,7 @@ export default function TailorChatPage() {
                   <div
                     key={message.id}
                     className={`max-w-[80%] p-3 text-sm ${
-                      message.sender === 'tailor' ? 'ml-auto bg-thy-deep text-[#fbfefd]' : 'bg-thy-mist'
+                      message.sender === 'tailor' ? 'ml-auto bg-thy-deep text-[#FBF6ED]' : 'bg-thy-mist'
                     }`}
                   >
                     <p>{message.text}</p>

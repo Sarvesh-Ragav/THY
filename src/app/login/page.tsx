@@ -4,18 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ThyLoginForm } from '@/components/auth/ThyLoginForm';
 import { ThySignUpForm } from '@/components/auth/ThySignUpForm';
-import { ThyOtpVerificationForm } from '@/components/auth/ThyOtpVerificationForm';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath } from '@/lib/tailor-session';
 import { LoginFormData } from '@/types/auth';
-import { requestOtp, resendOtp, verifyOtp, googleAuth } from '@/lib/auth-api';
+import { AuthApiError, googleAuth, loginWithPassword, type AuthenticatedUser } from '@/lib/auth-api';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { session, isReady, updateSession, completeAuthentication } = useTailorSession();
-  const [view, setView] = useState<'login' | 'signup' | 'otp'>('login');
-  const [userIdentifier, setUserIdentifier] = useState<string>('');
-  const [challengeId, setChallengeId] = useState<string>('');
+  const { session, isReady, completeAuthentication } = useTailorSession();
+  const [view, setView] = useState<'login' | 'signup'>('login');
 
   useEffect(() => {
     if (!isReady) return;
@@ -24,63 +21,57 @@ export default function LoginPage() {
     }
   }, [isReady, session, router]);
 
+  const handleAuthenticated = (accessToken: string, user?: AuthenticatedUser) => {
+    const next = completeAuthentication(
+      accessToken,
+      user?.role ?? null,
+      user?.email || user?.phoneNumber || undefined,
+      user
+    );
+    router.push(getPostAuthPath(next));
+  };
+
   const handleLoginContinue = async (formData: LoginFormData) => {
-    const result = await requestOtp(formData.identifier);
-    setUserIdentifier(formData.identifier);
-    setChallengeId(result.challengeId);
-    updateSession({ identifier: formData.identifier });
-    setView('otp');
-    return { success: true, message: 'Verification code sent.', data: result };
+    try {
+      const result = await loginWithPassword(formData.email, formData.password);
+      handleAuthenticated(result.accessToken, result.user);
+      return { success: true, message: 'Logged in. Redirecting...' };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof AuthApiError ? error.message : 'Unable to log in. Please try again.',
+      };
+    }
   };
 
   const handleGoogleSignIn = async (credential: string) => {
     try {
       const result = await googleAuth(credential);
-      handleAuthenticated(result.accessToken);
+      handleAuthenticated(result.accessToken, result.user);
     } catch (error) {
       console.error('Google Sign-In failed', error);
       alert('Google Sign-In failed. Please try again.');
     }
   };
 
-  const handleAuthenticated = (accessToken: string) => {
-    const next = completeAuthentication(accessToken);
-    router.push(getPostAuthPath(next));
-  };
-
   if (!isReady || session.isAuthenticated) {
     return (
-      <main className="min-h-dvh bg-thy-bg flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <main className="min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
         <p className="text-sm text-thy-muted">Loading...</p>
       </main>
     );
   }
 
+  const initialEmail = session.identifier.includes('@') ? session.identifier : '';
+
   return (
-    <main className="min-h-dvh bg-thy-bg flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <main className="min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
       {view === 'login' && (
         <ThyLoginForm
-          initialIdentifier={session.identifier}
+          initialEmail={initialEmail}
           onSubmit={handleLoginContinue}
           onGoogleSignIn={handleGoogleSignIn}
           onNavigateSignUp={() => setView('signup')}
-        />
-      )}
-
-      {view === 'otp' && (
-        <ThyOtpVerificationForm
-          identifier={userIdentifier || session.identifier}
-          onVerifyOtp={async (otp) => {
-            const result = await verifyOtp(userIdentifier || session.identifier, challengeId, otp);
-            handleAuthenticated(result.accessToken);
-            return true;
-          }}
-          onResendOtp={async () => {
-            const result = await resendOtp(userIdentifier || session.identifier);
-            setChallengeId(result.challengeId);
-            return true;
-          }}
-          onNavigateBack={() => setView('login')}
         />
       )}
 

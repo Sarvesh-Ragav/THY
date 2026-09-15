@@ -21,15 +21,22 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
   const router = useRouter();
   const { updateSession } = useTailorSession();
   const [selectedRole, setSelectedRole] = useState<'customer' | 'tailor' | null>('customer');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleRoleClick = (role: 'customer' | 'tailor') => {
     setSelectedRole(role);
+    setErrorMessage(null);
     if (onSelectRole) {
       onSelectRole(role);
     }
   };
 
   const handleContinue = () => {
+    if (!selectedRole) {
+      setErrorMessage('Please choose Customer or Tailor.');
+      return;
+    }
+
     if (selectedRole === 'tailor') {
       updateSession({ role: 'tailor' });
       router.push('/tailor-registration');
@@ -42,23 +49,21 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
 
   return (
     <div className="w-full max-w-sm mx-auto bg-thy-surface overflow-hidden border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.12)]">
-      {/* 1. Header Section */}
       <div className="thy-auth-header px-6 py-10 text-center flex flex-col items-center justify-center relative select-none">
-        <ThyLogo size={56} className="mb-0" />
+        <ThyLogo size={56} className="mb-0 text-white" />
       </div>
 
-      {/* 2. Body Section */}
       <div className="p-6 sm:p-8 bg-thy-surface">
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-thy-ink tracking-tight">
             Create your THY account
           </h2>
-          <p className="text-sm text-thy-muted mt-1">Choose how you want to get started.</p>
+          <p className="text-sm text-thy-muted mt-1">
+            Choose how you want to get started.
+          </p>
         </div>
 
-        {/* Role Options */}
-        <div className="space-y-4 mb-8">
-          {/* Customer Option */}
+        <div className="space-y-4 mb-6">
           <button
             type="button"
             onClick={() => handleRoleClick('customer')}
@@ -72,7 +77,6 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
             <span className="text-xs text-thy-muted mt-0.5">Find tailors and manage orders</span>
           </button>
 
-          {/* Tailor Option */}
           <button
             type="button"
             onClick={() => handleRoleClick('tailor')}
@@ -89,6 +93,10 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
           </button>
         </div>
 
+        {errorMessage ? (
+          <p className="text-xs text-red-500 font-medium mb-4">{errorMessage}</p>
+        ) : null}
+
         <button
           type="button"
           onClick={handleContinue}
@@ -97,7 +105,6 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
           Continue
         </button>
 
-        {/* Divider Line */}
         <div className="relative my-6 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-thy-ink/10"></div>
@@ -107,7 +114,6 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
           </div>
         </div>
 
-        {/* Secondary Social Sign-Up Button — Real Google Identity Services */}
         {onGoogleSignIn ? (
           <GoogleAuthButton onCredential={onGoogleSignIn} text="signup_with" />
         ) : (
@@ -120,7 +126,6 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
           </button>
         )}
 
-        {/* Footer Link */}
         <div className="text-center">
           <p className="text-sm text-thy-muted font-medium">
             Already have an account?{' '}
