@@ -5,7 +5,6 @@ export const MAIN_NAV = [
   { label: 'Explore', href: '/explore' },
   { label: 'Categories', href: '/categories' },
   { label: 'Tailors', href: '/tailors' },
-  { label: 'My Designs', href: '/my-designs' },
   { label: 'My Orders', href: '/my-orders' },
 ] as const;
 
@@ -28,6 +27,7 @@ export const AUTH_PATHS = [
   '/payment-methods',
   '/settings',
   '/notifications',
+  '/wishlist',
   '/chat',
   '/estimate-details',
   '/checkout/address',
@@ -84,6 +84,14 @@ export interface TailorReview {
   date: string;
 }
 
+export interface TailorPortfolioItem {
+  id: string;
+  title: string;
+  category: string;
+  image: string;
+  featured?: boolean;
+}
+
 export interface DirectoryTailor {
   id: string;
   name: string;
@@ -105,7 +113,7 @@ export interface DirectoryTailor {
   coverImage: string;
   experience: TailorExperience[];
   reviews: TailorReview[];
-  portfolio: string[];
+  portfolio: TailorPortfolioItem[];
 }
 
 export const TAILOR_AVAILABILITY_LABELS: Record<TailorAvailability, string> = {
@@ -143,7 +151,12 @@ export const TAILORS: DirectoryTailor[] = [
       { author: 'Ananya S.', rating: 5, text: 'The blouse sat perfectly. Meera checked every measurement before cutting.', date: 'Aug 2026' },
       { author: 'Lakshmi R.', rating: 5, text: 'Treated our family silk with so much care. Delivery was on time.', date: 'Jun 2026' },
     ],
-    portfolio: ['/hero/hero-couple.png', '/hero/fabric-charcoal.png', '/hero/fabric-beige.png'],
+    portfolio: [
+      { id: 't1-p1', title: 'Kanjeevaram bridal drape', category: 'Sarees', image: '/hero/hero-couple.png', featured: true },
+      { id: 't1-p2', title: 'Temple-border silk blouse', category: 'Blouses', image: '/hero/fabric-charcoal.png', featured: true },
+      { id: 't1-p3', title: 'Heirloom border restoration', category: 'Sarees', image: '/hero/fabric-beige.png', featured: false },
+      { id: 't1-p4', title: 'Zari motif placement', category: 'Embroidery', image: '/hero/fabric-olive.png', featured: true },
+    ],
   },
   {
     id: 't2',
@@ -173,7 +186,12 @@ export const TAILORS: DirectoryTailor[] = [
       { author: 'Rahul M.', rating: 5, text: 'The bandhgala looked boardroom-sharp and still sat easy through the ceremony.', date: 'Jul 2026' },
       { author: 'Vikram P.', rating: 4, text: 'Great finish on the buttons and collar. Would book again for groomsmen.', date: 'May 2026' },
     ],
-    portfolio: ['/hero/fabric-olive.png', '/hero/hero-street.png', '/hero/fabric-charcoal.png'],
+    portfolio: [
+      { id: 't2-p1', title: 'Ivory bandhgala set', category: 'Bandhgala', image: '/hero/fabric-olive.png', featured: true },
+      { id: 't2-p2', title: 'Groom sherwani with buttons', category: 'Sherwanis', image: '/hero/hero-street.png', featured: true },
+      { id: 't2-p3', title: 'Reception suit finish', category: 'Suits', image: '/hero/fabric-charcoal.png', featured: false },
+      { id: 't2-p4', title: 'Groomsmen matching set', category: 'Sherwanis', image: '/hero/hero-couple.png', featured: true },
+    ],
   },
   {
     id: 't3',
@@ -201,7 +219,12 @@ export const TAILORS: DirectoryTailor[] = [
     reviews: [
       { author: 'Zara K.', rating: 5, text: 'The lehenga felt light even with the work. Farah understood the brief immediately.', date: 'Apr 2026' },
     ],
-    portfolio: ['/hero/fabric-beige.png', '/hero/hero-couple.png', '/hero/fabric-olive.png'],
+    portfolio: [
+      { id: 't3-p1', title: 'Heavy bridal lehenga', category: 'Lehengas', image: '/hero/fabric-beige.png', featured: true },
+      { id: 't3-p2', title: 'Reception gown with can-can', category: 'Gowns', image: '/hero/hero-couple.png', featured: true },
+      { id: 't3-p3', title: 'Zardozi sleeve detail', category: 'Embroidery', image: '/hero/fabric-olive.png', featured: false },
+      { id: 't3-p4', title: 'Bridal blouse engineering', category: 'Blouses', image: '/hero/fabric-charcoal.png', featured: true },
+    ],
   },
   {
     id: 't4',
@@ -230,7 +253,12 @@ export const TAILORS: DirectoryTailor[] = [
       { author: 'Divya N.', rating: 5, text: 'My office kurtis finally sit at the right length. Fast turnaround.', date: 'Aug 2026' },
       { author: 'Priya T.', rating: 4, text: 'Neat seams and a good fit through the shoulder.', date: 'Mar 2026' },
     ],
-    portfolio: ['/hero/fabric-charcoal.png', '/hero/fabric-beige.png', '/hero/hero-street.png'],
+    portfolio: [
+      { id: 't4-p1', title: 'Office-ready kurti set', category: 'Kurtis', image: '/hero/fabric-charcoal.png', featured: true },
+      { id: 't4-p2', title: 'Everyday salwar suit', category: 'Salwars', image: '/hero/fabric-beige.png', featured: true },
+      { id: 't4-p3', title: 'Palazzo co-ord', category: 'Co-ords', image: '/hero/hero-street.png', featured: false },
+      { id: 't4-p4', title: 'Wash-and-wear finish', category: 'Kurtis', image: '/hero/fabric-olive.png', featured: true },
+    ],
   },
   {
     id: 't5',
@@ -257,7 +285,12 @@ export const TAILORS: DirectoryTailor[] = [
     reviews: [
       { author: 'Aditya S.', rating: 5, text: 'The nehru jacket sat clean on the shoulder. Clear updates throughout.', date: 'Jul 2026' },
     ],
-    portfolio: ['/hero/hero-street.png', '/hero/fabric-olive.png', '/hero/fabric-charcoal.png'],
+    portfolio: [
+      { id: 't5-p1', title: 'Structured achkan', category: 'Achkan', image: '/hero/hero-street.png', featured: true },
+      { id: 't5-p2', title: 'Festive nehru jacket', category: 'Jackets', image: '/hero/fabric-olive.png', featured: true },
+      { id: 't5-p3', title: 'Groom sherwani cut', category: 'Sherwanis', image: '/hero/fabric-charcoal.png', featured: false },
+      { id: 't5-p4', title: 'Muslin fit check set', category: 'Suits', image: '/hero/fabric-beige.png', featured: true },
+    ],
   },
   {
     id: 't6',
@@ -284,7 +317,12 @@ export const TAILORS: DirectoryTailor[] = [
     reviews: [
       { author: 'Keerthi V.', rating: 5, text: 'Best blouse I have worn. The back neck sat exactly as sketched.', date: 'Sep 2026' },
     ],
-    portfolio: ['/hero/fabric-beige.png', '/hero/hero-couple.png', '/hero/fabric-charcoal.png'],
+    portfolio: [
+      { id: 't6-p1', title: 'Deep-neck silk blouse', category: 'Blouses', image: '/hero/fabric-beige.png', featured: true },
+      { id: 't6-p2', title: 'Princess-cut bridal blouse', category: 'Blouses', image: '/hero/hero-couple.png', featured: true },
+      { id: 't6-p3', title: 'Piped lining finish', category: 'Finishing', image: '/hero/fabric-charcoal.png', featured: false },
+      { id: 't6-p4', title: 'Kanjeevaram blouse set', category: 'Blouses', image: '/hero/fabric-olive.png', featured: true },
+    ],
   },
   {
     id: 't7',
@@ -311,7 +349,12 @@ export const TAILORS: DirectoryTailor[] = [
     reviews: [
       { author: 'Omar H.', rating: 4, text: 'Rich work on the collar. Fit was true to the measurement sheet.', date: 'Feb 2026' },
     ],
-    portfolio: ['/hero/fabric-olive.png', '/hero/fabric-charcoal.png', '/hero/hero-street.png'],
+    portfolio: [
+      { id: 't7-p1', title: 'Hyderabadi sherwani', category: 'Sherwanis', image: '/hero/fabric-olive.png', featured: true },
+      { id: 't7-p2', title: 'Pearl & mirror collar', category: 'Embroidery', image: '/hero/fabric-charcoal.png', featured: true },
+      { id: 't7-p3', title: 'Matching kurta pajama', category: 'Kurtas', image: '/hero/hero-street.png', featured: false },
+      { id: 't7-p4', title: 'Nikah button set', category: 'Sherwanis', image: '/hero/hero-couple.png', featured: true },
+    ],
   },
   {
     id: 't8',
@@ -338,7 +381,12 @@ export const TAILORS: DirectoryTailor[] = [
     reviews: [
       { author: 'Riya D.', rating: 5, text: 'Wore the gown through a late sangeet. Structure held, and it packed well.', date: 'Jan 2026' },
     ],
-    portfolio: ['/hero/hero-couple.png', '/hero/fabric-beige.png', '/hero/hero-street.png'],
+    portfolio: [
+      { id: 't8-p1', title: 'Travel reception lehenga', category: 'Lehengas', image: '/hero/hero-couple.png', featured: true },
+      { id: 't8-p2', title: 'Pre-draped saree look', category: 'Sarees', image: '/hero/fabric-beige.png', featured: true },
+      { id: 't8-p3', title: 'Sangeet gown structure', category: 'Gowns', image: '/hero/hero-street.png', featured: false },
+      { id: 't8-p4', title: 'Light can-can finish', category: 'Lehengas', image: '/hero/fabric-olive.png', featured: true },
+    ],
   },
   {
     id: 't9',
@@ -365,7 +413,12 @@ export const TAILORS: DirectoryTailor[] = [
     reviews: [
       { author: 'Sneha P.', rating: 4, text: 'The anarkali was wearable, not costume-y. Good for weekday events.', date: 'Jun 2026' },
     ],
-    portfolio: ['/hero/fabric-charcoal.png', '/hero/hero-street.png', '/hero/fabric-beige.png'],
+    portfolio: [
+      { id: 't9-p1', title: 'Workwear anarkali', category: 'Anarkali', image: '/hero/fabric-charcoal.png', featured: true },
+      { id: 't9-p2', title: 'Office ethnic co-ord', category: 'Co-ords', image: '/hero/hero-street.png', featured: true },
+      { id: 't9-p3', title: 'Contemporary kurta', category: 'Kurtas', image: '/hero/fabric-beige.png', featured: false },
+      { id: 't9-p4', title: 'Weekday function set', category: 'Salwars', image: '/hero/fabric-olive.png', featured: true },
+    ],
   },
   {
     id: 't10',
@@ -392,7 +445,12 @@ export const TAILORS: DirectoryTailor[] = [
     reviews: [
       { author: 'Isha B.', rating: 5, text: 'Sent a Banarasi from Kolkata. Came back beautifully finished.', date: 'May 2026' },
     ],
-    portfolio: ['/hero/fabric-beige.png', '/hero/fabric-charcoal.png', '/hero/hero-couple.png'],
+    portfolio: [
+      { id: 't10-p1', title: 'Banarasi fall & pico', category: 'Sarees', image: '/hero/fabric-beige.png', featured: true },
+      { id: 't10-p2', title: 'Kanjeevaram blouse finish', category: 'Blouses', image: '/hero/fabric-charcoal.png', featured: true },
+      { id: 't10-p3', title: 'Steamed silk pack-out', category: 'Finishing', image: '/hero/hero-couple.png', featured: false },
+      { id: 't10-p4', title: 'Pallu-respecting drape', category: 'Sarees', image: '/hero/fabric-olive.png', featured: true },
+    ],
   },
 ];
 

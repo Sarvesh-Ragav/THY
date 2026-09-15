@@ -70,7 +70,7 @@ export const ThyOtpVerificationForm: React.FC<ThyOtpVerificationFormProps> = ({
     <div className="w-full max-w-sm mx-auto bg-thy-surface overflow-hidden border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.12)]">
       {/* 1. Header Section */}
       <div className="thy-auth-header px-6 py-10 text-center flex flex-col items-center justify-center relative select-none">
-        <ThyLogo size={56} className="mb-0" />
+        <ThyLogo size={56} className="mb-0 text-white" />
       </div>
 
       {/* 2. Body Section */}

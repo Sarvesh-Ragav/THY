@@ -88,7 +88,7 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
     <div className="w-full max-w-sm mx-auto bg-thy-surface overflow-hidden border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.12)]">
       {/* 1. Header Section */}
       <div className="thy-auth-header px-6 py-10 text-center flex flex-col items-center justify-center relative select-none">
-        <ThyLogo size={52} className="mb-2" />
+        <ThyLogo size={52} className="mb-2 text-white" />
         <h1 className="text-3xl tracking-[0.2em] text-white" style={{ fontFamily: 'var(--font-cormorant), serif' }}>THY</h1>
         <p className="text-thy-canvas text-sm font-medium opacity-90 mt-1">Tailoring, connected.</p>
       </div>

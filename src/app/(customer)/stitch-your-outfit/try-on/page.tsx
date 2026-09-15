@@ -348,14 +348,11 @@ function TryOnContent() {
                     <Sparkles size={20} className="text-thy-brand absolute inset-0 m-auto animate-pulse" />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm font-semibold tracking-wider uppercase text-thy-brand">
-                      Google virtual-try-on-001
-                    </p>
                     <p className="text-base font-serif text-white">
-                      Generating Photorealistic Fit...
+                      Visualizing your look...
                     </p>
                     <p className="text-xs text-white/60 max-w-xs leading-relaxed">
-                      Vertex AI is analyzing your posture and realistically tailoring the garment to your body.
+                      Softly draping the fabric and shaping it to your silhouette.
                     </p>
                   </div>
                 </div>

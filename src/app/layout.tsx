@@ -33,7 +33,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#0B332F',
+  themeColor: '#5C1A24',
 };
 
 export default function RootLayout({
@@ -43,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${cormorant.variable} ${outfit.variable}`}>
-      <body className="antialiased bg-thy-bg text-thy-ink min-h-dvh">
+      <body className="antialiased bg-thy-cream text-thy-ink min-h-dvh">
         <TailorSessionProvider>{children}</TailorSessionProvider>
       </body>
     </html>

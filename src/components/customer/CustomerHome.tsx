@@ -21,10 +21,10 @@ export function CustomerHome() {
         <HeroCarousel />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[68dvh] sm:min-h-[74dvh] md:min-h-[78vh] flex items-end pb-14 sm:pb-16 pointer-events-none">
           <div className="max-w-xl text-thy-canvas pointer-events-auto">
-            <h1 className="text-[clamp(2.4rem,12vw,6.4rem)] leading-[0.9]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+            <h1 className="text-[clamp(2.4rem,12vw,6.4rem)] leading-[0.9] drop-shadow-[0_2px_18px_rgba(0,0,0,0.28)]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
               Stitch Your Desire
             </h1>
-            <p className="mt-3 sm:mt-4 text-sm md:text-base tracking-[0.04em] text-thy-canvas/90">
+            <p className="mt-3 sm:mt-4 text-sm md:text-base tracking-[0.04em] text-thy-canvas/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.25)]">
               Your Fabric. Your Style. Your Tailor.
             </p>
             <Link
@@ -37,31 +37,51 @@ export function CustomerHome() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-12 md:space-y-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 space-y-14 md:space-y-20">
         <div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <p className="thy-section-kicker">Artisans</p>
+          <h2 className="thy-section-title text-2xl sm:text-3xl md:text-4xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Find Your Perfect Tailor
           </h2>
           <div className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {TAILORS.slice(0, 4).map((tailor) => (
-              <Link key={tailor.id} href={`/tailors/${tailor.id}`} className="thy-card overflow-hidden hover:border-thy-brand/40 transition-colors">
-                <img src={tailor.image} alt="" className="h-36 sm:h-40 w-full object-cover" />
-                <div className="p-4">
-                  <h3 className="text-xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{tailor.name}</h3>
-                  <p className="text-sm text-thy-muted">{tailor.specialty}</p>
-                </div>
-              </Link>
-            ))}
+            {TAILORS.slice(0, 4).map((tailor) => {
+              const samples = [
+                ...tailor.portfolio.filter((item) => item.featured),
+                ...tailor.portfolio.filter((item) => !item.featured),
+              ].slice(0, 3);
+              return (
+                <Link key={tailor.id} href={`/tailors/${tailor.id}`} className="thy-card overflow-hidden hover:border-black transition-colors">
+                  <img src={tailor.image} alt="" className="h-36 sm:h-40 w-full object-cover" />
+                  <div className="p-4">
+                    <h3 className="text-xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{tailor.name}</h3>
+                    <p className="text-sm text-thy-muted">{tailor.specialty}</p>
+                    {samples.length > 0 && (
+                      <div className="mt-3 grid grid-cols-3 gap-1.5">
+                        {samples.map((item) => (
+                          <img
+                            key={item.id}
+                            src={item.image}
+                            alt={item.title}
+                            className="h-12 w-full object-cover border border-black"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
 
         <div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <p className="thy-section-kicker">For you</p>
+          <h2 className="thy-section-title text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Picked Just for You
           </h2>
           <div className="mt-5 sm:mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {picked.map((design) => (
-              <Link key={design.id} href={`/categories/${design.categoryId}`} className="thy-card overflow-hidden hover:border-thy-brand/40 transition-colors">
+              <Link key={design.id} href={`/categories/${design.categoryId}`} className="thy-card overflow-hidden hover:border-black transition-colors">
                 <img src={design.image} alt="" className="h-32 sm:h-40 w-full object-cover" />
                 <p className="p-3 text-sm">{design.title}</p>
               </Link>
@@ -70,7 +90,8 @@ export function CustomerHome() {
         </div>
 
         <div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <p className="thy-section-kicker">Collections</p>
+          <h2 className="thy-section-title text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Find Your Style
           </h2>
           <div className="mt-5 sm:mt-6">
@@ -79,31 +100,33 @@ export function CustomerHome() {
         </div>
 
         <div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <p className="thy-section-kicker">Now</p>
+          <h2 className="thy-section-title text-2xl sm:text-3xl md:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Trending Now
           </h2>
           <div className="mt-5 sm:mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {trending.map((design) => (
-              <Link key={design.id} href="/explore" className="thy-card overflow-hidden hover:border-thy-brand/40 transition-colors">
+              <Link key={design.id} href="/explore" className="thy-card overflow-hidden hover:border-black transition-colors">
                 <img src={design.image} alt="" className="h-32 sm:h-40 w-full object-cover" />
                 <p className="p-3 text-sm">{design.title}</p>
               </Link>
             ))}
           </div>
-          <Link href="/explore" className="inline-block mt-4 text-[11px] uppercase tracking-[0.18em] text-thy-brand border-b border-thy-brand">
+          <Link href="/explore" className="inline-block mt-4 text-[11px] uppercase tracking-[0.18em] text-thy-burgundy border-b border-thy-burgundy/40">
             Explore Relevant Trending Designs
           </Link>
         </div>
 
         <div className="thy-card p-5 sm:p-6">
-          <h2 className="text-2xl sm:text-3xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+          <p className="thy-section-kicker">Continue</p>
+          <h2 className="thy-section-title text-2xl sm:text-3xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Continue Your Style Journey
           </h2>
           {activity ? (
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
-              <Link href="/my-designs" className="border-b border-thy-brand text-thy-brand">My Designs</Link>
-              <Link href="/my-orders" className="border-b border-thy-brand text-thy-brand">My Orders</Link>
-              <Link href="/my-measurements" className="border-b border-thy-brand text-thy-brand">My Measurements</Link>
+              <Link href="/my-designs" className="border-b border-thy-burgundy/40 text-thy-burgundy">My Designs</Link>
+              <Link href="/my-orders" className="border-b border-thy-burgundy/40 text-thy-burgundy">My Orders</Link>
+              <Link href="/my-measurements" className="border-b border-thy-burgundy/40 text-thy-burgundy">My Measurements</Link>
             </div>
           ) : (
             <div className="mt-4">
@@ -111,7 +134,7 @@ export function CustomerHome() {
               <p className="text-sm text-thy-subtle mt-1">Start your style journey with THY.</p>
               <Link
                 href="/stitch-your-outfit"
-                className="hero-leather-btn inline-flex items-center justify-center mt-5 w-full sm:w-auto px-6 py-3 text-[11px] uppercase tracking-[0.18em]"
+                className="inline-flex items-center justify-center mt-5 w-full sm:w-auto px-6 py-3 text-[11px] uppercase tracking-[0.18em] font-semibold bg-thy-burgundy text-thy-cream hover:bg-[#4A1520]"
               >
                 Stitch Your Outfit
               </Link>

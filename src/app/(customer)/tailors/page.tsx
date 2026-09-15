@@ -16,7 +16,7 @@ import {
 import { chatHref } from '@/lib/c31';
 
 const ghostBtn =
-  'inline-flex items-center justify-center min-h-10 px-3 text-sm text-center leading-none border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
+  'inline-flex items-center justify-center min-h-10 px-3 text-sm text-center leading-none border border-thy-burgundy/20 bg-thy-cream text-thy-ink transition-colors hover:border-thy-burgundy/40 hover:text-thy-burgundy cursor-pointer';
 
 export default function TailorsPage() {
   return (
@@ -107,7 +107,7 @@ function TailorDirectory() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <p className="text-[11px] uppercase tracking-[0.22em] text-thy-brand font-semibold">Network</p>
+      <p className="text-[11px] uppercase tracking-[0.22em] text-thy-burgundy font-semibold">Network</p>
       <h1
         className="mt-2 text-3xl sm:text-4xl md:text-5xl leading-[0.95]"
         style={{ fontFamily: 'var(--font-cormorant), serif' }}
@@ -115,7 +115,7 @@ function TailorDirectory() {
         Tailors
       </h1>
       <p className="mt-3 max-w-xl text-sm text-thy-muted">
-        Find verified makers by city, craft, and availability — then open a full profile.
+        Browse portfolio work while you compare makers, then open a full profile to message or request an estimate.
       </p>
 
       <div className="mt-6 lg:hidden">
@@ -147,7 +147,7 @@ function TailorDirectory() {
           {results.length === 0 && (
             <div className="thy-card p-6 text-sm text-thy-muted">
               No tailors match these filters.
-              <button type="button" className="ml-2 text-thy-brand underline cursor-pointer" onClick={clearFilters}>
+              <button type="button" className="ml-2 text-thy-burgundy underline cursor-pointer" onClick={clearFilters}>
                 Clear filters
               </button>
             </div>
@@ -158,7 +158,7 @@ function TailorDirectory() {
       {filtersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <button type="button" className="absolute inset-0 bg-thy-deep/40" onClick={() => setFiltersOpen(false)} aria-label="Close filters" />
-          <div className="absolute inset-y-0 left-0 w-[min(100%,20rem)] bg-thy-bg p-4 overflow-y-auto shadow-xl">
+          <div className="absolute inset-y-0 left-0 w-[min(100%,20rem)] bg-thy-cream p-4 overflow-y-auto shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm font-semibold">Filters</p>
               <button type="button" onClick={() => setFiltersOpen(false)} className="p-2 cursor-pointer" aria-label="Close">
@@ -174,56 +174,91 @@ function TailorDirectory() {
 }
 
 function TailorResultCard({ tailor }: { tailor: DirectoryTailor }) {
+  const portfolioPreview = [
+    ...tailor.portfolio.filter((item) => item.featured),
+    ...tailor.portfolio.filter((item) => !item.featured),
+  ].slice(0, 4);
+
   return (
-    <article className="thy-card p-4 sm:p-5 flex flex-col sm:flex-row gap-4">
-      <Link href={`/tailors/${tailor.id}`} className="shrink-0 self-start">
-        <img
-          src={tailor.image}
-          alt=""
-          className="h-20 w-20 sm:h-24 sm:w-24 rounded-full object-cover border border-thy-ink/10"
-        />
-      </Link>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
+    <article className="thy-card p-4 sm:p-5">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Link href={`/tailors/${tailor.id}`} className="shrink-0 self-start">
+          <img
+            src={tailor.image}
+            alt=""
+            className="h-20 w-20 sm:h-24 sm:w-24 rounded-full object-cover border border-thy-ink/10"
+          />
+        </Link>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/tailors/${tailor.id}`}
+              className="text-xl leading-tight hover:text-thy-burgundy"
+              style={{ fontFamily: 'var(--font-cormorant), serif' }}
+            >
+              {tailor.name}
+            </Link>
+            {tailor.verified && (
+              <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-thy-burgundy font-semibold">
+                <BadgeCheck size={14} />
+                Verified
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-sm text-thy-ink">{tailor.headline}</p>
+          <p className="mt-1 text-sm text-thy-muted inline-flex items-center gap-1">
+            <MapPin size={13} />
+            {tailor.studio} · {tailor.city}
+          </p>
+          <p className="mt-2 text-xs text-thy-subtle">
+            {tailor.specialty} · {tailor.yearsExperience}+ yrs · {tailor.ordersCompleted} orders ·{' '}
+            {TAILOR_AVAILABILITY_LABELS[tailor.availability]}
+          </p>
+          <p className="mt-1 inline-flex items-center gap-1 text-sm text-thy-ink">
+            <Star size={14} className="text-thy-burgundy fill-thy-burgundy" />
+            {tailor.rating.toFixed(1)}
+            <span className="text-thy-muted">({tailor.reviewCount})</span>
+          </p>
+        </div>
+        <div className="flex sm:flex-col gap-2 sm:w-40 shrink-0">
           <Link
             href={`/tailors/${tailor.id}`}
-            className="text-xl leading-tight hover:text-thy-brand"
-            style={{ fontFamily: 'var(--font-cormorant), serif' }}
+            className="hero-leather-btn inline-flex flex-1 items-center justify-center min-h-10 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-center leading-none"
           >
-            {tailor.name}
+            View profile
           </Link>
-          {tailor.verified && (
-            <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-thy-brand font-semibold">
-              <BadgeCheck size={14} />
-              Verified
-            </span>
-          )}
+          <Link href={chatHref(tailor.id, 'profile')} className={`${ghostBtn} flex-1`}>
+            Message
+          </Link>
         </div>
-        <p className="mt-1 text-sm text-thy-ink">{tailor.headline}</p>
-        <p className="mt-1 text-sm text-thy-muted inline-flex items-center gap-1">
-          <MapPin size={13} />
-          {tailor.studio} · {tailor.city}
-        </p>
-        <p className="mt-2 text-xs text-thy-subtle">
-          {tailor.specialty} · {tailor.yearsExperience}+ yrs · {tailor.ordersCompleted} orders · {TAILOR_AVAILABILITY_LABELS[tailor.availability]}
-        </p>
-        <p className="mt-1 inline-flex items-center gap-1 text-sm text-thy-ink">
-          <Star size={14} className="text-thy-brand fill-thy-brand" />
-          {tailor.rating.toFixed(1)}
-          <span className="text-thy-muted">({tailor.reviewCount})</span>
-        </p>
       </div>
-      <div className="flex sm:flex-col gap-2 sm:w-40 shrink-0">
-        <Link
-          href={`/tailors/${tailor.id}`}
-          className="hero-leather-btn inline-flex flex-1 items-center justify-center min-h-10 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-center leading-none"
-        >
-          View profile
-        </Link>
-        <Link href={chatHref(tailor.id, 'profile')} className={`${ghostBtn} flex-1`}>
-          Message
-        </Link>
-      </div>
+
+      {portfolioPreview.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-thy-ink/10">
+          <div className="flex items-center justify-between gap-2 mb-2.5">
+            <p className="text-[10px] uppercase tracking-[0.16em] text-thy-subtle font-semibold">Portfolio</p>
+            <Link href={`/tailors/${tailor.id}`} className="text-xs text-thy-burgundy hover:underline">
+              See all work
+            </Link>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {portfolioPreview.map((item) => (
+              <Link
+                key={item.id}
+                href={`/tailors/${tailor.id}`}
+                className="group overflow-hidden border border-thy-ink/10 bg-thy-mist/40"
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-16 sm:h-20 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                <p className="hidden sm:block px-1.5 py-1 text-[10px] text-thy-muted truncate">{item.title}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </article>
   );
 }
@@ -265,12 +300,12 @@ function Filters({
     <div className="thy-card p-4 space-y-5">
       <div className="flex items-center justify-between gap-2">
         <p className="text-[11px] uppercase tracking-[0.16em] text-thy-subtle font-semibold">Filters</p>
-        <button type="button" onClick={onClear} className="text-xs text-thy-brand cursor-pointer">
+        <button type="button" onClick={onClear} className="text-xs text-thy-burgundy cursor-pointer">
           Clear
         </button>
       </div>
 
-      <label className="flex items-center gap-2 border border-thy-ink/15 bg-thy-surface px-3 py-2">
+      <label className="flex items-center gap-2 border border-thy-burgundy/20 bg-thy-cream px-3 py-2">
         <Search size={14} className="text-thy-subtle shrink-0" />
         <input
           value={query}
