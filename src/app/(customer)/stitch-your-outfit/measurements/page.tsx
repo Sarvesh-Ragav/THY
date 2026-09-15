@@ -12,6 +12,12 @@ import {
 import { getStudioGarment } from '@/lib/design-studio';
 import { useC31 } from '@/hooks/useC31';
 import {
+  formatSizeMeasurements,
+  SIZE_CHART,
+  toSizeUnit,
+  type SizeUnit,
+} from '@/lib/size-chart';
+import {
   patchStudioDraft,
   readFileAsDataUrl,
   readStudioDraft,
@@ -22,7 +28,6 @@ import { StudioStepper } from '@/components/studio/StudioStepper';
 const ghostBtn =
   'inline-flex items-center justify-center min-h-11 px-4 text-sm border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
 
-const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'] as const;
 const MANUAL_FIELDS = ['Bust', 'Waist', 'Hip', 'Shoulder', 'Length'] as const;
 const GUIDE_STEPS = [
   { title: 'Bust', body: 'Measure around the fullest part of the bust, keeping the tape level and relaxed.' },
@@ -57,6 +62,8 @@ function MeasurementsContent() {
   const [thumb, setThumb] = useState(preset.fabricImage);
   const [manualValues, setManualValues] = useState<Record<string, string>>({});
   const [size, setSize] = useState('M');
+  const [hoveredSize, setHoveredSize] = useState<string | null>(null);
+  const [sizeUnit, setSizeUnit] = useState<SizeUnit>('in');
   const [sampleImage, setSampleImage] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -113,7 +120,7 @@ function MeasurementsContent() {
           <ArrowLeft size={16} />
           Back
         </button>
-        <div className="mt-6 max-w-2xl">
+        <div className={`mt-6 ${view === 'size' ? 'max-w-4xl' : 'max-w-2xl'}`}>
           {view === 'manual' && (
             <>
               <h1 className="text-3xl sm:text-4xl leading-[0.95]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
@@ -157,28 +164,132 @@ function MeasurementsContent() {
               <h1 className="text-3xl sm:text-4xl leading-[0.95]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
                 Choose standard size
               </h1>
-              <p className="mt-2 text-sm text-thy-muted">Select XS–XXL. Your tailor can still refine the fit later.</p>
-              <div className="mt-6 grid grid-cols-3 sm:grid-cols-6 gap-2">
-                {STANDARD_SIZES.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setSize(option)}
-                    className={`min-h-12 border text-sm font-medium cursor-pointer ${
-                      size === option
-                        ? 'border-thy-brand bg-thy-mist text-thy-brand'
-                        : 'border-thy-ink/15 bg-thy-surface text-thy-ink'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
+              <p className="mt-2 text-sm text-thy-muted">
+                Hover a size to see bust, waist, and hips. Your tailor can still refine the fit later.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                {SIZE_CHART.map((row) => {
+                  const active = size === row.size;
+                  return (
+                    <div
+                      key={row.size}
+                      className="relative"
+                      onMouseEnter={() => setHoveredSize(row.size)}
+                      onMouseLeave={() => setHoveredSize(null)}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSize(row.size)}
+                        onMouseEnter={() => setHoveredSize(row.size)}
+                        onMouseLeave={() => setHoveredSize(null)}
+                        onFocus={() => setHoveredSize(row.size)}
+                        onBlur={() => setHoveredSize((current) => (current === row.size ? null : current))}
+                        className={`min-h-12 min-w-14 px-3 border text-sm font-medium cursor-pointer ${
+                          active
+                            ? 'border-thy-brand bg-thy-mist text-thy-brand'
+                            : 'border-thy-ink/15 bg-thy-surface text-thy-ink'
+                        }`}
+                      >
+                        {row.size}
+                      </button>
+                      {hoveredSize === row.size && (
+                        <div className="absolute left-1/2 top-full z-20 mt-2 w-44 -translate-x-1/2 border border-thy-ink/10 bg-thy-surface px-3 py-2 text-center shadow-md">
+                          <p className="text-[10px] uppercase tracking-[0.14em] text-thy-brand font-semibold">{row.size}</p>
+                          <p className="mt-1 text-xs text-thy-ink leading-relaxed">
+                            {formatSizeMeasurements(row.size, sizeUnit)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
+
+              <p className="mt-3 text-sm text-thy-muted">
+                {formatSizeMeasurements(hoveredSize || size, sizeUnit)}
+              </p>
+
+              <div className="mt-8 thy-card p-4 sm:p-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-thy-ink">Size Guide</p>
+                    <p className="mt-1 text-sm text-thy-muted">
+                      Body Measurement ({sizeUnit === 'in' ? 'inches' : 'cm'})
+                    </p>
+                  </div>
+                  <div className="inline-flex border border-thy-ink/15 overflow-hidden">
+                    {(['in', 'cm'] as const).map((unit) => (
+                      <button
+                        key={unit}
+                        type="button"
+                        onClick={() => setSizeUnit(unit)}
+                        className={`min-h-9 px-3 text-xs uppercase tracking-[0.12em] font-semibold cursor-pointer ${
+                          sizeUnit === unit ? 'bg-thy-deep text-white' : 'bg-thy-surface text-thy-muted'
+                        }`}
+                      >
+                        {unit}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full min-w-[36rem] text-sm border-collapse">
+                    <thead>
+                      <tr className="border-b border-thy-ink/15 text-thy-subtle">
+                        <th className="py-2 px-3 text-left font-medium">Size</th>
+                        <th className="py-2 px-3 text-left font-medium">Brand Size</th>
+                        <th className="py-2 px-3 text-left font-medium">Bust</th>
+                        <th className="py-2 px-3 text-left font-medium">Waist</th>
+                        <th className="py-2 px-3 text-left font-medium">Hips</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {SIZE_CHART.map((row) => {
+                        const active = size === row.size;
+                        const hovering = hoveredSize === row.size;
+                        return (
+                          <tr
+                            key={row.size}
+                            onClick={() => setSize(row.size)}
+                            onMouseEnter={() => setHoveredSize(row.size)}
+                            onMouseLeave={() => setHoveredSize(null)}
+                            className={`border-b border-thy-ink/10 cursor-pointer ${
+                              active ? 'bg-thy-mist' : hovering ? 'bg-thy-canvas' : 'bg-thy-surface'
+                            }`}
+                          >
+                            <td className="py-2.5 px-3">
+                              <span className="inline-flex items-center gap-2">
+                                <span
+                                  className={`h-3.5 w-3.5 rounded-full border ${
+                                    active ? 'border-thy-brand bg-thy-brand' : 'border-thy-ink/30 bg-white'
+                                  }`}
+                                />
+                                {row.size}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-3">{row.brandSize}</td>
+                            <td className="py-2.5 px-3">{toSizeUnit(row.bust, sizeUnit)}</td>
+                            <td className="py-2.5 px-3">{toSizeUnit(row.waist, sizeUnit)}</td>
+                            <td className="py-2.5 px-3">{toSizeUnit(row.hips, sizeUnit)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
               <button
                 type="button"
                 className="hero-leather-btn mt-6 inline-flex min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em]"
                 onClick={() => {
-                  persistChoice({ method: 'size', size, measurementLabel: `Standard size ${size}` });
+                  persistChoice({
+                    method: 'size',
+                    size,
+                    measurementLabel: `Standard size ${size} · ${formatSizeMeasurements(size)}`,
+                  });
                   setView('home');
                 }}
               >
@@ -345,7 +456,7 @@ function MeasurementsContent() {
           <MethodCard
             icon={Layers}
             title="Choose Standard Size"
-            body="Select XS–XXL"
+            body="Select XS–7XL"
             active={choice?.method === 'size'}
             onClick={() => setView('size')}
           />
