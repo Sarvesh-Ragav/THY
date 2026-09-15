@@ -29,13 +29,7 @@ const ghostBtn =
   'inline-flex items-center justify-center min-h-11 px-4 text-sm border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
 
 const MANUAL_FIELDS = ['Bust', 'Waist', 'Hip', 'Shoulder', 'Length'] as const;
-const GUIDE_STEPS = [
-  { title: 'Bust', body: 'Measure around the fullest part of the bust, keeping the tape level and relaxed.' },
-  { title: 'Waist', body: 'Measure around the natural waist, usually the narrowest point above the hips.' },
-  { title: 'Hip', body: 'Measure around the fullest part of the hips, with feet together.' },
-  { title: 'Shoulder', body: 'Measure from one shoulder bone to the other across the back.' },
-  { title: 'Length', body: 'Measure from the highest shoulder point down to the desired hem.' },
-] as const;
+const TUTORIAL_EMBED_SRC = 'https://www.youtube.com/embed/4KkWlnkGdME';
 
 type MethodView = 'home' | 'manual' | 'size' | 'sample' | 'guide';
 
@@ -67,6 +61,7 @@ function MeasurementsContent() {
   const [sampleImage, setSampleImage] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [guideFrom, setGuideFrom] = useState<'home' | 'manual'>('home');
 
   const c15 = getC15Garment(preset.categoryId);
   const audienceLabel = isC15Audience(audienceParam)
@@ -114,19 +109,29 @@ function MeasurementsContent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <button
           type="button"
-          onClick={() => setView('home')}
+          onClick={() => setView(view === 'guide' && guideFrom === 'manual' ? 'manual' : 'home')}
           className="inline-flex items-center gap-2 text-sm text-thy-brand cursor-pointer"
         >
           <ArrowLeft size={16} />
           Back
         </button>
-        <div className={`mt-6 ${view === 'size' ? 'max-w-4xl' : 'max-w-2xl'}`}>
+        <div className={`mt-6 ${view === 'size' || view === 'guide' ? 'max-w-4xl' : 'max-w-2xl'}`}>
           {view === 'manual' && (
             <>
               <h1 className="text-3xl sm:text-4xl leading-[0.95]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
                 Enter manually
               </h1>
               <p className="mt-2 text-sm text-thy-muted">Add your measurements in inches for a closer fit.</p>
+              <button
+                type="button"
+                className={`${ghostBtn} mt-4`}
+                onClick={() => {
+                  setGuideFrom('manual');
+                  setView('guide');
+                }}
+              >
+                Watch tutorial
+              </button>
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {MANUAL_FIELDS.map((field) => (
                   <label key={field} className="block">
@@ -367,29 +372,15 @@ function MeasurementsContent() {
           )}
 
           {view === 'guide' && (
-            <>
-              <h1 className="text-3xl sm:text-4xl leading-[0.95]" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-                Measurement guide
-              </h1>
-              <p className="mt-2 text-sm text-thy-muted">Learn how to measure correctly before you enter values.</p>
-              <ol className="mt-6 space-y-3">
-                {GUIDE_STEPS.map((step, index) => (
-                  <li key={step.title} className="thy-card p-4">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-thy-brand font-semibold">
-                      {index + 1}. {step.title}
-                    </p>
-                    <p className="mt-1 text-sm text-thy-muted">{step.body}</p>
-                  </li>
-                ))}
-              </ol>
-              <button
-                type="button"
-                className={`${ghostBtn} mt-6`}
-                onClick={() => setView('manual')}
-              >
-                Enter measurements
-              </button>
-            </>
+            <div className="relative w-full aspect-video overflow-hidden bg-thy-deep">
+              <iframe
+                src={TUTORIAL_EMBED_SRC}
+                title="Measurement tutorial"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="absolute inset-0 h-full w-full border-0"
+              />
+            </div>
           )}
         </div>
       </main>
@@ -470,8 +461,11 @@ function MeasurementsContent() {
           <MethodCard
             icon={BookOpen}
             title="Measurement Guide"
-            body="Learn how to measure correctly"
-            onClick={() => setView('guide')}
+            body="Watch the tutorial"
+            onClick={() => {
+              setGuideFrom('home');
+              setView('guide');
+            }}
           />
         </div>
       </section>
