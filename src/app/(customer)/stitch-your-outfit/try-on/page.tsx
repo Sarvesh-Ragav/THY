@@ -516,7 +516,7 @@ function TryOnContent() {
             Back to visualization
           </Link>
           <Link
-            href="/my-measurements"
+            href={`/stitch-your-outfit/measurements${query}`}
             className="hero-leather-btn inline-flex w-full items-center justify-center min-h-12 px-4 text-[11px] font-semibold uppercase tracking-[0.16em]"
           >
             Next: Measurements

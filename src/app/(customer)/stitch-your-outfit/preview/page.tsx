@@ -219,7 +219,7 @@ function DesignPreviewContent() {
 
   const continueToMeasurements = () => {
     persistDraft({ aiRender });
-    router.push(`/my-measurements${query}`);
+    router.push(`/stitch-your-outfit/measurements${query}`);
   };
 
   const previewImage = showAiRender && aiRender ? aiRender : fabricImage;

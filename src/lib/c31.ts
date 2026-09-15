@@ -100,6 +100,11 @@ export interface C31State {
 
 export const DEFAULT_MEASUREMENTS: SavedMeasurement[] = [
   {
+    id: 'm-ananya',
+    label: 'Ananya – Regular Fit',
+    details: 'Last updated: 12 Aug 2026',
+  },
+  {
     id: 'm-profile',
     label: 'Saved profile set',
     details: 'Bust 36 in · Waist 30 in · Shoulder 14.5 in · Arm 10 in',

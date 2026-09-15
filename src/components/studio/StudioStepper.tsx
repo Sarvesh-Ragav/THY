@@ -36,6 +36,7 @@ export function StudioStepper({
                 }`}
               >
                 {step.label}
+                {index < activeIndex ? ' ✓' : ''}
               </span>
             </Link>
           </li>
