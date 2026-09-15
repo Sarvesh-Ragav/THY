@@ -6,4 +6,5 @@ export * from './TailorProfile.js';
 export * from './Catalog.js';
 export * from './StudioDesign.js';
 export * from './Chat.js';
+export * from './ChatMedia.js';
 export * from './Order.js';
