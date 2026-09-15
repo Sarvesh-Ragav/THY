@@ -33,7 +33,7 @@ function StudioFallback() {
 }
 
 const ghostBtn =
-  'inline-flex items-center justify-center min-h-11 px-4 text-sm border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
+  'inline-flex items-center justify-center min-h-11 px-4 text-sm text-center leading-none border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
 
 const DEFAULT_PATTERN_IMAGE = '/preview/Roundneck_sleeveless_A-line_calflength.png';
 const DEFAULT_PATTERN_LABEL = 'Roundneck sleeveless A-line';
@@ -321,7 +321,7 @@ function DesignPreviewContent() {
                   event.stopPropagation();
                   fileRef.current?.click();
                 }}
-                className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 bg-thy-surface/95 backdrop-blur-xs border border-thy-ink/15 px-3 py-2 text-[10px] uppercase tracking-[0.14em] font-semibold text-thy-ink shadow-xs cursor-pointer hover:border-thy-brand/40 hover:text-thy-brand transition-colors"
+                className="absolute top-3 right-3 z-20 inline-flex items-center justify-center gap-2 bg-thy-surface/95 backdrop-blur-xs border border-thy-ink/15 px-3 py-2 text-[10px] uppercase tracking-[0.14em] font-semibold leading-none text-thy-ink shadow-xs cursor-pointer hover:border-thy-brand/40 hover:text-thy-brand transition-colors"
                 title="Add a different fabric image"
               >
                 <ImagePlus size={14} />
@@ -471,7 +471,7 @@ function DesignPreviewContent() {
             id="generate-with-gemini"
             disabled={aiGenerating}
             onClick={generateWithAI}
-            className="inline-flex w-full items-center justify-center min-h-12 px-4 text-sm font-semibold bg-thy-brand text-white border border-thy-brand/60 transition-all hover:bg-thy-deep disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="inline-flex w-full items-center justify-center min-h-12 px-4 text-sm font-semibold text-center leading-none bg-thy-brand text-white border border-thy-brand/60 transition-all hover:bg-thy-deep disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           >
             {aiGenerating ? 'Visualizing…' : 'Visualize your dress'}
           </button>
@@ -481,14 +481,14 @@ function DesignPreviewContent() {
               <button
                 type="button"
                 onClick={continueToTryOn}
-                className="hero-leather-btn inline-flex w-full items-center justify-center min-h-12 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-center"
+                className="hero-leather-btn inline-flex w-full items-center justify-center min-h-12 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-center leading-none"
               >
                 Continue to try-on
               </button>
               <button
                 type="button"
                 onClick={continueToMeasurements}
-                className={`${ghostBtn} w-full min-h-12 uppercase tracking-[0.16em] text-[11px] font-semibold`}
+                className={`${ghostBtn} w-full min-h-12 uppercase tracking-[0.16em] text-[11px] font-semibold text-center leading-none`}
               >
                 Next
               </button>

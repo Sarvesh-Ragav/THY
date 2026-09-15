@@ -26,7 +26,7 @@ import {
 import { StudioStepper } from '@/components/studio/StudioStepper';
 
 const ghostBtn =
-  'inline-flex items-center justify-center min-h-11 px-4 text-sm border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
+  'inline-flex items-center justify-center min-h-11 px-4 text-sm text-center leading-none border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
 
 const MANUAL_FIELDS = ['Bust', 'Waist', 'Hip', 'Shoulder', 'Length'] as const;
 const TUTORIAL_EMBED_SRC = 'https://www.youtube.com/embed/4KkWlnkGdME';
@@ -150,7 +150,7 @@ function MeasurementsContent() {
               </div>
               <button
                 type="button"
-                className="hero-leather-btn mt-6 inline-flex min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em]"
+                className="hero-leather-btn mt-6 inline-flex items-center justify-center min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-center leading-none"
                 onClick={() => {
                   persistChoice({
                     method: 'manual',
@@ -190,7 +190,7 @@ function MeasurementsContent() {
                         onMouseLeave={() => setHoveredSize(null)}
                         onFocus={() => setHoveredSize(row.size)}
                         onBlur={() => setHoveredSize((current) => (current === row.size ? null : current))}
-                        className={`min-h-12 min-w-14 px-3 border text-sm font-medium cursor-pointer ${
+                        className={`inline-flex items-center justify-center min-h-12 min-w-14 px-3 border text-sm font-medium text-center leading-none cursor-pointer ${
                           active
                             ? 'border-thy-brand bg-thy-mist text-thy-brand'
                             : 'border-thy-ink/15 bg-thy-surface text-thy-ink'
@@ -229,7 +229,7 @@ function MeasurementsContent() {
                         key={unit}
                         type="button"
                         onClick={() => setSizeUnit(unit)}
-                        className={`min-h-9 px-3 text-xs uppercase tracking-[0.12em] font-semibold cursor-pointer ${
+                        className={`inline-flex items-center justify-center min-h-9 px-3 text-xs uppercase tracking-[0.12em] font-semibold leading-none cursor-pointer ${
                           sizeUnit === unit ? 'bg-thy-deep text-white' : 'bg-thy-surface text-thy-muted'
                         }`}
                       >
@@ -288,7 +288,7 @@ function MeasurementsContent() {
 
               <button
                 type="button"
-                className="hero-leather-btn mt-6 inline-flex min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em]"
+                className="hero-leather-btn mt-6 inline-flex items-center justify-center min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-center leading-none"
                 onClick={() => {
                   persistChoice({
                     method: 'size',
@@ -360,7 +360,7 @@ function MeasurementsContent() {
               <button
                 type="button"
                 disabled={!sampleImage}
-                className="hero-leather-btn mt-6 inline-flex min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em] disabled:opacity-50"
+                className="hero-leather-btn mt-6 inline-flex items-center justify-center min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-center leading-none disabled:opacity-50"
                 onClick={() => {
                   persistChoice({ method: 'sample', measurementLabel: 'Sample garment reference' });
                   setView('home');
@@ -436,7 +436,7 @@ function MeasurementsContent() {
         <p className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle font-semibold">
           How would you like to provide your measurements?
         </p>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
           <MethodCard
             icon={Ruler}
             title="Enter Manually"
@@ -515,7 +515,7 @@ function MeasurementsContent() {
         <button
           type="button"
           onClick={continueToTailors}
-          className="hero-leather-btn inline-flex items-center gap-2 min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em]"
+          className="hero-leather-btn inline-flex items-center justify-center gap-2 min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-center leading-none"
         >
           Continue
           <ArrowRight size={14} />
@@ -542,16 +542,19 @@ function MethodCard({
     <button
       type="button"
       onClick={onClick}
-      className={`thy-card p-5 text-left min-h-[9.5rem] flex flex-col cursor-pointer transition-colors hover:border-thy-brand/40 ${
+      className={`thy-card p-5 text-left items-start justify-start min-h-[10.5rem] w-full h-full flex flex-col cursor-pointer transition-colors hover:border-thy-brand/40 ${
         active ? 'border-thy-brand' : ''
       }`}
     >
-      <Icon size={22} className="text-thy-brand" />
-      <p className="mt-3 text-lg leading-tight" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+      <Icon size={22} className="text-thy-brand shrink-0" />
+      <p
+        className="mt-3 w-full text-lg leading-snug min-h-[2.5rem] text-left"
+        style={{ fontFamily: 'var(--font-cormorant), serif' }}
+      >
         {title}
       </p>
-      <p className="mt-1 text-sm text-thy-muted flex-1">{body}</p>
-      <ArrowRight size={16} className="mt-3 text-thy-brand" />
+      <p className="mt-1 w-full text-sm leading-snug text-thy-muted text-left min-h-[2.5rem]">{body}</p>
+      <ArrowRight size={16} className="mt-auto text-thy-brand shrink-0" />
     </button>
   );
 }
