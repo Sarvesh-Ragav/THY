@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 
 interface PortfolioItem {
   id: string;
@@ -29,14 +30,17 @@ interface Review {
 }
 
 export default function TailorProfilePreviewPage() {
+  const { session } = useTailorSession();
   const [activeFilter, setActiveFilter] = useState<string>('All');
-  const [isEstimateModalOpen, setIsEstimateModalOpen] = useState(false);
-  const [selectedEstimateService, setSelectedEstimateService] = useState('Saree Blouse');
-  const [estimateNotes, setEstimateNotes] = useState('');
+
+  const displayName = session?.profile?.fullName || session?.identifier || 'Priya S.';
+  const displayBusinessName = session?.profile?.fullName 
+    ? `${session.profile.fullName}'s Boutique & Custom Tailoring` 
+    : "Priya's Boutique & Custom Tailoring";
 
   const tailorInfo = {
-    name: "Priya S.",
-    businessName: "Priya's Boutique & Custom Tailoring",
+    name: displayName,
+    businessName: displayBusinessName,
     location: "Adyar, Chennai",
     experience: "8+ Years",
     rating: 4.9,
@@ -149,14 +153,6 @@ export default function TailorProfilePreviewPage() {
               <span className="text-amber-500">⭐ {tailorInfo.rating} ({tailorInfo.totalReviews} Reviews)</span>
             </div>
           </div>
-          <div className="shrink-0 space-y-2 text-center w-full md:w-auto">
-            <button
-              onClick={() => setIsEstimateModalOpen(true)}
-              className="w-full px-5 py-2.5 bg-[#5C1A24] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#4A1520] transition-colors"
-            >
-              Request Estimate
-            </button>
-          </div>
         </div>
 
         {/* Services & Indicative Pricing */}
@@ -202,8 +198,8 @@ export default function TailorProfilePreviewPage() {
                 <button
                   key={cat}
                   onClick={() => setActiveFilter(cat)}
-                  className={`px-3 py-1 text-[11px] font-bold rounded-lg transition-colors ${
-                    activeFilter === cat ? 'bg-[#5C1A24] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  className={`px-3 py-1 text-[11px] font-bold rounded-lg transition-colors cursor-pointer ${
+                    activeFilter === cat ? 'bg-[#00c9b7] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
                   {cat}
@@ -252,8 +248,8 @@ export default function TailorProfilePreviewPage() {
         </div>
 
         {/* Trust Card */}
-        <div className="bg-gradient-to-r from-[#3F1218] to-slate-900 text-white p-6 rounded-3xl shadow-sm space-y-3">
-          <h3 className="text-sm font-bold text-thy-cream">Why Customers Choose Priya</h3>
+        <div className="bg-gradient-to-r from-teal-900 to-slate-900 text-white p-6 rounded-3xl shadow-sm space-y-3">
+          <h3 className="text-sm font-bold text-teal-300">Why Customers Choose {tailorInfo.name}</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center pt-2">
             <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
               <p className="text-lg font-black text-white">{tailorInfo.experience}</p>
@@ -274,54 +270,6 @@ export default function TailorProfilePreviewPage() {
           </div>
         </div>
       </div>
-
-      {/* Request Estimate Modal */}
-      {isEstimateModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full space-y-4 shadow-xl">
-            <h3 className="text-base font-bold text-slate-900">Request Estimate from {tailorInfo.name}</h3>
-            <form onSubmit={e => { e.preventDefault(); alert('Test Estimate Request Sent!'); setIsEstimateModalOpen(false); }} className="space-y-3">
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Garment Service</label>
-                <select
-                  value={selectedEstimateService}
-                  onChange={e => setSelectedEstimateService(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#5C1A24]"
-                >
-                  {services.map(s => (
-                    <option key={s.id} value={s.name}>{s.name} (₹{s.minPrice} - ₹{s.maxPrice})</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Design Details / Notes</label>
-                <textarea
-                  placeholder="Describe your design, measurements, or preferred timeline..."
-                  value={estimateNotes}
-                  onChange={e => setEstimateNotes(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-[#5C1A24]"
-                />
-              </div>
-              <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsEstimateModalOpen(false)}
-                  className="flex-1 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-2.5 bg-[#5C1A24] text-white rounded-xl text-xs font-bold hover:bg-[#4A1520]"
-                >
-                  Send Request
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
