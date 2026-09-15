@@ -1,16 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Heart, 
-  Search, 
-  MapPin, 
-  Star, 
-  Scissors, 
-  ShoppingBag, 
-  ArrowRight, 
-  Sparkles
-} from 'lucide-react';
+import Link from 'next/link';
+import { Heart, Search, MapPin, Star, Scissors } from 'lucide-react';
 
 interface WishlistItem {
   id: string;
@@ -36,7 +28,7 @@ const initialWishlist: WishlistItem[] = [
     price: 4200,
     fabric: 'Pure Kanchipuram Silk with Zari',
     imageUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=600',
-    deliveryEstimate: '5-7 Days'
+    deliveryEstimate: '5–7 days',
   },
   {
     id: 'THY-W02',
@@ -48,11 +40,11 @@ const initialWishlist: WishlistItem[] = [
     price: 8500,
     fabric: 'Italian Navy Wool Blend',
     imageUrl: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&q=80&w=600',
-    deliveryEstimate: '8-10 Days'
+    deliveryEstimate: '8–10 days',
   },
   {
     id: 'THY-W03',
-    title: 'Handcrafted Bridal Lehengas Set',
+    title: 'Handcrafted Bridal Lehenga Set',
     category: 'Bridal',
     boutiqueName: 'Heritage Threads Couture',
     rating: 4.9,
@@ -60,7 +52,7 @@ const initialWishlist: WishlistItem[] = [
     price: 24500,
     fabric: 'Raw Silk with Hand-Done Zardozi',
     imageUrl: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&q=80&w=600',
-    deliveryEstimate: '12-15 Days'
+    deliveryEstimate: '12–15 days',
   },
   {
     id: 'THY-W04',
@@ -72,9 +64,12 @@ const initialWishlist: WishlistItem[] = [
     price: 2800,
     fabric: 'Breathable Pure Linen',
     imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=600',
-    deliveryEstimate: '4-5 Days'
-  }
+    deliveryEstimate: '4–5 days',
+  },
 ];
+
+const ghostBtn =
+  'inline-flex items-center justify-center min-h-10 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] border border-thy-burgundy/20 bg-thy-cream text-thy-ink transition-colors hover:border-thy-burgundy/40 hover:text-thy-burgundy cursor-pointer';
 
 export default function WishlistPage() {
   const [wishlist, setWishlist] = useState<WishlistItem[]>(initialWishlist);
@@ -83,193 +78,149 @@ export default function WishlistPage() {
 
   const categories = ['All', 'Ethnic', 'Formal', 'Bridal'];
 
-  const handleRemove = (id: string) => {
-    setWishlist(prev => prev.filter(item => item.id !== id));
-  };
-
-  const filteredItems = wishlist.filter(item => {
-    const matchesSearch = 
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.boutiqueName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.fabric.toLowerCase().includes(searchQuery.toLowerCase());
-    
+  const filteredItems = wishlist.filter((item) => {
+    const needle = searchQuery.toLowerCase();
+    const matchesSearch =
+      item.title.toLowerCase().includes(needle) ||
+      item.boutiqueName.toLowerCase().includes(needle) ||
+      item.fabric.toLowerCase().includes(needle);
     const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
-    
     return matchesSearch && matchesCategory;
   });
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-gray-800 font-sans pb-16">
-      {/* Top Header Bar */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 bg-[#26988a] rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
-              thy
-            </div>
-            <div>
-              <h1 className="font-bold text-gray-900 text-base leading-tight">THY Custom Tailoring</h1>
-              <p className="text-xs text-gray-500">Crafting connections, one stitch at a time.</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center bg-[#26988a]/10 text-[#26988a] px-3 py-1.5 rounded-full text-xs font-semibold">
-              <Heart className="w-3.5 h-3.5 fill-[#26988a] mr-1.5" />
-              {wishlist.length} Saved Items
-            </div>
-          </div>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <p className="text-[11px] uppercase tracking-[0.22em] text-thy-burgundy font-semibold">Saved</p>
+      <div className="mt-2 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+        <div>
+          <h1
+            className="text-3xl sm:text-4xl md:text-5xl leading-[0.95] text-thy-ink"
+            style={{ fontFamily: 'var(--font-cormorant), serif' }}
+          >
+            Wishlist
+          </h1>
+          <p className="mt-3 max-w-xl text-sm text-thy-muted">
+            Looks and fabrics you want to stitch next. Open a piece to customize, or keep browsing the atelier.
+          </p>
         </div>
-      </header>
+        <p className="text-sm text-thy-muted shrink-0">
+          {wishlist.length} {wishlist.length === 1 ? 'saved look' : 'saved looks'}
+        </p>
+      </div>
+      <div className="thy-divider-glow mt-4 max-w-md" />
 
-      {/* Main Content Container */}
-      <main className="max-w-5xl mx-auto px-4 pt-6">
-        
-        {/* Title & Description */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center">
-              My Wishlist <Sparkles className="w-5 h-5 ml-2 text-[#26988a]" />
-            </h2>
-            <p className="text-sm text-gray-500 mt-0.5">
-              Your saved custom styles & preferred fabrics ready for tailoring.
-            </p>
-          </div>
-
-          {/* Search Box */}
-          <div className="relative w-full md:w-72">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Search saved styles, fabrics..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#26988a] transition-all shadow-2xs"
-            />
-          </div>
+      <div className="mt-8 flex flex-col md:flex-row gap-3 md:items-center">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-thy-subtle" />
+          <input
+            type="text"
+            placeholder="Search styles, ateliers, fabrics"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="thy-input !pl-11"
+          />
         </div>
-
-        {/* Category Filter Pills */}
-        <div className="flex items-center space-x-2 overflow-x-auto pb-3 mb-6 no-scrollbar">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap shadow-2xs ${
-                activeCategory === cat
-                  ? 'bg-[#26988a] text-white font-semibold'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              {cat} {cat === 'All' ? `(${wishlist.length})` : `(${wishlist.filter(i => i.category === cat).length})`}
-            </button>
-          ))}
-        </div>
-
-        {/* Wishlist Grid */}
-        {filteredItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5">
-            {filteredItems.map((item) => (
-              <div 
-                key={item.id}
-                className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
+        <div className="flex gap-2 overflow-x-auto thy-scroll-x">
+          {categories.map((cat) => {
+            const count = cat === 'All' ? wishlist.length : wishlist.filter((i) => i.category === cat).length;
+            const active = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap border transition-colors ${
+                  active
+                    ? 'bg-thy-burgundy text-white border-thy-burgundy'
+                    : 'border-thy-burgundy/20 bg-thy-cream text-thy-ink hover:border-thy-burgundy/40'
+                }`}
               >
+                {cat} · {count}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {filteredItems.length > 0 ? (
+        <ul className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {filteredItems.map((item) => (
+            <li key={item.id} className="thy-card overflow-hidden flex flex-col">
+              <div className="relative h-56 thy-media bg-thy-mist">
+                <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+                <span className="absolute top-3 left-3 bg-thy-surface/92 border border-thy-burgundy/15 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] font-semibold text-thy-ink">
+                  {item.category}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setWishlist((prev) => prev.filter((entry) => entry.id !== item.id))}
+                  className="absolute top-3 right-3 w-10 h-10 bg-thy-surface/92 border border-thy-burgundy/15 text-thy-burgundy flex items-center justify-center hover:border-thy-burgundy/40"
+                  aria-label={`Remove ${item.title}`}
+                >
+                  <Heart className="w-4 h-4 fill-current" />
+                </button>
+              </div>
+
+              <div className="p-5 flex flex-col flex-1 gap-3">
                 <div>
-                  {/* Card Image & Overlay Actions */}
-                  <div className="relative h-56 overflow-hidden bg-gray-100">
-                    <img 
-                      src={item.imageUrl} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-80" />
-                    
-                    {/* Category Tag */}
-                    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-gray-800 text-[11px] font-semibold px-2.5 py-1 rounded-md shadow-xs">
-                      {item.category}
-                    </span>
-
-                    {/* Heart Remove Button */}
-                    <button 
-                      onClick={() => handleRemove(item.id)}
-                      className="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-rose-500 hover:bg-white shadow-sm transition-transform active:scale-95 cursor-pointer"
-                      title="Remove from wishlist"
-                    >
-                      <Heart className="w-4 h-4 fill-rose-500" />
-                    </button>
-
-                    {/* Price & Delivery badge on image */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
-                      <div>
-                        <span className="text-xs text-gray-200 block">Estimated Delivery</span>
-                        <span className="text-xs font-semibold">{item.deliveryEstimate}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xs text-gray-200 block">Custom Price</span>
-                        <span className="text-base font-bold">₹{item.price.toLocaleString('en-IN')}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Body */}
-                  <div className="p-4">
-                    <h3 className="font-bold text-gray-900 text-base mb-1 group-hover:text-[#26988a] transition-colors">
-                      {item.title}
-                    </h3>
-
-                    {/* Fabric details */}
-                    <p className="text-xs text-gray-600 bg-gray-50 p-2 rounded-lg mb-3 border border-gray-100 flex items-center">
-                      <Scissors className="w-3.5 h-3.5 text-[#26988a] mr-1.5 shrink-0" />
-                      <span className="truncate">Fabric: {item.fabric}</span>
-                    </p>
-
-                    {/* Boutique & Location */}
-                    <div className="flex items-center justify-between text-xs text-gray-500 border-t border-gray-100 pt-3">
-                      <div>
-                        <span className="font-semibold text-gray-700 block">{item.boutiqueName}</span>
-                        <span className="flex items-center text-gray-400 mt-0.5">
-                          <MapPin className="w-3 h-3 mr-1 shrink-0" />
-                          <span className="truncate max-w-[180px]">{item.location}</span>
-                        </span>
-                      </div>
-                      <div className="flex items-center bg-amber-50 text-amber-700 px-2 py-1 rounded-md font-bold text-xs shrink-0 border border-amber-200/60">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400 mr-1" />
-                        {item.rating}
-                      </div>
-                    </div>
-                  </div>
+                  <h2 className="text-xl leading-tight text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+                    {item.title}
+                  </h2>
+                  <p className="mt-2 text-xs text-thy-muted flex items-center gap-1.5">
+                    <Scissors className="w-3.5 h-3.5 shrink-0" />
+                    {item.fabric}
+                  </p>
                 </div>
 
-                {/* Card Footer Action */}
-                <div className="p-4 pt-0">
-                  <button className="w-full bg-[#26988a] hover:bg-[#22877b] text-white py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center transition-colors shadow-xs active:scale-[0.99] cursor-pointer">
-                    <ShoppingBag className="w-4 h-4 mr-2" />
-                    Customize & Order Now
-                    <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-                  </button>
+                <div className="flex items-start justify-between gap-3 text-xs text-thy-muted pt-3 border-t border-thy-burgundy/10">
+                  <div>
+                    <p className="font-semibold text-thy-ink">{item.boutiqueName}</p>
+                    <p className="mt-1 flex items-center gap-1">
+                      <MapPin className="w-3 h-3 shrink-0" />
+                      {item.location}
+                    </p>
+                  </div>
+                  <p className="flex items-center gap-1 text-thy-ink font-semibold shrink-0">
+                    <Star className="w-3 h-3 fill-current" />
+                    {item.rating}
+                  </p>
+                </div>
+
+                <div className="flex items-end justify-between gap-3 pt-1">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-thy-subtle">From</p>
+                    <p className="text-lg text-thy-burgundy" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+                      ₹{item.price.toLocaleString('en-IN')}
+                    </p>
+                    <p className="text-[11px] text-thy-muted">{item.deliveryEstimate}</p>
+                  </div>
+                  <Link href="/stitch-your-outfit" className={`${ghostBtn} shrink-0`}>
+                    Customize
+                  </Link>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          /* Empty State */
-          <div className="text-center py-16 bg-white rounded-2xl border border-gray-200 p-8 shadow-xs mt-4">
-            <div className="w-16 h-16 bg-[#26988a]/10 rounded-full flex items-center justify-center mx-auto mb-4 text-[#26988a]">
-              <Heart className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Your wishlist is empty</h3>
-            <p className="text-sm text-gray-500 max-w-sm mx-auto mb-6">
-              Tap the heart icon on any custom design or fabric while browsing to save them here for future tailoring.
-            </p>
-            <button 
-              onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}
-              className="bg-[#26988a] text-white px-6 py-2.5 rounded-xl text-xs font-semibold shadow-xs hover:bg-[#22877b] transition-colors cursor-pointer"
-            >
-              Explore All Styles
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="thy-card mt-8 p-10 text-center max-w-lg mx-auto space-y-3">
+          <Heart className="w-8 h-8 mx-auto text-thy-burgundy" />
+          <h2 className="text-2xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+            Nothing saved yet
+          </h2>
+          <p className="text-sm text-thy-muted">
+            Save a look while browsing, then come back here when you are ready to stitch.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3 pt-2">
+            <button type="button" className={ghostBtn} onClick={() => { setSearchQuery(''); setActiveCategory('All'); }}>
+              Clear filters
             </button>
+            <Link href="/explore" className="hero-leather-btn inline-flex px-6 py-3 text-[11px] uppercase tracking-[0.16em]">
+              Explore looks
+            </Link>
           </div>
-        )}
-      </main>
-    </div>
+        </div>
+      )}
+    </main>
   );
 }

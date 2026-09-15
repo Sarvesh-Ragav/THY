@@ -4,6 +4,7 @@ import React from 'react';
 import { CustomerPage } from '@/components/customer/CustomerPage';
 import { RequireCustomerAuth } from '@/components/customer/RequireCustomerAuth';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { useCustomerLocation } from '@/hooks/useCustomerLocation';
 
 export default function ProfilePage() {
   return (
@@ -15,6 +16,7 @@ export default function ProfilePage() {
 
 function ProfileContent() {
   const { session } = useTailorSession();
+  const { label, detecting } = useCustomerLocation();
   const profile = session.customerProfile;
 
   return (
@@ -23,7 +25,7 @@ function ProfileContent() {
         <p>{profile?.fullName}</p>
         <p>{profile?.phone}</p>
         <p>{profile?.email}</p>
-        <p>{profile?.city}</p>
+        <p>{label || (detecting ? 'Detecting location…' : profile?.city)}</p>
         <p>{profile?.address}</p>
       </div>
     </CustomerPage>

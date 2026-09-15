@@ -28,6 +28,7 @@ import {
   FileText,
   Bookmark
 } from 'lucide-react';
+import { useCustomerLocation } from '@/hooks/useCustomerLocation';
 
 const CUSTOMER_DATA = {
   name: "Sarah Jenkins",
@@ -220,6 +221,7 @@ const CUSTOMER_DATA = {
 };
 
 export default function App() {
+  const { label, detecting } = useCustomerLocation({ autoDetect: true });
   const [activeTab, setActiveTab] = useState('orders');
   const [selectedProfileId, setSelectedProfileId] = useState('self');
   const [selectedOrderModal, setSelectedOrderModal] = useState<(typeof CUSTOMER_DATA.orders)[number] | null>(null);
@@ -299,7 +301,7 @@ export default function App() {
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-2 text-xs text-slate-500">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 text-[#5C1A24]" />
-                      {CUSTOMER_DATA.location}
+                      {label || (detecting ? 'Detecting location…' : CUSTOMER_DATA.location)}
                     </span>
                     <span>•</span>
                     <span className="flex items-center gap-1">

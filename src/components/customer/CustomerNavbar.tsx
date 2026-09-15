@@ -3,10 +3,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Bell, Heart, MapPin, Menu, Search, ShoppingBag, User, X, LogOut } from 'lucide-react';
+import { Bell, Heart, Menu, Search, ShoppingBag, User, X, LogOut } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
-import { AUTH_PATHS, CITIES, MAIN_NAV, PROFILE_MENU } from '@/lib/customer-home-data';
+import { AUTH_PATHS, MAIN_NAV, PROFILE_MENU } from '@/lib/customer-home-data';
 import { ThyLogo } from '@/components/auth/ThyLogo';
+import { CustomerLocationControl } from '@/components/customer/CustomerLocationControl';
 
 const iconBtn =
   'thy-nav-icon inline-flex items-center justify-center h-11 w-11';
@@ -14,15 +15,13 @@ const iconBtn =
 export function CustomerNavbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { session, isReady, updateSession, logout } = useTailorSession();
+  const { session, isReady, logout } = useTailorSession();
   const [query, setQuery] = useState('');
   const [profileOpen, setProfileOpen] = useState(false);
-  const [locationOpen, setLocationOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
   const profileRef = useRef<HTMLDivElement>(null);
-  const desktopLocationRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const loggedIn = isReady && session.isAuthenticated;
@@ -34,9 +33,6 @@ export function CustomerNavbar() {
       if (profileRef.current && !profileRef.current.contains(target)) {
         setProfileOpen(false);
       }
-      if (desktopLocationRef.current && !desktopLocationRef.current.contains(target)) {
-        setLocationOpen(false);
-      }
     };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
@@ -46,7 +42,6 @@ export function CustomerNavbar() {
     setMenuOpen(false);
     setSearchOpen(false);
     setProfileOpen(false);
-    setLocationOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -91,14 +86,14 @@ export function CustomerNavbar() {
     router.push(`/search?q=${encodeURIComponent(query)}`);
   };
 
-  const locationLabel = session.selectedLocation || 'Location';
-
   return (
     <header className="thy-silk-bar sticky top-0 z-50 border-b border-white/20 pt-[env(safe-area-inset-top)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 lg:h-[4.5rem] flex items-center gap-2 sm:gap-3">
         <Link href="/" className="shrink-0 inline-flex items-center text-white" aria-label="THY home">
           <ThyLogo size={40} />
         </Link>
+
+        <CustomerLocationControl />
 
         <nav className="hidden lg:flex items-center gap-5 ml-2">
           {MAIN_NAV.map((item) => (
@@ -130,33 +125,6 @@ export function CustomerNavbar() {
         </form>
 
         <div className="hidden lg:flex items-center gap-1 shrink-0">
-          <div className="relative" ref={desktopLocationRef}>
-            <button
-              type="button"
-              onClick={() => setLocationOpen((open) => !open)}
-              className="thy-nav-link thy-nav-link-tall inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] min-h-11 px-2"
-            >
-              <MapPin size={14} />
-              {locationLabel}
-            </button>
-            {locationOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-thy-surface border border-thy-ink/10 shadow-lg p-2 z-50 rounded-lg">
-                {CITIES.map((city) => (
-                  <button
-                    key={city}
-                    type="button"
-                    className="block w-full text-left px-2 py-2 text-sm text-thy-ink hover:bg-thy-mist min-h-11 rounded"
-                    onClick={() => {
-                      updateSession({ selectedLocation: city });
-                      setLocationOpen(false);
-                    }}
-                  >
-                    {city}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
 
           <button type="button" aria-label="Notifications" className={iconBtn} onClick={() => goAuthPath('/notifications')}>
             <Bell size={18} />
@@ -240,7 +208,6 @@ export function CustomerNavbar() {
             className="inline-flex items-center justify-center h-11 w-11 text-white"
             onClick={() => {
               setSearchOpen(false);
-              setLocationOpen(false);
               setMenuOpen((open) => !open);
             }}
           >

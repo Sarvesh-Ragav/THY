@@ -6,11 +6,15 @@ import { notFound, useParams } from 'next/navigation';
 import { ArrowLeft, BadgeCheck, MapPin, MessageSquare, Star } from 'lucide-react';
 import { getTailorById, TAILOR_AVAILABILITY_LABELS } from '@/lib/customer-home-data';
 import { chatHref } from '@/lib/c31';
+import { useCustomerLocation } from '@/hooks/useCustomerLocation';
+import { distanceToCity, formatDistanceKm } from '@/lib/geo';
 
 export default function TailorProfilePage() {
   const params = useParams<{ id: string }>();
   const tailor = getTailorById(params.id);
   const [portfolioFilter, setPortfolioFilter] = useState('All');
+  const { coords } = useCustomerLocation();
+  const distanceKm = tailor && coords ? distanceToCity(coords, tailor.city) : null;
 
   const categories = useMemo(() => {
     if (!tailor) return ['All'];
@@ -65,6 +69,7 @@ export default function TailorProfilePage() {
               <p className="mt-2 text-sm text-thy-muted inline-flex items-center gap-1">
                 <MapPin size={14} />
                 {tailor.studio} · {tailor.city}, {tailor.state}
+                {distanceKm != null ? ` · ${formatDistanceKm(distanceKm)} from you` : ''}
               </p>
               <p className="mt-2 text-sm text-thy-muted">
                 {tailor.specialty} · {TAILOR_AVAILABILITY_LABELS[tailor.availability]} · {tailor.yearsExperience}+ years ·{' '}

@@ -6,12 +6,14 @@ import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath, isCustomerOnboardingComplete } from '@/lib/tailor-session';
 import { AuthApiError, registerAccount } from '@/lib/auth-api';
 import { PasswordField, validatePasswordPair } from '@/components/auth/PasswordField';
+import { useCustomerLocation } from '@/hooks/useCustomerLocation';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function CustomerRegistration() {
   const router = useRouter();
   const { session, isReady, completeAuthentication } = useTailorSession();
+  const { label, city: detectedCity, detecting } = useCustomerLocation({ autoDetect: true });
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -54,6 +56,15 @@ export default function CustomerRegistration() {
     // Prefill once after session hydrates so typing is not reset.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, router]);
+
+  useEffect(() => {
+    if (city.trim()) return;
+    if (detectedCity) {
+      setCity(detectedCity);
+      return;
+    }
+    if (label) setCity(label);
+  }, [city, detectedCity, label]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,7 +209,7 @@ export default function CustomerRegistration() {
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              placeholder="e.g. Chennai"
+              placeholder={detecting ? 'Detecting your city…' : 'e.g. Chennai'}
               className="thy-input"
             />
           </div>

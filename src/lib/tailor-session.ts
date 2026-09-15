@@ -108,6 +108,11 @@ export interface CustomerOrderSave {
   status: string;
 }
 
+export interface LocationCoords {
+  lat: number;
+  lng: number;
+}
+
 export interface TailorSession {
   identifier: string;
   role: UserRole | null;
@@ -118,6 +123,7 @@ export interface TailorSession {
   customerProfile: CustomerProfile | null;
   customerPreferences: CustomerPreferences | null;
   selectedLocation: string | null;
+  locationCoords: LocationCoords | null;
   customerDesigns: CustomerDesignSave[];
   customerOrders: CustomerOrderSave[];
   availability: TailorAvailability;
@@ -197,6 +203,7 @@ export function createDefaultSession(): TailorSession {
     customerProfile: null,
     customerPreferences: null,
     selectedLocation: null,
+    locationCoords: null,
     customerDesigns: [],
     customerOrders: [],
     availability: {
@@ -284,6 +291,15 @@ function isBrowser(): boolean {
   return typeof window !== 'undefined';
 }
 
+function parseStoredCoords(value: unknown): LocationCoords | null {
+  if (!value || typeof value !== 'object') return null;
+  const lat = Number((value as { lat?: unknown }).lat);
+  const lng = Number((value as { lng?: unknown }).lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+  return { lat, lng };
+}
+
 export function loadTailorSession(): TailorSession {
   const fallback = createDefaultSession();
   if (!isBrowser()) return fallback;
@@ -311,6 +327,7 @@ export function loadTailorSession(): TailorSession {
       customerProfile: parsed.customerProfile ?? null,
       customerPreferences: parsed.customerPreferences ?? null,
       selectedLocation: parsed.selectedLocation ?? null,
+      locationCoords: parseStoredCoords(parsed.locationCoords),
       hasPassword: Boolean(parsed.hasPassword),
       customerDesigns: Array.isArray(parsed.customerDesigns) ? parsed.customerDesigns : [],
       customerOrders: Array.isArray(parsed.customerOrders) ? parsed.customerOrders : [],

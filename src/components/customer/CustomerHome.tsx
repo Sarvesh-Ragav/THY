@@ -7,13 +7,25 @@ import { HeroCarousel } from '@/components/customer/HeroCarousel';
 import { CategoryGrid } from '@/components/customer/CategoryGrid';
 import { DESIGNS, TAILORS } from '@/lib/customer-home-data';
 import { hasCustomerActivity, isCustomerOnboardingComplete } from '@/lib/tailor-session';
+import { useCustomerLocation } from '@/hooks/useCustomerLocation';
+import { NEAR_ME_RADIUS_KM, distanceToCity, nearestCity } from '@/lib/geo';
 
 export function CustomerHome() {
   const { session, isReady } = useTailorSession();
+  const { coords, label } = useCustomerLocation();
   const loggedIn = isReady && session.isAuthenticated && isCustomerOnboardingComplete(session);
   const activity = loggedIn && hasCustomerActivity(session);
   const picked = DESIGNS.filter((design) => design.popular);
   const trending = DESIGNS.filter((design) => design.trending);
+  const nearbyTailors = React.useMemo(() => {
+    if (!coords) return TAILORS.slice(0, 4);
+    const ranked = [...TAILORS]
+      .map((tailor) => ({ tailor, km: distanceToCity(coords, tailor.city) ?? Number.POSITIVE_INFINITY }))
+      .sort((a, b) => a.km - b.km);
+    const nearby = ranked.filter((item) => item.km <= NEAR_ME_RADIUS_KM);
+    const source = nearby.length > 0 ? nearby : ranked.filter((item) => item.tailor.city === nearestCity(coords).city);
+    return (source.length > 0 ? source : ranked).slice(0, 4).map((item) => item.tailor);
+  }, [coords]);
 
   return (
     <>
@@ -43,8 +55,9 @@ export function CustomerHome() {
           <h2 className="thy-section-title text-2xl sm:text-3xl md:text-4xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
             Find Your Perfect Tailor
           </h2>
+          {label && <p className="mt-1 text-sm text-thy-muted">Near {label}</p>}
           <div className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {TAILORS.slice(0, 4).map((tailor) => {
+            {nearbyTailors.map((tailor) => {
               const samples = [
                 ...tailor.portfolio.filter((item) => item.featured),
                 ...tailor.portfolio.filter((item) => !item.featured),
@@ -54,7 +67,7 @@ export function CustomerHome() {
                   <img src={tailor.image} alt="" className="h-36 sm:h-40 w-full object-cover" />
                   <div className="p-4">
                     <h3 className="text-xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{tailor.name}</h3>
-                    <p className="text-sm text-thy-muted">{tailor.specialty}</p>
+                    <p className="text-sm text-thy-muted">{tailor.specialty} · {tailor.city}</p>
                     {samples.length > 0 && (
                       <div className="mt-3 grid grid-cols-3 gap-1.5">
                         {samples.map((item) => (

@@ -14,6 +14,13 @@ import {
   type TailorAvailability,
 } from '@/lib/customer-home-data';
 import { chatHref } from '@/lib/c31';
+import { useCustomerLocation } from '@/hooks/useCustomerLocation';
+import {
+  NEAR_ME_RADIUS_KM,
+  distanceToCity,
+  formatDistanceKm,
+  nearestCity,
+} from '@/lib/geo';
 
 const ghostBtn =
   'inline-flex items-center justify-center min-h-10 px-3 text-sm text-center leading-none border border-thy-burgundy/20 bg-thy-cream text-thy-ink transition-colors hover:border-thy-burgundy/40 hover:text-thy-burgundy cursor-pointer';
@@ -29,7 +36,9 @@ export default function TailorsPage() {
 function TailorDirectory() {
   const searchParams = useSearchParams();
   const presetSpecialty = specialtyForCategory(searchParams.get('category'));
+  const { label, coords, detecting, error, detect } = useCustomerLocation();
   const [query, setQuery] = useState('');
+  const [nearMe, setNearMe] = useState(false);
   const [cities, setCities] = useState<string[]>([]);
   const [specialties, setSpecialties] = useState<string[]>(presetSpecialty ? [presetSpecialty] : []);
   const [availability, setAvailability] = useState<TailorAvailability[]>([]);
@@ -38,9 +47,21 @@ function TailorDirectory() {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
+  const toggleNearMe = () => {
+    const next = !nearMe;
+    setNearMe(next);
+    if (next) {
+      setCities([]);
+      if (!coords) void detect();
+    }
+  };
+
   const results = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return TAILORS.filter((tailor) => {
+    const ranked = TAILORS.map((tailor) => ({
+      tailor,
+      distanceKm: coords ? distanceToCity(coords, tailor.city) : null,
+    })).filter(({ tailor }) => {
       const matchesQuery =
         !needle ||
         tailor.name.toLowerCase().includes(needle) ||
@@ -48,26 +69,35 @@ function TailorDirectory() {
         tailor.headline.toLowerCase().includes(needle) ||
         tailor.specialty.toLowerCase().includes(needle) ||
         tailor.city.toLowerCase().includes(needle);
-      const matchesCity = cities.length === 0 || cities.includes(tailor.city);
       const matchesSpecialty = specialties.length === 0 || specialties.includes(tailor.specialty);
       const matchesAvailability = availability.length === 0 || availability.includes(tailor.availability);
       const matchesRating = tailor.rating >= minRating;
       const matchesExperience = tailor.yearsExperience >= minExperience;
       const matchesVerified = !verifiedOnly || tailor.verified;
-      return (
-        matchesQuery &&
-        matchesCity &&
-        matchesSpecialty &&
-        matchesAvailability &&
-        matchesRating &&
-        matchesExperience &&
-        matchesVerified
-      );
+      return matchesQuery && matchesSpecialty && matchesAvailability && matchesRating && matchesExperience && matchesVerified;
     });
-  }, [query, cities, specialties, availability, minRating, minExperience, verifiedOnly]);
+
+    if (nearMe && coords) {
+      const nearby = ranked.filter(
+        (item) => item.distanceKm != null && item.distanceKm <= NEAR_ME_RADIUS_KM
+      );
+      const next =
+        nearby.length > 0 ? nearby : ranked.filter((item) => item.tailor.city === nearestCity(coords).city);
+      return [...next].sort(
+        (a, b) => (a.distanceKm ?? Number.POSITIVE_INFINITY) - (b.distanceKm ?? Number.POSITIVE_INFINITY)
+      );
+    }
+
+    if (cities.length > 0) {
+      return ranked.filter((item) => cities.includes(item.tailor.city));
+    }
+
+    return ranked;
+  }, [query, cities, specialties, availability, minRating, minExperience, verifiedOnly, nearMe, coords]);
 
   const clearFilters = () => {
     setQuery('');
+    setNearMe(false);
     setCities([]);
     setSpecialties([]);
     setAvailability([]);
@@ -77,6 +107,7 @@ function TailorDirectory() {
   };
 
   const activeCount =
+    (nearMe ? 1 : 0) +
     cities.length +
     specialties.length +
     availability.length +
@@ -89,8 +120,13 @@ function TailorDirectory() {
     <Filters
       query={query}
       onQuery={setQuery}
+      nearMe={nearMe}
+      onToggleNearMe={toggleNearMe}
       cities={cities}
-      onToggleCity={(city) => toggleValue(cities, city, setCities)}
+      onToggleCity={(city) => {
+        setNearMe(false);
+        toggleValue(cities, city, setCities);
+      }}
       specialties={specialties}
       onToggleSpecialty={(item) => toggleValue(specialties, item, setSpecialties)}
       availability={availability}
@@ -116,6 +152,7 @@ function TailorDirectory() {
       </h1>
       <p className="mt-3 max-w-xl text-sm text-thy-muted">
         Browse portfolio work while you compare makers, then open a full profile to message or request an estimate.
+        {label ? ` Your location: ${label}.` : detecting ? ' Detecting your location…' : ''}
       </p>
 
       <div className="mt-6 lg:hidden">
@@ -133,20 +170,35 @@ function TailorDirectory() {
             <p className="text-sm text-thy-muted">
               {results.length} {results.length === 1 ? 'profile' : 'profiles'}
               {presetSpecialty && specialties.includes(presetSpecialty) ? ` · ${presetSpecialty}` : ''}
+              {nearMe ? ' · Near me' : ''}
             </p>
           </div>
 
+          {nearMe && detecting && (
+            <p className="mt-3 text-sm text-thy-muted">Finding tailors near your location…</p>
+          )}
+          {nearMe && error && (
+            <p className="mt-3 text-sm text-rose-700">
+              {error}{' '}
+              <button type="button" className="underline text-thy-burgundy cursor-pointer" onClick={() => void detect()}>
+                Try again
+              </button>
+            </p>
+          )}
+
           <ul className="mt-4 space-y-3">
-            {results.map((tailor) => (
+            {results.map(({ tailor, distanceKm }) => (
               <li key={tailor.id}>
-                <TailorResultCard tailor={tailor} />
+                <TailorResultCard tailor={tailor} distanceKm={nearMe ? distanceKm : null} />
               </li>
             ))}
           </ul>
 
           {results.length === 0 && (
             <div className="thy-card p-6 text-sm text-thy-muted">
-              No tailors match these filters.
+              {nearMe
+                ? 'No tailors found near your location yet. Try another city filter, or clear Near me.'
+                : 'No tailors match these filters.'}
               <button type="button" className="ml-2 text-thy-burgundy underline cursor-pointer" onClick={clearFilters}>
                 Clear filters
               </button>
@@ -173,7 +225,13 @@ function TailorDirectory() {
   );
 }
 
-function TailorResultCard({ tailor }: { tailor: DirectoryTailor }) {
+function TailorResultCard({
+  tailor,
+  distanceKm,
+}: {
+  tailor: DirectoryTailor;
+  distanceKm?: number | null;
+}) {
   const portfolioPreview = [
     ...tailor.portfolio.filter((item) => item.featured),
     ...tailor.portfolio.filter((item) => !item.featured),
@@ -209,6 +267,7 @@ function TailorResultCard({ tailor }: { tailor: DirectoryTailor }) {
           <p className="mt-1 text-sm text-thy-muted inline-flex items-center gap-1">
             <MapPin size={13} />
             {tailor.studio} · {tailor.city}
+            {distanceKm != null ? ` · ${formatDistanceKm(distanceKm)} away` : ''}
           </p>
           <p className="mt-2 text-xs text-thy-subtle">
             {tailor.specialty} · {tailor.yearsExperience}+ yrs · {tailor.ordersCompleted} orders ·{' '}
@@ -266,6 +325,8 @@ function TailorResultCard({ tailor }: { tailor: DirectoryTailor }) {
 function Filters({
   query,
   onQuery,
+  nearMe,
+  onToggleNearMe,
   cities,
   onToggleCity,
   specialties,
@@ -282,6 +343,8 @@ function Filters({
 }: {
   query: string;
   onQuery: (value: string) => void;
+  nearMe: boolean;
+  onToggleNearMe: () => void;
   cities: string[];
   onToggleCity: (city: string) => void;
   specialties: string[];
@@ -316,6 +379,7 @@ function Filters({
       </label>
 
       <FilterGroup title="Location">
+        <CheckRow label="Near me" checked={nearMe} onChange={onToggleNearMe} />
         {CITIES.map((city) => (
           <CheckRow key={city} label={city} checked={cities.includes(city)} onChange={() => onToggleCity(city)} />
         ))}

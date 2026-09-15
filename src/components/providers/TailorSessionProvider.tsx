@@ -46,15 +46,18 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
       .then(({ accessToken, user }) => {
         setAccessToken(accessToken);
         setSession((current) => {
-          const existing = current.customerProfile;
-          const resolvedIdentifier = user.phoneNumber || user.email || current.identifier;
+          const existing = current.customerProfile ?? localSession.customerProfile;
+          const resolvedIdentifier = user.phoneNumber || user.email || current.identifier || localSession.identifier;
           const isPhone = Boolean(resolvedIdentifier && /^\+?\d{10,15}$/.test(resolvedIdentifier));
           const isEmail = Boolean(resolvedIdentifier && resolvedIdentifier.includes('@'));
           const next = {
+            ...localSession,
             ...current,
             isAuthenticated: true,
-            role: user.role ?? current.role,
+            role: user.role ?? current.role ?? localSession.role,
             identifier: resolvedIdentifier,
+            selectedLocation: current.selectedLocation ?? localSession.selectedLocation,
+            locationCoords: current.locationCoords ?? localSession.locationCoords,
             customerProfile: {
               fullName: existing?.fullName || user.name || '',
               phone: existing?.phone || user.phoneNumber || (isPhone ? resolvedIdentifier : ''),
@@ -72,11 +75,14 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
   }, []);
 
   const updateSession = useCallback((partial: Partial<TailorSession>) => {
-    const next = { ...session, ...partial };
-    setSession(next);
-    persistTailorSession(next);
+    let next: TailorSession = createDefaultSession();
+    setSession((current) => {
+      next = { ...current, ...partial };
+      persistTailorSession(next);
+      return next;
+    });
     return next;
-  }, [session]);
+  }, []);
 
   const completeAuthentication = useCallback(
     (

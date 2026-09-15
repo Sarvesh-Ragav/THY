@@ -1,19 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  ShoppingBag, 
-  Search, 
-  Star, 
-  MapPin, 
-  Clock, 
-  CheckCircle2, 
-  Truck, 
-  X, 
-  FileText, 
+import Link from 'next/link';
+import {
+  Search,
+  Star,
+  MapPin,
+  Clock,
+  CheckCircle2,
+  Truck,
+  X,
+  FileText,
   AlertCircle,
   Package,
-  Sparkles
 } from 'lucide-react';
 
 interface OrderItem {
@@ -36,7 +35,6 @@ interface Order {
   rating: number;
   location: string;
   status: 'In Progress' | 'Completed' | 'Cancelled';
-  statusStage: number;
   currentStageText: string;
   date: string;
   total: number;
@@ -48,75 +46,79 @@ interface Order {
 
 const INITIAL_ORDERS: Order[] = [
   {
-    id: "THY-89241",
-    boutique: "Royal Stitch Atelier",
+    id: 'THY-89241',
+    boutique: 'Royal Stitch Atelier',
     rating: 4.9,
-    location: "T. Nagar, Chennai",
-    status: "In Progress",
-    statusStage: 3,
-    currentStageText: "Cutting & Stitching",
-    date: "14 Sep 2026, 10:30 AM",
+    location: 'T. Nagar, Chennai',
+    status: 'In Progress',
+    currentStageText: 'Cutting & stitching',
+    date: '14 Sep 2026, 10:30 AM',
     total: 11900,
-    paymentMode: "UPI / GPay (Paid)",
-    deliveryAddress: "Flat 4B, Ceebros Apartments, Adyar, Chennai - 600020",
+    paymentMode: 'UPI / GPay (Paid)',
+    deliveryAddress: 'Flat 4B, Ceebros Apartments, Adyar, Chennai - 600020',
     items: [
-      { name: "Custom 3-Piece Tuxedo Blazer", qty: 1, price: 8500, fabric: "Italian Navy Wool" },
-      { name: "Slim Fit Formal Trousers", qty: 2, price: 3400, fabric: "Premium Cotton Twill" }
+      { name: 'Custom 3-Piece Tuxedo Blazer', qty: 1, price: 8500, fabric: 'Italian Navy Wool' },
+      { name: 'Slim Fit Formal Trousers', qty: 2, price: 3400, fabric: 'Premium Cotton Twill' },
     ],
     timeline: [
-      { title: "Order Confirmed", time: "14 Sep, 10:30 AM", completed: true },
-      { title: "Fabric Picked Up", time: "14 Sep, 03:15 PM", completed: true },
-      { title: "Measurements Verified", time: "15 Sep, 11:00 AM", completed: true },
-      { title: "Cutting & Stitching", time: "In Progress", completed: false, active: true },
-      { title: "Quality Check & Ironing", time: "Pending", completed: false },
-      { title: "Delivered to Doorstep", time: "Estimated 19 Sep", completed: false }
-    ]
+      { title: 'Order confirmed', time: '14 Sep, 10:30 AM', completed: true },
+      { title: 'Fabric picked up', time: '14 Sep, 03:15 PM', completed: true },
+      { title: 'Measurements verified', time: '15 Sep, 11:00 AM', completed: true },
+      { title: 'Cutting & stitching', time: 'In progress', completed: false, active: true },
+      { title: 'Quality check & ironing', time: 'Pending', completed: false },
+      { title: 'Delivered to doorstep', time: 'Estimated 19 Sep', completed: false },
+    ],
   },
   {
-    id: "THY-87102",
-    boutique: "Vogue Custom Design Studio",
+    id: 'THY-87102',
+    boutique: 'Vogue Custom Design Studio',
     rating: 4.8,
-    location: "Nungambakkam, Chennai",
-    status: "Completed",
-    statusStage: 5,
-    currentStageText: "Delivered on 11 Sep 2026",
-    date: "06 Sep 2026, 02:20 PM",
+    location: 'Nungambakkam, Chennai',
+    status: 'Completed',
+    currentStageText: 'Delivered 11 Sep 2026',
+    date: '06 Sep 2026, 02:20 PM',
     total: 4200,
-    paymentMode: "Credit Card (Paid)",
-    deliveryAddress: "Flat 4B, Ceebros Apartments, Adyar, Chennai - 600020",
+    paymentMode: 'Credit Card (Paid)',
+    deliveryAddress: 'Flat 4B, Ceebros Apartments, Adyar, Chennai - 600020',
     items: [
-      { name: "Silk Embroidered Anarkali Kurti", qty: 1, price: 4200, fabric: "Pure Kanchipuram Silk with Zari" }
+      { name: 'Silk Embroidered Anarkali Kurti', qty: 1, price: 4200, fabric: 'Pure Kanchipuram Silk with Zari' },
     ],
     timeline: [
-      { title: "Order Confirmed", time: "06 Sep, 02:20 PM", completed: true },
-      { title: "Fabric Picked Up", time: "06 Sep, 05:00 PM", completed: true },
-      { title: "Measurements Verified", time: "07 Sep, 10:00 AM", completed: true },
-      { title: "Cutting & Stitching", time: "09 Sep, 01:00 PM", completed: true },
-      { title: "Quality Check & Ironing", time: "10 Sep, 04:00 PM", completed: true },
-      { title: "Delivered to Doorstep", time: "11 Sep, 01:30 PM", completed: true }
-    ]
+      { title: 'Order confirmed', time: '06 Sep, 02:20 PM', completed: true },
+      { title: 'Fabric picked up', time: '06 Sep, 05:00 PM', completed: true },
+      { title: 'Measurements verified', time: '07 Sep, 10:00 AM', completed: true },
+      { title: 'Cutting & stitching', time: '09 Sep, 01:00 PM', completed: true },
+      { title: 'Quality check & ironing', time: '10 Sep, 04:00 PM', completed: true },
+      { title: 'Delivered to doorstep', time: '11 Sep, 01:30 PM', completed: true },
+    ],
   },
   {
-    id: "THY-85409",
-    boutique: "Thread & Tailor Co.",
+    id: 'THY-85409',
+    boutique: 'Thread & Tailor Co.',
     rating: 4.7,
-    location: "Velachery, Chennai",
-    status: "Cancelled",
-    statusStage: -1,
-    currentStageText: "Cancelled by Customer",
-    date: "01 Sep 2026, 09:15 AM",
+    location: 'Velachery, Chennai',
+    status: 'Cancelled',
+    currentStageText: 'Cancelled by you',
+    date: '01 Sep 2026, 09:15 AM',
     total: 2800,
-    paymentMode: "Refunded via UPI",
-    deliveryAddress: "Flat 4B, Ceebros Apartments, Adyar, Chennai - 600020",
-    items: [
-      { name: "Mandarin Collar Nehru Jacket", qty: 1, price: 2800, fabric: "Raw Khadi Silk" }
-    ],
+    paymentMode: 'Refunded via UPI',
+    deliveryAddress: 'Flat 4B, Ceebros Apartments, Adyar, Chennai - 600020',
+    items: [{ name: 'Mandarin Collar Nehru Jacket', qty: 1, price: 2800, fabric: 'Raw Khadi Silk' }],
     timeline: [
-      { title: "Order Confirmed", time: "01 Sep, 09:15 AM", completed: true },
-      { title: "Order Cancelled", time: "01 Sep, 10:00 AM", completed: false, active: true }
-    ]
-  }
+      { title: 'Order confirmed', time: '01 Sep, 09:15 AM', completed: true },
+      { title: 'Order cancelled', time: '01 Sep, 10:00 AM', completed: false, active: true },
+    ],
+  },
 ];
+
+const ghostBtn =
+  'inline-flex items-center justify-center min-h-10 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] border border-thy-burgundy/20 bg-thy-cream text-thy-ink transition-colors hover:border-thy-burgundy/40 hover:text-thy-burgundy cursor-pointer';
+
+function statusClass(status: Order['status']) {
+  if (status === 'In Progress') return 'border-amber-300/70 bg-amber-50 text-amber-900';
+  if (status === 'Completed') return 'border-thy-burgundy/20 bg-thy-mist text-thy-ink';
+  return 'border-rose-200 bg-rose-50 text-rose-800';
+}
 
 export default function MyOrdersPage() {
   const [orders] = useState<Order[]>(INITIAL_ORDERS);
@@ -125,324 +127,273 @@ export default function MyOrdersPage() {
   const [selectedOrderDetails, setSelectedOrderDetails] = useState<Order | null>(null);
   const [selectedOrderTracking, setSelectedOrderTracking] = useState<Order | null>(null);
 
-  const filteredOrders = orders.filter(order => {
-    const matchesTab = 
-      activeTab === 'All' ? true :
-      activeTab === 'In Progress' ? order.status === 'In Progress' :
-      activeTab === 'Completed' ? order.status === 'Completed' :
-      activeTab === 'Cancelled' ? order.status === 'Cancelled' : true;
-    
-    const matchesSearch = 
-      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.boutique.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.items.some(item => 
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        item.fabric.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  const tabs = [
+    { id: 'All', count: orders.length },
+    { id: 'In Progress', count: orders.filter((o) => o.status === 'In Progress').length },
+    { id: 'Completed', count: orders.filter((o) => o.status === 'Completed').length },
+    { id: 'Cancelled', count: orders.filter((o) => o.status === 'Cancelled').length },
+  ];
 
+  const filteredOrders = orders.filter((order) => {
+    const matchesTab = activeTab === 'All' || order.status === activeTab;
+    const needle = searchQuery.toLowerCase();
+    const matchesSearch =
+      order.id.toLowerCase().includes(needle) ||
+      order.boutique.toLowerCase().includes(needle) ||
+      order.items.some(
+        (item) => item.name.toLowerCase().includes(needle) || item.fabric.toLowerCase().includes(needle)
+      );
     return matchesTab && matchesSearch;
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-16">
-      
-      {/* Header & Search Bar */}
-      <header className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-2xs">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-[#26988a] flex items-center justify-center text-white font-bold text-xl shadow-md shadow-[#26988a]/30">
-                thy
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-bold tracking-tight text-slate-900 leading-none">THY</span>
-                <span className="text-xs text-[#26988a] font-medium tracking-wide">Custom Tailoring</span>
-              </div>
-            </div>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      <p className="text-[11px] uppercase tracking-[0.22em] text-thy-burgundy font-semibold">Atelier</p>
+      <h1
+        className="mt-2 text-3xl sm:text-4xl md:text-5xl leading-[0.95] text-thy-ink"
+        style={{ fontFamily: 'var(--font-cormorant), serif' }}
+      >
+        My Orders
+      </h1>
+      <p className="mt-3 max-w-xl text-sm text-thy-muted">
+        Follow stitching progress, open a quotation summary, and keep past fittings in one place.
+      </p>
+      <div className="thy-divider-glow mt-4 max-w-md" />
 
-            <div className="flex bg-[#26988a]/10 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#26988a] items-center gap-1.5">
-              <ShoppingBag className="w-3.5 h-3.5" />
-              <span>{orders.length} Orders</span>
-            </div>
-          </div>
-
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search orders, boutiques, fabrics..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-sm bg-slate-100/80 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#26988a] focus:bg-white transition-all"
-            />
-          </div>
+      <div className="mt-8 flex flex-col md:flex-row gap-3 md:items-center">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-thy-subtle" />
+          <input
+            type="text"
+            placeholder="Search order ID, atelier, or fabric"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="thy-input !pl-11"
+          />
         </div>
-
-        {/* Swiggy/Zomato Style Filter Tabs */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 flex items-center gap-2 overflow-x-auto no-scrollbar pb-3 pt-1">
-          {[
-            { id: 'All', count: orders.length },
-            { id: 'In Progress', count: orders.filter(o => o.status === 'In Progress').length },
-            { id: 'Completed', count: orders.filter(o => o.status === 'Completed').length },
-            { id: 'Cancelled', count: orders.filter(o => o.status === 'Cancelled').length }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                activeTab === tab.id 
-                  ? 'bg-[#26988a] text-white shadow-sm shadow-[#26988a]/30' 
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
-              }`}
-            >
-              {tab.id} Orders ({tab.count})
-            </button>
-          ))}
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">My Orders</h1>
-          <p className="text-sm text-slate-500 mt-0.5">Track live tailor progress, review stitching details, and manage past fits.</p>
-        </div>
-
-        {filteredOrders.length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-md mx-auto my-8 shadow-2xs">
-            <div className="w-16 h-16 bg-[#26988a]/10 text-[#26988a] rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Package className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-semibold text-slate-800 mb-1">No Orders Found</h3>
-            <p className="text-slate-500 text-sm mb-6">No orders match your selected filter or search query.</p>
-            <button 
-              onClick={() => { setActiveTab('All'); setSearchQuery(''); }}
-              className="px-5 py-2.5 bg-[#26988a] text-white font-medium text-sm rounded-xl hover:bg-[#22877b] transition-all shadow-sm cursor-pointer"
-            >
-              Reset Filters
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredOrders.map(order => (
-              <div 
-                key={order.id} 
-                className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs hover:shadow-md transition-all"
+        <div className="flex gap-2 overflow-x-auto thy-scroll-x">
+          {tabs.map((tab) => {
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap border transition-colors ${
+                  active
+                    ? 'bg-thy-burgundy text-white border-thy-burgundy'
+                    : 'border-thy-burgundy/20 bg-thy-cream text-thy-ink hover:border-thy-burgundy/40'
+                }`}
               >
-                {/* Order Header Info */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-slate-900 text-base">{order.boutique}</h3>
-                      <span className="flex items-center text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400 mr-1" />
-                        {order.rating}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
-                      <span className="flex items-center">
-                        <MapPin className="w-3.5 h-3.5 mr-1 text-slate-400" />
-                        {order.location}
-                      </span>
-                      <span>•</span>
-                      <span className="font-mono font-medium text-slate-700">ID: {order.id}</span>
-                    </div>
-                  </div>
+                {tab.id} · {tab.count}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
-                  <div>
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                      order.status === 'In Progress' ? 'bg-amber-50 text-amber-700 border border-amber-200/60' :
-                      order.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' :
-                      'bg-rose-50 text-rose-700 border border-rose-200/60'
-                    }`}>
-                      {order.status === 'In Progress' && <span className="w-2 h-2 rounded-full bg-amber-500 mr-1.5 animate-pulse"></span>}
-                      {order.status === 'Completed' && <CheckCircle2 className="w-3.5 h-3.5 mr-1 text-emerald-600" />}
-                      {order.status === 'Cancelled' && <AlertCircle className="w-3.5 h-3.5 mr-1 text-rose-600" />}
-                      {order.currentStageText}
+      {filteredOrders.length === 0 ? (
+        <div className="thy-card mt-8 p-10 text-center max-w-lg mx-auto space-y-3">
+          <Package className="w-8 h-8 mx-auto text-thy-burgundy" />
+          <h2 className="text-2xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+            No matching orders
+          </h2>
+          <p className="text-sm text-thy-muted">Try another filter, or start a new custom stitch.</p>
+          <div className="flex flex-wrap justify-center gap-3 pt-2">
+            <button type="button" className={ghostBtn} onClick={() => { setActiveTab('All'); setSearchQuery(''); }}>
+              Reset filters
+            </button>
+            <Link href="/stitch-your-outfit" className="hero-leather-btn inline-flex px-6 py-3 text-[11px] uppercase tracking-[0.16em]">
+              Stitch an outfit
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <ul className="mt-8 space-y-4">
+          {filteredOrders.map((order) => (
+            <li key={order.id} className="thy-card p-5 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-thy-burgundy/10">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+                      {order.boutique}
+                    </h2>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-thy-ink">
+                      <Star className="w-3 h-3 fill-current" />
+                      {order.rating}
                     </span>
                   </div>
+                  <p className="mt-1 text-xs text-thy-muted flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span className="inline-flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5" />
+                      {order.location}
+                    </span>
+                    <span className="font-mono">{order.id}</span>
+                  </p>
                 </div>
-
-                {/* Garments List */}
-                <div className="py-4 space-y-3">
-                  {order.items.map((item, idx) => (
-                    <div key={idx} className="flex items-center justify-between text-sm">
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-2 h-2 rounded-full bg-[#26988a] mt-2 shrink-0"></div>
-                        <div>
-                          <span className="font-semibold text-slate-800">{item.qty}x {item.name}</span>
-                          <p className="text-xs text-slate-500">Fabric: <span className="text-slate-700 font-medium">{item.fabric}</span></p>
-                        </div>
-                      </div>
-                      <span className="font-bold text-slate-900">₹{item.price.toLocaleString('en-IN')}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Order Footer & Actions */}
-                <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-2 text-xs text-slate-500 w-full sm:w-auto">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Ordered on {order.date}</span>
-                    <span className="text-slate-300">|</span>
-                    <span className="font-bold text-slate-900">Total: ₹{order.total.toLocaleString('en-IN')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-                    <button 
-                      onClick={() => setSelectedOrderDetails(order)}
-                      className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5 text-[#26988a]" />
-                      View Details
-                    </button>
-                    
-                    {order.status !== 'Cancelled' && (
-                      <button 
-                        onClick={() => setSelectedOrderTracking(order)}
-                        className="px-4 py-2 bg-[#26988a] hover:bg-[#22877b] text-white text-xs font-semibold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Truck className="w-3.5 h-3.5" />
-                        Track Order
-                      </button>
-                    )}
-                  </div>
-                </div>
-
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] border ${statusClass(order.status)}`}>
+                  {order.status === 'Completed' && <CheckCircle2 className="w-3.5 h-3.5" />}
+                  {order.status === 'Cancelled' && <AlertCircle className="w-3.5 h-3.5" />}
+                  {order.currentStageText}
+                </span>
               </div>
-            ))}
-          </div>
-        )}
-      </main>
 
-      {/* Track Order Modal */}
+              <div className="py-4 space-y-3">
+                {order.items.map((item) => (
+                  <div key={item.name} className="flex items-start justify-between gap-4 text-sm">
+                    <div>
+                      <p className="font-medium text-thy-ink">
+                        {item.qty}× {item.name}
+                      </p>
+                      <p className="text-xs text-thy-muted mt-0.5">{item.fabric}</p>
+                    </div>
+                    <p className="font-semibold text-thy-ink shrink-0">₹{item.price.toLocaleString('en-IN')}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4 border-t border-thy-burgundy/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p className="text-xs text-thy-muted flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5" />
+                  {order.date}
+                  <span className="text-thy-ink font-semibold">₹{order.total.toLocaleString('en-IN')}</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" className={ghostBtn} onClick={() => setSelectedOrderDetails(order)}>
+                    <FileText className="w-3.5 h-3.5 mr-1.5" />
+                    Details
+                  </button>
+                  {order.status !== 'Cancelled' && (
+                    <button
+                      type="button"
+                      className="hero-leather-btn inline-flex min-h-10 px-4 text-[11px] uppercase tracking-[0.14em]"
+                      onClick={() => setSelectedOrderTracking(order)}
+                    >
+                      <Truck className="w-3.5 h-3.5 mr-1.5" />
+                      Track
+                    </button>
+                  )}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
       {selectedOrderTracking && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-2xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
-            <button 
+        <div className="fixed inset-0 z-50 bg-thy-deep/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="thy-card max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
+            <button
+              type="button"
               onClick={() => setSelectedOrderTracking(null)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors cursor-pointer"
+              className="absolute top-4 right-4 w-9 h-9 border border-thy-burgundy/20 text-thy-ink hover:border-thy-burgundy/40 inline-flex items-center justify-center"
+              aria-label="Close tracker"
             >
               <X className="w-4 h-4" />
             </button>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-thy-burgundy font-semibold">Progress</p>
+            <h3 className="mt-1 text-2xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+              Stitching tracker
+            </h3>
+            <p className="text-xs text-thy-muted mt-1 font-mono">
+              {selectedOrderTracking.id} · {selectedOrderTracking.boutique}
+            </p>
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-[#26988a]/10 rounded-xl flex items-center justify-center text-[#26988a]">
-                <Truck className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">Live Stitching Tracker</h3>
-                <p className="text-xs text-slate-500">Order ID: <span className="font-mono font-semibold text-slate-700">{selectedOrderTracking.id}</span> • {selectedOrderTracking.boutique}</p>
-              </div>
-            </div>
-
-            {/* Timeline Milestones */}
-            <div className="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 mb-6">
+            <div className="relative mt-6 pl-6 space-y-5 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-px before:bg-thy-burgundy/15">
               {selectedOrderTracking.timeline.map((step, idx) => (
-                <div key={idx} className="relative flex items-start gap-3">
-                  <div className={`absolute -left-6 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ring-4 ring-white ${
-                    step.completed ? 'bg-[#26988a] text-white' : 
-                    step.active ? 'bg-amber-500 text-white animate-pulse' : 
-                    'bg-slate-200 text-slate-500'
-                  }`}>
+                <div key={step.title} className="relative">
+                  <div
+                    className={`absolute -left-6 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ring-4 ring-thy-surface ${
+                      step.completed
+                        ? 'bg-thy-burgundy text-white'
+                        : step.active
+                          ? 'bg-amber-500 text-white'
+                          : 'bg-thy-mist text-thy-subtle'
+                    }`}
+                  >
                     {step.completed ? <CheckCircle2 className="w-3.5 h-3.5" /> : idx + 1}
                   </div>
-                  <div>
-                    <h4 className={`text-sm font-bold ${step.completed || step.active ? 'text-slate-900' : 'text-slate-400'}`}>
-                      {step.title}
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">{step.time}</p>
-                  </div>
+                  <p className={`text-sm font-semibold ${step.completed || step.active ? 'text-thy-ink' : 'text-thy-subtle'}`}>
+                    {step.title}
+                  </p>
+                  <p className="text-xs text-thy-muted mt-0.5">{step.time}</p>
                 </div>
               ))}
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
-              <div>
-                <span className="font-semibold text-slate-800 block mb-0.5">Estimated Doorstep Delivery</span>
-                <span>By Friday, 19 Sep 2026 (Evening Slot)</span>
-              </div>
-              <Sparkles className="w-6 h-6 text-[#26988a]" />
+            <div className="mt-6 bg-thy-mist/70 border border-thy-burgundy/10 p-4 text-xs text-thy-muted">
+              <p className="font-semibold text-thy-ink">Estimated doorstep delivery</p>
+              <p className="mt-0.5">Friday, 19 Sep 2026 · evening slot</p>
             </div>
-
-            <button 
-              onClick={() => setSelectedOrderTracking(null)}
-              className="w-full mt-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-xl transition-colors cursor-pointer"
-            >
-              Close Tracker
+            <button type="button" className={`${ghostBtn} w-full mt-5`} onClick={() => setSelectedOrderTracking(null)}>
+              Close
             </button>
           </div>
         </div>
       )}
 
-      {/* View Details / Invoice Modal */}
       {selectedOrderDetails && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-2xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
-            <button 
+        <div className="fixed inset-0 z-50 bg-thy-deep/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="thy-card max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
+            <button
+              type="button"
               onClick={() => setSelectedOrderDetails(null)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition-colors cursor-pointer"
+              className="absolute top-4 right-4 w-9 h-9 border border-thy-burgundy/20 text-thy-ink hover:border-thy-burgundy/40 inline-flex items-center justify-center"
+              aria-label="Close details"
             >
               <X className="w-4 h-4" />
             </button>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-thy-burgundy font-semibold">Summary</p>
+            <h3 className="mt-1 text-2xl text-thy-ink" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+              Order details
+            </h3>
+            <p className="text-xs text-thy-muted mt-1 font-mono">{selectedOrderDetails.id}</p>
 
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-[#26988a]/10 rounded-xl flex items-center justify-center text-[#26988a]">
-                <FileText className="w-5 h-5" />
+            <dl className="mt-5 space-y-2 text-xs">
+              <div className="flex justify-between gap-4">
+                <dt className="text-thy-muted">Atelier</dt>
+                <dd className="font-semibold text-thy-ink text-right">{selectedOrderDetails.boutique}</dd>
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">Order Tax Invoice & Summary</h3>
-                <p className="text-xs text-slate-500">Order ID: <span className="font-mono font-semibold text-slate-700">{selectedOrderDetails.id}</span></p>
+              <div className="flex justify-between gap-4">
+                <dt className="text-thy-muted">Payment</dt>
+                <dd className="font-semibold text-thy-ink text-right">{selectedOrderDetails.paymentMode}</dd>
               </div>
-            </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-thy-muted">Deliver to</dt>
+                <dd className="font-semibold text-thy-ink text-right max-w-[240px]">{selectedOrderDetails.deliveryAddress}</dd>
+              </div>
+            </dl>
 
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 mb-4 text-xs">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Tailoring Boutique:</span>
-                <span className="font-semibold text-slate-800">{selectedOrderDetails.boutique}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Payment Mode:</span>
-                <span className="font-semibold text-slate-800">{selectedOrderDetails.paymentMode}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Fulfillment Address:</span>
-                <span className="font-semibold text-slate-800 text-right max-w-[240px]">{selectedOrderDetails.deliveryAddress}</span>
-              </div>
-            </div>
-
-            <div className="border border-slate-200 rounded-xl overflow-hidden mb-4">
-              <div className="bg-slate-100 px-4 py-2 text-[11px] font-bold text-slate-600 uppercase tracking-wider flex justify-between">
-                <span>Garment Specification</span>
+            <div className="mt-5 border border-thy-burgundy/15">
+              <div className="bg-thy-mist/60 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-thy-muted flex justify-between">
+                <span>Garment</span>
                 <span>Amount</span>
               </div>
-              <div className="divide-y divide-slate-100 text-xs">
-                {selectedOrderDetails.items.map((item, idx) => (
-                  <div key={idx} className="p-4 flex justify-between items-center">
+              <div className="divide-y divide-thy-burgundy/10 text-xs">
+                {selectedOrderDetails.items.map((item) => (
+                  <div key={item.name} className="p-4 flex justify-between gap-4">
                     <div>
-                      <span className="font-bold text-slate-900 block">{item.qty}x {item.name}</span>
-                      <span className="text-slate-500">Fabric: {item.fabric}</span>
+                      <p className="font-semibold text-thy-ink">
+                        {item.qty}× {item.name}
+                      </p>
+                      <p className="text-thy-muted mt-0.5">{item.fabric}</p>
                     </div>
-                    <span className="font-bold text-slate-900">₹{item.price.toLocaleString('en-IN')}</span>
+                    <p className="font-semibold text-thy-ink">₹{item.price.toLocaleString('en-IN')}</p>
                   </div>
                 ))}
               </div>
-              <div className="bg-slate-50 p-4 border-t border-slate-200 flex justify-between items-center text-sm font-bold">
-                <span className="text-slate-700">Total Amount Paid</span>
-                <span className="text-[#26988a]">₹{selectedOrderDetails.total.toLocaleString('en-IN')}</span>
+              <div className="bg-thy-mist/40 px-4 py-3 border-t border-thy-burgundy/15 flex justify-between text-sm font-semibold">
+                <span>Total</span>
+                <span className="text-thy-burgundy">₹{selectedOrderDetails.total.toLocaleString('en-IN')}</span>
               </div>
             </div>
 
-            <button 
-              onClick={() => setSelectedOrderDetails(null)}
-              className="w-full py-2.5 bg-[#26988a] hover:bg-[#22877b] text-white font-semibold text-xs rounded-xl transition-colors shadow-xs cursor-pointer"
-            >
+            <button type="button" className={`${ghostBtn} w-full mt-5`} onClick={() => setSelectedOrderDetails(null)}>
               Done
             </button>
           </div>
         </div>
       )}
-
-    </div>
+    </main>
   );
 }
