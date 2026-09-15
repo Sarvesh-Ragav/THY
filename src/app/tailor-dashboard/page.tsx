@@ -2,9 +2,13 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 
 export default function TailorDashboardPage() {
   const [isAvailable, setIsAvailable] = useState(true);
+  const { session } = useTailorSession();
+
+  const displayName = session?.profile?.fullName || session?.identifier || 'Priya S!';
 
   return (
     <div 
@@ -13,7 +17,7 @@ export default function TailorDashboardPage() {
         backgroundImage: `linear-gradient(to bottom, rgba(248, 250, 252, 0.93), rgba(241, 245, 249, 0.96)), url('https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=2000&q=80')`
       }}
     >
-      {/* Welcome Banner with Elegant Tailoring Workshop Background */}
+      {/* Welcome Banner */}
       <div 
         className="relative rounded-3xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center overflow-hidden shadow-sm border border-teal-100/60 bg-cover bg-center"
         style={{
@@ -22,7 +26,7 @@ export default function TailorDashboardPage() {
       >
         <div className="space-y-1 z-10">
           <h1 className="text-2xl md:text-3xl font-extrabold text-[#083e38] tracking-tight">
-            Welcome back, Priya S!
+            Welcome back, {displayName}
           </h1>
           <p className="text-xs md:text-sm text-teal-800/90 font-medium">
             Manage your tailoring orders and grow your business with THY.
@@ -147,7 +151,6 @@ export default function TailorDashboardPage() {
               </div>
 
               <div className="space-y-3">
-                {/* Item 1 */}
                 <div className="p-3 bg-slate-50/80 rounded-2xl flex items-center justify-between gap-3 border border-slate-100/80 hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <img
@@ -175,7 +178,6 @@ export default function TailorDashboardPage() {
                   </div>
                 </div>
 
-                {/* Item 2 */}
                 <div className="p-3 bg-slate-50/80 rounded-2xl flex items-center justify-between gap-3 border border-slate-100/80 hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <img
@@ -203,7 +205,6 @@ export default function TailorDashboardPage() {
                   </div>
                 </div>
 
-                {/* Item 3 */}
                 <div className="p-3 bg-slate-50/80 rounded-2xl flex items-center justify-between gap-3 border border-slate-100/80 hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <img
@@ -246,7 +247,6 @@ export default function TailorDashboardPage() {
               </div>
 
               <div className="space-y-3">
-                {/* Active 1 */}
                 <div className="p-3 bg-slate-50/80 rounded-2xl flex items-center justify-between gap-3 border border-slate-100/80 hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <img
@@ -274,7 +274,6 @@ export default function TailorDashboardPage() {
                   </div>
                 </div>
 
-                {/* Active 2 */}
                 <div className="p-3 bg-slate-50/80 rounded-2xl flex items-center justify-between gap-3 border border-slate-100/80 hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <img
@@ -302,7 +301,6 @@ export default function TailorDashboardPage() {
                   </div>
                 </div>
 
-                {/* Active 3 */}
                 <div className="p-3 bg-slate-50/80 rounded-2xl flex items-center justify-between gap-3 border border-slate-100/80 hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
                     <img
@@ -363,7 +361,6 @@ export default function TailorDashboardPage() {
           {/* Activity Feeds */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Recent Notifications */}
             <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-100 shadow-xs space-y-3">
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 className="text-xs font-bold text-slate-900">Recent Notifications</h3>
@@ -387,7 +384,6 @@ export default function TailorDashboardPage() {
               </div>
             </div>
 
-            {/* Recent Messages */}
             <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-100 shadow-xs space-y-3">
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <h3 className="text-xs font-bold text-slate-900">Recent Messages</h3>
@@ -431,7 +427,6 @@ export default function TailorDashboardPage() {
         {/* Right Sidebar */}
         <div className="space-y-6">
           
-          {/* Availability Card */}
           <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-100 shadow-xs space-y-4">
             <h3 className="text-xs font-bold text-slate-900">Your Availability</h3>
             <div className="flex items-center justify-between">
@@ -455,7 +450,6 @@ export default function TailorDashboardPage() {
               </button>
             </div>
 
-            {/* Custom Studio Banner Image under Availability */}
             <div className="relative rounded-xl overflow-hidden h-24 border border-slate-100 shadow-2xs">
               <img
                 src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80"
@@ -477,7 +471,6 @@ export default function TailorDashboardPage() {
             </Link>
           </div>
 
-          {/* Earnings Quick Summary */}
           <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-100 shadow-xs space-y-3">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <h3 className="text-xs font-bold text-slate-900">Earnings & Reports</h3>
@@ -500,7 +493,6 @@ export default function TailorDashboardPage() {
               </div>
             </div>
 
-            {/* Financial & Analytics Image under Earnings & Reports */}
             <div className="relative rounded-xl overflow-hidden h-24 border border-slate-100 shadow-2xs mt-2">
               <img
                 src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80"
@@ -515,7 +507,6 @@ export default function TailorDashboardPage() {
             </div>
           </div>
 
-          {/* Enhanced High-Res Portfolio */}
           <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl border border-slate-100 shadow-xs space-y-3">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <h3 className="text-xs font-bold text-slate-900">Your Portfolio</h3>
