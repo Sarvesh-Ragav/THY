@@ -1,13 +1,10 @@
 'use client';
 
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Eye, Heart, Scissors, Sparkles, X } from 'lucide-react';
-import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { Eye, ImagePlus, Sparkles, Upload, X } from 'lucide-react';
 import {
   FABRIC_TREATMENTS,
-  asFabricTreatments,
   getStudioGarment,
   type FabricTreatment,
 } from '@/lib/design-studio';
@@ -17,8 +14,6 @@ import {
   readStudioDraft,
   type GarmentCustomizationDetails,
 } from '@/lib/studio-draft';
-import { isCustomerOnboardingComplete } from '@/lib/tailor-session';
-import { GarmentVisualization } from '@/components/studio/GarmentVisualization';
 import { StudioStepper } from '@/components/studio/StudioStepper';
 
 export default function DesignPreviewPage() {
@@ -38,18 +33,20 @@ function StudioFallback() {
 }
 
 const ghostBtn =
-  'inline-flex items-center justify-center min-h-11 px-4 text-sm border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep';
+  'inline-flex items-center justify-center min-h-11 px-4 text-sm border border-thy-ink/15 bg-thy-surface text-thy-ink transition-colors hover:border-thy-brand/40 hover:text-thy-deep cursor-pointer';
 
 const DEFAULT_PATTERN_IMAGE = '/preview/Roundneck_sleeveless_A-line_calflength.png';
 const DEFAULT_PATTERN_LABEL = 'Roundneck sleeveless A-line';
+
+function isUploadedFabric(src: string | null | undefined) {
+  return Boolean(src && (src.startsWith('data:') || src.startsWith('blob:')));
+}
 
 function DesignPreviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const categoryId = searchParams.get('category') ?? 'salwars';
   const preset = useMemo(() => getStudioGarment(categoryId), [categoryId]);
-  const { session, isReady, updateSession } = useTailorSession();
-  const loggedIn = isReady && session.isAuthenticated && isCustomerOnboardingComplete(session);
   const fileRef = useRef<HTMLInputElement>(null);
   const patternFileRef = useRef<HTMLInputElement>(null);
 
@@ -59,22 +56,19 @@ function DesignPreviewContent() {
   const [patternImage, setPatternImage] = useState<string | null>(null);
   const [patternLabel, setPatternLabel] = useState<string | null>(null);
   const [patternModalOpen, setPatternModalOpen] = useState(false);
-  const [generating, setGenerating] = useState(true);
-  const [favorite, setFavorite] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [compareOpen, setCompareOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  // Gemini AI render state
   const [aiRender, setAiRender] = useState<string | null>(null);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [showAiRender, setShowAiRender] = useState(false);
   const [customization, setCustomization] = useState<GarmentCustomizationDetails | undefined>(undefined);
+  const [dragActive, setDragActive] = useState(false);
 
   const currentPatternImage = patternImage || DEFAULT_PATTERN_IMAGE;
   const currentPatternLabel = patternLabel || DEFAULT_PATTERN_LABEL;
   const hasCustomPattern = Boolean(patternImage);
+  const hasUserFabric = isUploadedFabric(fabricImage);
+  const query = `?category=${encodeURIComponent(preset.categoryId)}`;
 
   useEffect(() => {
     const draft = readStudioDraft(preset.categoryId);
@@ -84,12 +78,9 @@ function DesignPreviewContent() {
     setPatternImage(draft?.patternImage || null);
     setPatternLabel(draft?.patternLabel || null);
     setCustomization(draft?.customization);
-    setFavorite(false);
-    setSaved(false);
-    setEditing(false);
-    setCompareOpen(false);
     setPatternModalOpen(false);
     setMessage(null);
+    setDragActive(false);
     if (draft?.aiRender) {
       setAiRender(draft.aiRender);
       setShowAiRender(true);
@@ -98,36 +89,7 @@ function DesignPreviewContent() {
       setShowAiRender(false);
     }
     setAiError(null);
-    setGenerating(true);
-    const timer = window.setTimeout(() => setGenerating(false), 1100);
-    return () => window.clearTimeout(timer);
   }, [preset]);
-
-  const regenerate = () => {
-    setGenerating(true);
-    window.setTimeout(() => setGenerating(false), 900);
-  };
-
-  const toggleTreatment = (treatment: FabricTreatment) => {
-    if (!editing) return;
-    setTreatments((current) => {
-      const next = current.includes(treatment)
-        ? current.filter((item) => item !== treatment)
-        : [...current, treatment];
-      persistDraft({ treatments: next });
-      return next;
-    });
-    setSaved(false);
-    regenerate();
-  };
-
-  const requireAccount = (next: () => void) => {
-    if (!loggedIn) {
-      router.push('/login');
-      return;
-    }
-    next();
-  };
 
   const persistDraft = (next?: {
     fabricImage?: string;
@@ -156,16 +118,46 @@ function DesignPreviewContent() {
     });
   };
 
+  const applyFabricFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      setMessage('Please choose an image file.');
+      return;
+    }
+    const url = await readFileAsDataUrl(file);
+    setFabricImage(url);
+    setFabricLabel(file.name);
+    setAiRender(null);
+    setShowAiRender(false);
+    persistDraft({ fabricImage: url, fabricLabel: file.name, aiRender: null });
+    setMessage('Fabric added. Preview is ready.');
+  };
+
   const onFabricUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
-    const url = await readFileAsDataUrl(file);
-    setFabricImage(url);
-    setFabricLabel(file.name);
-    setSaved(false);
-    persistDraft({ fabricImage: url, fabricLabel: file.name });
-    regenerate();
+    await applyFabricFile(file);
+  };
+
+  const onFabricDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragActive(true);
+  };
+
+  const onFabricDragLeave = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragActive(false);
+  };
+
+  const onFabricDrop = async (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setDragActive(false);
+    const file = event.dataTransfer.files?.[0];
+    if (!file) return;
+    await applyFabricFile(file);
   };
 
   const onPatternUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,7 +167,6 @@ function DesignPreviewContent() {
     const url = await readFileAsDataUrl(file);
     setPatternImage(url);
     setPatternLabel(file.name);
-    setSaved(false);
     persistDraft({ patternImage: url, patternLabel: file.name });
     setMessage('Dress pattern uploaded.');
   };
@@ -183,7 +174,6 @@ function DesignPreviewContent() {
   const onRemovePattern = () => {
     setPatternImage(null);
     setPatternLabel(null);
-    setSaved(false);
     persistDraft({ patternImage: null, patternLabel: null });
     setMessage('Dress pattern removed.');
   };
@@ -211,7 +201,6 @@ function DesignPreviewContent() {
       }
       setAiRender(data.image);
       setShowAiRender(true);
-      setSaved(false);
       persistDraft({ aiRender: data.image });
       setMessage('AI render complete — now showing Gemini visualization.');
     } catch (err: unknown) {
@@ -228,34 +217,13 @@ function DesignPreviewContent() {
     router.push(`/stitch-your-outfit/try-on${query}`);
   };
 
-  const saveDesign = () => {
-    requireAccount(() => {
-      const id = `design-${Date.now()}`;
-      updateSession({
-        customerDesigns: [
-          {
-            id,
-            title: preset.garment,
-            categoryId: preset.categoryId,
-            garment: preset.garment,
-            fabric: fabricLabel,
-            fabricImage: aiRender ?? (fabricImage.startsWith('blob:') ? preset.fabricImage : fabricImage),
-            patternImage: patternImage && !patternImage.startsWith('blob:') ? patternImage : undefined,
-            patternLabel: patternLabel ?? undefined,
-            treatments,
-            favorite,
-            createdAt: new Date().toISOString(),
-          },
-          ...session.customerDesigns,
-        ],
-      });
-      setSaved(true);
-      setMessage('Saved to My Designs.');
-    });
+  const continueToMeasurements = () => {
+    persistDraft({ aiRender });
+    router.push(`/my-measurements${query}`);
   };
 
-  const query = `?category=${encodeURIComponent(preset.categoryId)}`;
-  const comparable = session.customerDesigns.filter((design) => design.categoryId);
+  const previewImage = showAiRender && aiRender ? aiRender : fabricImage;
+  const previewLabel = showAiRender && aiRender ? `${preset.garment} AI render` : fabricLabel;
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -269,7 +237,7 @@ function DesignPreviewContent() {
             Design Preview
           </h1>
           <p className="mt-3 max-w-xl text-sm text-thy-muted">
-            Inspect the visualized garment on your fabric before you try it on.
+            Drop in your fabric photo, then continue to try-on or measurements.
           </p>
         </div>
         <p className="text-[11px] uppercase tracking-[0.16em] text-thy-subtle">
@@ -283,19 +251,44 @@ function DesignPreviewContent() {
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)] gap-4 sm:gap-5">
         <section className="thy-card p-5 sm:p-7">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-thy-brand font-semibold">Visualized</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-thy-brand font-semibold">Fabric</p>
           <h2
             className="mt-2 text-2xl sm:text-3xl leading-tight"
             style={{ fontFamily: 'var(--font-cormorant), serif' }}
           >
-            Your design, on cloth
+            {hasUserFabric ? 'Your fabric preview' : 'Insert your fabric'}
           </h2>
           <p className="mt-1 text-sm text-thy-muted">
-            {preset.garment} mapped onto the selected fabric.
+            {hasUserFabric
+              ? 'Preview of the fabric you added. Use the button on the right to replace it.'
+              : 'Drag and drop a fabric photo here, or click to browse.'}
           </p>
 
-          <div className="relative mt-6 overflow-hidden min-h-[22rem] sm:min-h-[28rem] hero-vellum border border-thy-ink/10">
-            {/* AI generating overlay */}
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFabricUpload} />
+
+          <div
+            role={hasUserFabric ? undefined : 'button'}
+            tabIndex={hasUserFabric ? undefined : 0}
+            onClick={() => {
+              if (!hasUserFabric) fileRef.current?.click();
+            }}
+            onKeyDown={(event) => {
+              if (!hasUserFabric && (event.key === 'Enter' || event.key === ' ')) {
+                event.preventDefault();
+                fileRef.current?.click();
+              }
+            }}
+            onDragOver={onFabricDragOver}
+            onDragLeave={onFabricDragLeave}
+            onDrop={onFabricDrop}
+            className={`relative mt-6 overflow-hidden min-h-[22rem] sm:min-h-[28rem] border transition-colors ${
+              dragActive
+                ? 'border-thy-brand bg-thy-mist'
+                : hasUserFabric
+                  ? 'hero-vellum border-thy-ink/10'
+                  : 'border-dashed border-thy-ink/20 bg-thy-canvas/60 cursor-pointer'
+            }`}
+          >
             {aiGenerating && (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-thy-deep/60 backdrop-blur-sm">
                 <span className="h-12 w-12 rounded-full border-2 border-thy-brand/30 border-t-thy-brand animate-spin" />
@@ -306,65 +299,54 @@ function DesignPreviewContent() {
               </div>
             )}
 
-            {/* SVG diagram overlay (loading) */}
-            {generating && !aiGenerating && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-thy-muted bg-thy-canvas/70">
-                <span className="h-10 w-10 rounded-full border-2 border-thy-brand/30 border-t-thy-brand animate-spin" />
-                <p className="text-[11px] uppercase tracking-[0.18em]">Laying fabric on the garment</p>
+            {hasUserFabric ? (
+              <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-8">
+                <img
+                  src={previewImage}
+                  alt={previewLabel}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
+                <span className="flex h-14 w-14 items-center justify-center border border-thy-brand/30 bg-thy-mist text-thy-brand">
+                  <Upload size={22} />
+                </span>
+                <p className="text-sm font-medium text-thy-ink">Drag and drop your fabric here</p>
+                <p className="text-xs text-thy-muted">or click to choose a photo from your device</p>
               </div>
             )}
 
-            {!generating && (
-              <div className="absolute inset-0 flex items-center justify-center p-6 sm:p-10">
-                {showAiRender && aiRender ? (
-                  <img
-                    src={aiRender}
-                    alt={`AI render of ${preset.garment}`}
-                    className="h-full w-full object-contain"
-                  />
-                ) : (
-                  <div className="w-full max-w-[20rem]">
-                    <GarmentVisualization
-                      silhouette={preset.silhouette}
-                      treatments={treatments}
-                      fabricImage={fabricImage}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Toggle between SVG and AI render */}
-            {aiRender && !aiGenerating && (
+            {hasUserFabric && (
               <button
                 type="button"
-                onClick={() => setShowAiRender((v) => !v)}
-                className="absolute bottom-3 left-3 flex items-center gap-2 bg-thy-deep/80 backdrop-blur-sm text-white border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.14em] font-semibold cursor-pointer hover:bg-thy-brand/80 transition-colors"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  fileRef.current?.click();
+                }}
+                className="absolute top-3 right-3 z-20 inline-flex items-center gap-2 bg-thy-surface/95 backdrop-blur-xs border border-thy-ink/15 px-3 py-2 text-[10px] uppercase tracking-[0.14em] font-semibold text-thy-ink shadow-xs cursor-pointer hover:border-thy-brand/40 hover:text-thy-brand transition-colors"
+                title="Add a different fabric image"
               >
-                <Sparkles size={12} />
-                {showAiRender ? 'Show diagram' : 'Show AI render'}
+                <ImagePlus size={14} />
+                Change image
               </button>
             )}
 
-            {/* Pattern badge */}
-            <button
-              type="button"
-              onClick={() => setPatternModalOpen(true)}
-              className="absolute top-3 right-3 flex items-center gap-2 bg-thy-surface/90 backdrop-blur-xs border border-thy-ink/10 px-2.5 py-1.5 shadow-xs cursor-pointer hover:border-thy-brand/40 transition-colors"
-              title="View dress pattern"
-            >
-              <img
-                src={currentPatternImage}
-                alt=""
-                className="h-5 w-5 object-contain bg-white border border-thy-ink/10"
-              />
-              <span className="text-[10px] uppercase tracking-[0.14em] text-thy-brand font-semibold">
-                {hasCustomPattern ? 'Pattern attached' : 'Default pattern'}
-              </span>
-            </button>
+            {aiRender && hasUserFabric && !aiGenerating && (
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setShowAiRender((v) => !v);
+                }}
+                className="absolute bottom-3 left-3 z-20 flex items-center gap-2 bg-thy-deep/80 backdrop-blur-sm text-white border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.14em] font-semibold cursor-pointer hover:bg-thy-brand/80 transition-colors"
+              >
+                <Sparkles size={12} />
+                {showAiRender ? 'Show fabric' : 'Show AI render'}
+              </button>
+            )}
           </div>
 
-          {/* AI error message */}
           {aiError && (
             <p className="mt-2 text-xs text-red-500 border border-red-200 bg-red-50 px-3 py-2">
               ⚠ {aiError}
@@ -372,7 +354,11 @@ function DesignPreviewContent() {
           )}
 
           <p className="mt-3 text-xs text-thy-subtle">
-            {showAiRender ? 'Gemini AI render · photorealistic studio visualization' : 'Studio visualization · not a photograph'}
+            {hasUserFabric
+              ? showAiRender
+                ? 'Gemini AI render · photorealistic studio visualization'
+                : 'Your uploaded fabric photo'
+              : 'JPG, PNG or WEBP · drop a clear photo of the cloth'}
           </p>
         </section>
 
@@ -391,49 +377,32 @@ function DesignPreviewContent() {
               </div>
               <div>
                 <dt className="text-[10px] uppercase tracking-[0.16em] text-thy-subtle">Selected fabric</dt>
-                <dd className="mt-1 text-sm text-thy-ink break-all">{fabricLabel}</dd>
+                <dd className="mt-1 text-sm text-thy-ink break-all">
+                  {hasUserFabric ? fabricLabel : 'No fabric added yet'}
+                </dd>
               </div>
             </dl>
           </div>
 
           <div>
-            <p className="text-[10px] uppercase tracking-[0.16em] text-thy-subtle mb-2">
-              {editing ? 'Tap to add or remove' : 'Treatments on this piece'}
-            </p>
+            <p className="text-[10px] uppercase tracking-[0.16em] text-thy-subtle mb-2">Treatments on this piece</p>
             <div className="flex flex-wrap gap-2">
               {FABRIC_TREATMENTS.map((treatment) => {
                 const active = treatments.includes(treatment);
                 return (
-                  <button
+                  <span
                     key={treatment}
-                    type="button"
-                    disabled={!editing}
-                    onClick={() => toggleTreatment(treatment)}
-                    className={`px-3 min-h-9 text-[11px] uppercase tracking-[0.12em] border transition-colors ${active
+                    className={`inline-flex items-center px-3 min-h-9 text-[11px] uppercase tracking-[0.12em] border ${
+                      active
                         ? 'border-thy-brand/40 bg-thy-mist text-thy-brand'
                         : 'border-thy-ink/10 bg-thy-bg text-thy-subtle'
-                      } ${editing ? 'cursor-pointer' : 'cursor-default'}`}
+                    }`}
                   >
                     {treatment}
-                  </button>
+                  </span>
                 );
               })}
             </div>
-          </div>
-
-          <div className="bg-thy-mist/90 border border-thy-ink/10 p-4 space-y-4">
-            <p className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle">Fabric project</p>
-            <div className="flex items-center gap-3">
-              <img src={fabricImage} alt="" className="h-14 w-14 object-cover border border-thy-ink/10 shrink-0" />
-              <div className="min-w-0">
-                <p className="text-sm truncate">{fabricLabel}</p>
-                <p className="text-xs text-thy-brand font-semibold uppercase tracking-[0.12em]">Generated</p>
-              </div>
-            </div>
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFabricUpload} />
-            <button type="button" onClick={() => fileRef.current?.click()} className={`${ghostBtn} w-full`}>
-              Upload fabric photo
-            </button>
           </div>
 
           <div className="bg-thy-mist/90 border border-thy-ink/10 p-4 space-y-4">
@@ -498,62 +467,8 @@ function DesignPreviewContent() {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                if (comparable.length === 0) {
-                  setMessage('Save this design first to compare versions.');
-                  return;
-                }
-                setCompareOpen(true);
-              }}
-              className={ghostBtn}
-            >
-              Compare designs
-            </button>
-            <Link href="/my-designs" className={`${ghostBtn} bg-thy-mist border-thy-brand/20`}>
-              My designs
-            </Link>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setEditing((open) => !open);
-              setMessage(
-                editing
-                  ? null
-                  : 'Adjust colours, prints, motifs, embroidery and texture on the piece.',
-              );
-            }}
-            className={`${ghostBtn} w-full bg-thy-bg`}
-          >
-            {editing ? 'Finish editing' : 'Customize / Edit design'}
-          </button>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() =>
-                requireAccount(() => {
-                  setFavorite((open) => !open);
-                  setMessage(favorite ? 'Removed from favorites.' : 'Marked as favorite.');
-                })
-              }
-              className={`${ghostBtn} gap-2`}
-            >
-              <Heart size={15} className={favorite ? 'fill-thy-brand text-thy-brand' : 'text-thy-muted'} />
-              Favorite
-            </button>
-            <button type="button" onClick={saveDesign} className={ghostBtn}>
-              {saved ? 'Saved' : 'Save design'}
-            </button>
-          </div>
-
           {message && <p className="text-xs text-thy-muted">{message}</p>}
 
-          {/* ── Gemini AI Generate button ── */}
           <div className="relative overflow-hidden border border-thy-brand/30 bg-gradient-to-br from-thy-mist to-thy-surface p-4 space-y-3">
             <div className="flex items-start gap-3">
               <div className="shrink-0 h-8 w-8 rounded-full bg-thy-brand/10 border border-thy-brand/20 flex items-center justify-center">
@@ -584,66 +499,29 @@ function DesignPreviewContent() {
             )}
           </div>
 
-          <div className="mt-auto pt-1 space-y-2">
-            <button
-              type="button"
-              onClick={continueToTryOn}
-              className="hero-leather-btn inline-flex w-full items-center justify-center min-h-12 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-center"
-            >
-              Continue to try-on
-            </button>
+          <div className="mt-auto pt-1 space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={continueToTryOn}
+                className="hero-leather-btn inline-flex w-full items-center justify-center min-h-12 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-center"
+              >
+                Continue to try-on
+              </button>
+              <button
+                type="button"
+                onClick={continueToMeasurements}
+                className={`${ghostBtn} w-full min-h-12 uppercase tracking-[0.16em] text-[11px] font-semibold`}
+              >
+                Next
+              </button>
+            </div>
             <p className="text-[10px] uppercase tracking-[0.14em] text-thy-subtle text-center">
               Try-on · Measurements · Tailor · Estimate · Cart
             </p>
           </div>
         </aside>
       </div>
-
-      {compareOpen && (
-        <div className="fixed inset-0 z-50 bg-thy-deep/45 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="w-full max-w-4xl bg-thy-surface sm:border sm:border-thy-ink/10 p-5 sm:p-6 max-h-[90dvh] overflow-y-auto pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-2xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-                Compare designs
-              </h2>
-              <button type="button" className={`${ghostBtn} min-w-20`} onClick={() => setCompareOpen(false)}>
-                Close
-              </button>
-            </div>
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="border border-thy-ink/10 p-3">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-thy-brand mb-2">Current</p>
-                <div className="hero-vellum min-h-[16rem] flex items-center justify-center p-4">
-                  <GarmentVisualization
-                    silhouette={preset.silhouette}
-                    treatments={treatments}
-                    fabricImage={fabricImage}
-                    patternId="compare-current"
-                  />
-                </div>
-                <p className="mt-2 text-sm">{preset.garment}</p>
-              </div>
-              {comparable.slice(0, 1).map((design) => {
-                const savedPreset = getStudioGarment(design.categoryId);
-                return (
-                  <div key={design.id} className="border border-thy-ink/10 p-3">
-                    <p className="text-[11px] uppercase tracking-[0.16em] text-thy-subtle mb-2">Saved</p>
-                    <div className="hero-vellum min-h-[16rem] flex items-center justify-center p-4">
-                      <GarmentVisualization
-                        silhouette={savedPreset.silhouette}
-                        treatments={asFabricTreatments(design.treatments)}
-                        fabricImage={design.fabricImage || savedPreset.fabricImage}
-                        patternId="compare-saved"
-                      />
-                    </div>
-                    <p className="mt-2 text-sm">{design.title}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
 
       {patternModalOpen && (
         <div className="fixed inset-0 z-50 bg-thy-deep/50 flex items-center justify-center p-4">
