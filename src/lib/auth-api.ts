@@ -25,7 +25,7 @@ export interface AccountTailorProfile {
   shopAddress: string;
   city: string;
   phone?: string | null;
-  portfolio: Array<{ id: string; title: string; image: string; category: string }>;
+  portfolio: Array<{ id: string; title: string; image: string; category: string; isFeatured?: boolean }>;
 }
 
 export interface AuthenticationResult {
@@ -139,4 +139,38 @@ export function resetPassword(payload: {
 
 export async function logoutAuthentication(): Promise<void> {
   try { await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' }); } catch { /* Local logout remains safe if the server is unavailable. */ }
+}
+
+export function updateCustomerAccount(
+  payload: { fullName?: string; email?: string; city?: string },
+  accessToken: string
+): Promise<{ profile: AccountCustomerProfile }> {
+  return request('/me/profile', {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateTailorAccount(
+  payload: {
+    fullName?: string;
+    shopName?: string;
+    yearsOfExperience?: number;
+    shopAddress?: string;
+    city?: string;
+    availability?: {
+      isAvailable?: boolean;
+      vacationMode?: boolean;
+      maxActiveCapacity?: number;
+      schedule?: Array<{ day: string; isOpen: boolean; openTime: string; closeTime: string }>;
+    };
+  },
+  accessToken: string
+): Promise<{ profile: AccountTailorProfile }> {
+  return request('/tailors/me', {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(payload),
+  });
 }

@@ -18,6 +18,7 @@ export const catalogueQuerySchema = paginationSchema.extend({
 export const tailorDirectoryQuerySchema = paginationSchema.extend({
   city: optionalText(120),
   q: optionalText(120),
+  limit: z.coerce.number().int().min(1).max(50).default(50),
 });
 
 export const categorySlugSchema = z.object({ slug: z.string().trim().regex(/^[a-z0-9-]+$/).max(80) });

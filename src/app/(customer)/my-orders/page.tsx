@@ -15,6 +15,9 @@ import {
   Package,
 } from 'lucide-react';
 import { useAppearance } from '@/components/providers/AppearanceProvider';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { syncCustomerOrder } from '@/lib/notifications';
+import type { CustomerOrderSave } from '@/lib/tailor-session';
 
 interface OrderItem {
   name: string;
@@ -121,9 +124,41 @@ function statusClass(status: Order['status']) {
   return 'border-rose-200 bg-rose-50 text-rose-800';
 }
 
+function toDisplayOrder(item: CustomerOrderSave): Order {
+  return {
+    id: item.id,
+    boutique: item.tailorName || 'THY atelier',
+    rating: 4.8,
+    location: item.location || 'India',
+    status: item.status === 'Completed' ? 'Completed' : item.status === 'Cancelled' ? 'Cancelled' : 'In Progress',
+    currentStageText: item.currentStageText || item.status,
+    date: item.date || '',
+    total: item.total || 0,
+    paymentMode: item.paymentMode || 'Paid',
+    deliveryAddress: item.deliveryAddress || '',
+    items: [{ name: item.title, qty: 1, price: item.total || 0, fabric: item.fabric || 'Custom fabric' }],
+    timeline: item.timeline?.length
+      ? item.timeline
+      : [{ title: item.currentStageText || item.status, time: item.date || '', completed: item.status === 'Completed', active: item.status !== 'Completed' }],
+  };
+}
+
 export default function MyOrdersPage() {
   const { t } = useAppearance();
-  const [orders] = useState<Order[]>(INITIAL_ORDERS);
+  const { session } = useTailorSession();
+  const customerName = session.customerProfile?.fullName?.trim();
+  const liveOrders = (() => {
+    const merged = new Map<string, CustomerOrderSave>();
+    for (const order of session.customerOrders) {
+      merged.set(order.id, order);
+    }
+    for (const order of session.orders) {
+      const mine = merged.has(order.id) || Boolean(customerName && order.customerName === customerName);
+      if (mine) merged.set(order.id, syncCustomerOrder(order, merged.get(order.id)));
+    }
+    return Array.from(merged.values()).map(toDisplayOrder);
+  })();
+  const orders = liveOrders.length ? liveOrders : INITIAL_ORDERS;
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrderDetails, setSelectedOrderDetails] = useState<Order | null>(null);

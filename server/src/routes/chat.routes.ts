@@ -9,6 +9,7 @@ import {
   serveChatMedia,
   listCustomerDesigns,
   listCustomerMeasurements,
+  createCustomerMeasurement,
 } from '../controllers/chat.controller.js';
 
 const upload = multer({
@@ -30,3 +31,4 @@ chatRouter.get('/threads/:threadId/messages', authenticate, listMessages);
 chatRouter.post('/upload', authenticate, upload.single('file'), uploadChatMedia);
 chatRouter.get('/designs', authenticate, listCustomerDesigns);
 chatRouter.get('/measurements', authenticate, listCustomerMeasurements);
+chatRouter.post('/measurements', authenticate, createCustomerMeasurement);

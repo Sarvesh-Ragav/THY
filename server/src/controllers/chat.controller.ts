@@ -271,6 +271,26 @@ export const listCustomerDesigns: RequestHandler = async (req, res, next) => {
   }
 };
 
+const MEASUREMENT_CATEGORIES = ['sarees', 'salwars', 'sherwanis', 'lehengas', 'general', 'other'] as const;
+
+function measurementPayload(doc: { toJSON: () => Record<string, unknown> } | Record<string, unknown>) {
+  const obj = typeof (doc as { toJSON?: () => Record<string, unknown> }).toJSON === 'function'
+    ? (doc as { toJSON: () => Record<string, unknown> }).toJSON()
+    : { ...(doc as Record<string, unknown>) };
+  const rawValues = obj.values;
+  const values =
+    rawValues instanceof Map
+      ? Object.fromEntries(rawValues)
+      : rawValues && typeof rawValues === 'object'
+        ? rawValues
+        : {};
+  return {
+    ...obj,
+    id: String(obj.id || obj._id || ''),
+    values,
+  };
+}
+
 export const listCustomerMeasurements: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.auth?.userId;
@@ -282,7 +302,40 @@ export const listCustomerMeasurements: RequestHandler = async (req, res, next) =
       userId: new Types.ObjectId(userId),
     }).sort({ isDefault: -1, updatedAt: -1 });
 
-    res.status(200).json({ success: true, data: { measurements } });
+    res.status(200).json({
+      success: true,
+      data: { measurements: measurements.map(measurementPayload) },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createCustomerMeasurement: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.auth?.userId;
+    if (!userId) {
+      throw new ApiError(401, 'Unauthorized', 'UNAUTHORIZED');
+    }
+
+    const values = req.body?.values;
+    if (!values || typeof values !== 'object' || Array.isArray(values) || Object.keys(values).length === 0) {
+      throw new ApiError(400, 'Enter at least one measurement value.', 'VALIDATION_ERROR');
+    }
+
+    const category = MEASUREMENT_CATEGORIES.includes(req.body?.category)
+      ? req.body.category
+      : 'general';
+    const measurement = await CustomerMeasurement.create({
+      userId,
+      label: String(req.body?.label || 'Saved Measurement Set').trim().slice(0, 160) || 'Saved Measurement Set',
+      category,
+      values,
+      unit: req.body?.unit === 'cm' ? 'cm' : 'inch',
+      notes: typeof req.body?.notes === 'string' ? req.body.notes.slice(0, 500) : '',
+    });
+
+    res.status(201).json({ success: true, data: { measurement: measurementPayload(measurement) } });
   } catch (err) {
     next(err);
   }

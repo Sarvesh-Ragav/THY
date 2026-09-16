@@ -25,7 +25,9 @@ interface TailorSessionContextValue {
   session: TailorSession;
   isReady: boolean;
   accessToken: string | null;
-  updateSession: (partial: Partial<TailorSession>) => TailorSession;
+  updateSession: (
+    partial: Partial<TailorSession> | ((current: TailorSession) => Partial<TailorSession>)
+  ) => TailorSession;
   completeAuthentication: (
     result: AuthenticationResult,
     sessionPatch?: Partial<TailorSession>
@@ -62,15 +64,19 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
       .finally(() => setIsReady(true));
   }, []);
 
-  const updateSession = useCallback((partial: Partial<TailorSession>) => {
-    let next: TailorSession = createDefaultSession();
-    setSession((current) => {
-      next = { ...current, ...partial };
-      persistTailorSession(next);
+  const updateSession = useCallback(
+    (partial: Partial<TailorSession> | ((current: TailorSession) => Partial<TailorSession>)) => {
+      let next: TailorSession = createDefaultSession();
+      setSession((current) => {
+        const patch = typeof partial === 'function' ? partial(current) : partial;
+        next = { ...current, ...patch };
+        persistTailorSession(next);
+        return next;
+      });
       return next;
-    });
-    return next;
-  }, []);
+    },
+    []
+  );
 
   const completeAuthentication = useCallback(
     (result: AuthenticationResult, sessionPatch?: Partial<TailorSession>) => {

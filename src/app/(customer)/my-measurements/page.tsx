@@ -3,7 +3,7 @@
 import React from 'react';
 import { CustomerPage } from '@/components/customer/CustomerPage';
 import { RequireCustomerAuth } from '@/components/customer/RequireCustomerAuth';
-import { useC31 } from '@/hooks/useC31';
+import { useSavedMeasurements } from '@/hooks/useSavedMeasurements';
 
 export default function MyMeasurementsPage() {
   return (
@@ -14,18 +14,22 @@ export default function MyMeasurementsPage() {
 }
 
 function MeasurementsContent() {
-  const { state } = useC31();
+  const { measurements } = useSavedMeasurements();
 
   return (
     <CustomerPage titleKey="pageMeasurements">
-      <ul className="space-y-3 max-w-lg">
-        {state.measurements.map((item) => (
-          <li key={item.id} className="thy-card p-4">
-            <p>{item.label}</p>
-            <p className="text-sm text-thy-muted">{item.details}</p>
-          </li>
-        ))}
-      </ul>
+      {measurements.length === 0 ? (
+        <p className="text-sm text-thy-muted">No saved measurements yet. Add them from the stitching measurements step.</p>
+      ) : (
+        <ul className="space-y-3 max-w-lg">
+          {measurements.map((item) => (
+            <li key={item.id} className="thy-card p-4">
+              <p>{item.label}</p>
+              <p className="text-sm text-thy-muted">{item.details}</p>
+            </li>
+          ))}
+        </ul>
+      )}
     </CustomerPage>
   );
 }

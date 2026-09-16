@@ -5,16 +5,32 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CustomerPage } from '@/components/customer/CustomerPage';
 import { searchCatalog } from '@/lib/customer-home-data';
+import { useDirectoryTailors } from '@/hooks/useDirectoryTailors';
 
 function SearchResults() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') ?? '';
-  const { designs, tailors } = searchCatalog(query);
+  const { designs } = searchCatalog(query);
+  const { tailors: directoryTailors, loading } = useDirectoryTailors();
+  const needle = query.trim().toLowerCase();
+  const tailors = needle
+    ? directoryTailors.filter(
+        (tailor) =>
+          tailor.name.toLowerCase().includes(needle) ||
+          tailor.studio.toLowerCase().includes(needle) ||
+          tailor.specialty.toLowerCase().includes(needle) ||
+          tailor.specialties.some((item) => item.toLowerCase().includes(needle)) ||
+          tailor.city.toLowerCase().includes(needle) ||
+          tailor.bio.toLowerCase().includes(needle)
+      )
+    : [];
 
   return (
     <CustomerPage titleKey="pageSearch">
       {!query.trim() ? (
         <p className="text-sm text-thy-muted">Search designs, styles or tailors...</p>
+      ) : loading ? (
+        <p className="text-sm text-thy-muted">Searching signed-up tailors…</p>
       ) : designs.length === 0 && tailors.length === 0 ? (
         <p className="text-sm text-thy-muted">No results for “{query}”.</p>
       ) : (
@@ -42,14 +58,14 @@ function SearchResults() {
                     <Link key={tailor.id} href={`/tailors/${tailor.id}`} className="thy-card overflow-hidden">
                       <img src={tailor.image} alt="" className="h-36 sm:h-40 w-full object-cover" />
                       <div className="p-4">
-                        <p className="text-lg" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{tailor.name}</p>
+                        <p className="text-lg" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{tailor.studio}</p>
                         <p className="text-sm text-thy-muted">{tailor.specialty}</p>
                         {samples.length > 0 && (
                           <div className="mt-3 grid grid-cols-3 gap-1.5">
-                            {samples.map((image, index) => (
+                            {samples.map((item) => (
                               <img
-                                key={`${tailor.id}-sample-${index}`}
-                                src={image}
+                                key={item.id}
+                                src={item.image}
                                 alt=""
                                 className="h-12 w-full object-cover border border-thy-ink/10"
                               />

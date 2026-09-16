@@ -10,7 +10,8 @@ import {
   isC15Audience,
 } from '@/lib/c15-catalog';
 import { getStudioGarment } from '@/lib/design-studio';
-import { useC31 } from '@/hooks/useC31';
+import { useSavedMeasurements } from '@/hooks/useSavedMeasurements';
+import { measurementCategoryForGarment } from '@/lib/measurements';
 import {
   formatSizeMeasurements,
   SIZE_CHART,
@@ -48,7 +49,7 @@ function MeasurementsContent() {
   const audienceParam = searchParams.get('audience');
   const preset = useMemo(() => getStudioGarment(categoryId), [categoryId]);
   const query = `?category=${encodeURIComponent(preset.categoryId)}`;
-  const { state } = useC31();
+  const { measurements, addMeasurement, saving } = useSavedMeasurements();
   const sampleFileRef = useRef<HTMLInputElement>(null);
 
   const [view, setView] = useState<MethodView>('home');
@@ -150,16 +151,34 @@ function MeasurementsContent() {
               </div>
               <button
                 type="button"
-                className="hero-leather-btn mt-6 inline-flex items-center justify-center min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-center leading-none"
+                disabled={saving}
+                className="hero-leather-btn mt-6 inline-flex items-center justify-center min-h-12 px-6 text-[11px] font-semibold uppercase tracking-[0.16em] text-center leading-none disabled:opacity-50"
                 onClick={() => {
-                  persistChoice({
-                    method: 'manual',
-                    measurementLabel: MANUAL_FIELDS.map((field) => `${field} ${manualValues[field] || '—'} in`).join(' · '),
+                  const filled = Object.fromEntries(
+                    MANUAL_FIELDS
+                      .map((field) => [field, (manualValues[field] ?? '').trim()] as const)
+                      .filter(([, value]) => value)
+                  );
+                  if (Object.keys(filled).length === 0) {
+                    setMessage('Enter at least one measurement to save.');
+                    return;
+                  }
+                  void addMeasurement({
+                    label: `${garmentLabel} · Manual fit`,
+                    values: filled,
+                    category: measurementCategoryForGarment(preset.categoryId),
+                  }).then((saved) => {
+                    persistChoice({
+                      method: 'saved',
+                      measurementId: saved.id,
+                      measurementLabel: saved.details || saved.label,
+                    });
+                    setMessage('Measurements saved. They now appear in Saved measurements.');
+                    setView('home');
                   });
-                  setView('home');
                 }}
               >
-                Save measurements
+                {saving ? 'Saving…' : 'Save measurements'}
               </button>
             </>
           )}
@@ -473,7 +492,7 @@ function MeasurementsContent() {
       <section className="mt-10 max-w-3xl">
         <p className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle font-semibold">Saved measurements</p>
         <ul className="mt-3 space-y-3">
-          {state.measurements.map((item) => {
+          {measurements.map((item) => {
             const selected = choice?.method === 'saved' && choice.measurementId === item.id;
             return (
               <li key={item.id} className={`thy-card p-4 ${selected ? 'border-thy-brand' : ''}`}>
@@ -503,6 +522,11 @@ function MeasurementsContent() {
               </li>
             );
           })}
+          {measurements.length === 0 && (
+            <li className="thy-card p-4 text-sm text-thy-muted">
+              No saved measurements yet. Enter them manually and tap Save measurements.
+            </li>
+          )}
         </ul>
       </section>
 

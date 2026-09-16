@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { TailorPage } from '@/components/tailor/TailorPage';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { saveTailorPortfolio } from '@/lib/directory-api';
 
 interface PortfolioItem {
   id: string;
@@ -22,7 +23,7 @@ interface ServicePrice {
 }
 
 export default function TailorPortfolioManagementPage() {
-  const { session, updateSession } = useTailorSession();
+  const { session, updateSession, accessToken } = useTailorSession();
   const [isAddWorkOpen, setIsAddWorkOpen] = useState(false);
   const [isEditServicesOpen, setIsEditServicesOpen] = useState(false);
 
@@ -47,16 +48,34 @@ export default function TailorPortfolioManagementPage() {
       if (current.length) return current;
       return (session.tailorPortfolio ?? []).map((item, index) => ({
         ...item,
-        isFeatured: index < 2,
+        isFeatured: Boolean(item.isFeatured) || index < 2,
       }));
     });
   }, [session.tailorPortfolio]);
 
+  useEffect(() => {
+    const items = session.tailorPortfolio ?? [];
+    if (!accessToken || items.length === 0) return;
+    void saveTailorPortfolio(items, accessToken).catch((error) => {
+      console.warn('Could not publish portfolio to the directory:', error);
+    });
+  }, [accessToken, session.tailorPortfolio]);
+
   const persistPortfolio = (items: PortfolioItem[]) => {
     setPortfolioItems(items);
-    updateSession({
-      tailorPortfolio: items.map(({ id, title, image, category }) => ({ id, title, image, category })),
-    });
+    const payload = items.map(({ id, title, image, category, isFeatured }) => ({
+      id,
+      title,
+      image,
+      category,
+      isFeatured,
+    }));
+    updateSession({ tailorPortfolio: payload });
+    if (accessToken) {
+      void saveTailorPortfolio(payload, accessToken).catch((error) => {
+        console.warn('Could not save portfolio to the directory:', error);
+      });
+    }
   };
 
   // Services & Pricing State

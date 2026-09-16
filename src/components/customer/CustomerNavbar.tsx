@@ -13,6 +13,7 @@ import { CustomerLocationControl } from '@/components/customer/CustomerLocationC
 import { AppearanceControls } from '@/components/customer/AppearanceControls';
 import { favoritedDesigns } from '@/lib/wishlist';
 import { useAppearance } from '@/components/providers/AppearanceProvider';
+import { unreadCount } from '@/lib/notifications';
 
 const iconBtn =
   'thy-nav-icon inline-flex items-center justify-center h-11 w-11';
@@ -32,6 +33,7 @@ export function CustomerNavbar() {
 
   const loggedIn = isReady && session.isAuthenticated;
   const wishlistCount = favoritedDesigns(session).length;
+  const notificationCount = unreadCount(session.customerNotifications);
   const fullName = getAccountDisplayName(session);
   const displayName = session.customerProfile?.fullName
     ? getCustomerFirstName(session)
@@ -139,8 +141,13 @@ export function CustomerNavbar() {
 
         <div className="hidden lg:flex items-center gap-1 shrink-0">
           <AppearanceControls />
-          <button type="button" aria-label={t('navNotifications')} className={iconBtn} onClick={() => goAuthPath('/notifications')}>
+          <button type="button" aria-label={t('navNotifications')} className={`${iconBtn} relative`} onClick={() => goAuthPath('/notifications')}>
             <Bell size={18} />
+            {notificationCount > 0 ? (
+              <span className="absolute top-1.5 right-1.5 min-w-4 h-4 px-1 rounded-full bg-white text-thy-burgundy text-[9px] font-bold leading-4 text-center">
+                {notificationCount}
+              </span>
+            ) : null}
           </button>
           <button type="button" aria-label={t('navWishlist')} className={iconBtn} onClick={() => goAuthPath('/wishlist')}>
             <Heart size={18} className={wishlistCount > 0 ? 'fill-current' : undefined} />
@@ -201,8 +208,13 @@ export function CustomerNavbar() {
 
         <div className="flex lg:hidden items-center gap-0.5 ml-auto shrink-0">
           <AppearanceControls />
-          <button type="button" aria-label={t('navNotifications')} className={iconBtn} onClick={() => goAuthPath('/notifications')}>
+          <button type="button" aria-label={t('navNotifications')} className={`${iconBtn} relative`} onClick={() => goAuthPath('/notifications')}>
             <Bell size={18} />
+            {notificationCount > 0 ? (
+              <span className="absolute top-1.5 right-1.5 min-w-4 h-4 px-1 rounded-full bg-white text-thy-burgundy text-[9px] font-bold leading-4 text-center">
+                {notificationCount}
+              </span>
+            ) : null}
           </button>
           <button type="button" aria-label={t('navWishlist')} className={iconBtn} onClick={() => goAuthPath('/wishlist')}>
             <Heart size={18} className={wishlistCount > 0 ? 'fill-current' : undefined} />

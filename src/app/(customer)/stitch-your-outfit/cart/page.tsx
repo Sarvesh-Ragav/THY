@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { useCustomerLocation } from '@/hooks/useCustomerLocation';
+import { placeCustomerWorkspaceOrder } from '@/lib/notifications';
 
 const INITIAL_CART = [
   {
@@ -43,7 +44,7 @@ type CartItem = (typeof INITIAL_CART)[number];
 type Step = 'cart' | 'quotation' | 'checkout' | 'done';
 
 export default function StitchCartPage() {
-  const { session } = useTailorSession();
+  const { session, updateSession } = useTailorSession();
   const { label } = useCustomerLocation();
   const [step, setStep] = useState<Step>('cart');
   const [cart, setCart] = useState(INITIAL_CART);
@@ -383,6 +384,22 @@ export default function StitchCartPage() {
           className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"
           onSubmit={(event) => {
             event.preventDefault();
+            const first = quoteItem || activeCartItems[0];
+            if (first) {
+              updateSession((current) =>
+                placeCustomerWorkspaceOrder(current, {
+                  title: first.title,
+                  tailorName: first.tailorName,
+                  location: first.tailorExperience,
+                  total: Math.round(grandTotal),
+                  paymentMode:
+                    paymentMethod === 'cash' ? 'Cash on fabric pickup' : paymentMethod === 'card' ? 'Card' : 'UPI / GPay',
+                  deliveryAddress: pickupAddress || current.customerProfile?.address || current.selectedLocation || '',
+                  fabric: first.customizations.map((extra) => extra.name).join(', '),
+                  pickupSlot: pickupOption,
+                })
+              );
+            }
             setStep('done');
           }}
         >
@@ -494,7 +511,7 @@ export default function StitchCartPage() {
             Your stitch is in motion
           </h2>
           <p className="text-sm text-thy-muted">
-            Tracking reference THY-89241. Pickup is scheduled for the {pickupOption} slot. Follow progress from My Orders.
+            Pickup is scheduled for the {pickupOption} slot. Follow progress and alerts from My Orders and Notifications.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <Link href="/my-orders" className={leatherBtn}>

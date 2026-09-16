@@ -1,4 +1,4 @@
-import { TAILORS } from '@/lib/customer-home-data';
+import { cachedDirectoryTailor } from '@/lib/directory-api';
 
 const C31_KEY = 'thy-c31-commerce';
 
@@ -18,6 +18,7 @@ export interface SavedMeasurement {
   id: string;
   label: string;
   details: string;
+  values?: Record<string, string>;
 }
 
 export interface ChatAttachment {
@@ -133,8 +134,16 @@ export function loadC31(): C31State {
     if (!raw) return emptyC31();
     const parsed = JSON.parse(raw) as Partial<C31State>;
     return {
-      measurements: Array.isArray(parsed.measurements) && parsed.measurements.length
-        ? parsed.measurements
+      measurements: Array.isArray(parsed.measurements)
+        ? parsed.measurements.map((item) => ({
+            id: String(item.id ?? ''),
+            label: String(item.label ?? 'Saved measurements'),
+            details: String(item.details ?? ''),
+            values:
+              item.values && typeof item.values === 'object' && !Array.isArray(item.values)
+                ? Object.fromEntries(Object.entries(item.values).map(([key, value]) => [key, String(value)]))
+                : undefined,
+          }))
         : DEFAULT_MEASUREMENTS,
       threads: Array.isArray(parsed.threads) ? parsed.threads : [],
       cart: Array.isArray(parsed.cart) ? parsed.cart : [],
@@ -156,7 +165,7 @@ export function persistC31(state: C31State) {
 }
 
 export function tailorDirectoryEntry(tailorId?: string | null) {
-  return TAILORS.find((item) => item.id === tailorId) ?? TAILORS[0];
+  return cachedDirectoryTailor(tailorId);
 }
 
 export function chatHref(tailorId: string, from: ChatEntry = 'profile') {
@@ -172,17 +181,19 @@ export function nowStamp() {
 }
 
 export function ensureThread(state: C31State, tailorId?: string | null): { state: C31State; thread: ChatThread } {
-  const tailor = tailorDirectoryEntry(tailorId);
-  const existing = state.threads.find((thread) => thread.tailorId === tailor.id);
+  const id = tailorId || 'tailor';
+  const existing = state.threads.find((thread) => thread.tailorId === id);
   if (existing) {
     return { state, thread: existing };
   }
+  const cached = cachedDirectoryTailor(id);
+  const tailorName = cached?.name || 'Tailor';
   const thread: ChatThread = {
-    id: `thread-${tailor.id}`,
-    tailorId: tailor.id,
-    tailorName: tailor.name,
-    tailorStudio: tailor.studio,
-    verified: true,
+    id: `thread-${id}`,
+    tailorId: id,
+    tailorName,
+    tailorStudio: cached?.studio || 'Atelier',
+    verified: Boolean(cached?.verified),
     online: true,
     status: 'new',
     messages: [
@@ -190,7 +201,7 @@ export function ensureThread(state: C31State, tailorId?: string | null): { state
         id: `sys-${Date.now()}`,
         sender: 'tailor',
         kind: 'system',
-        text: `You can talk through design, fabric, measurements, customization, stitching, and price with ${tailor.name}.`,
+        text: `You can talk through design, fabric, measurements, customization, stitching, and price with ${tailorName}.`,
         createdAt: nowStamp(),
         status: 'read',
       },

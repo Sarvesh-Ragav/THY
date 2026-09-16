@@ -3,11 +3,7 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, ImagePlus, Sparkles, Upload, X } from 'lucide-react';
-import {
-  FABRIC_TREATMENTS,
-  getStudioGarment,
-  type FabricTreatment,
-} from '@/lib/design-studio';
+import { getStudioGarment } from '@/lib/design-studio';
 import {
   patchStudioDraft,
   readFileAsDataUrl,
@@ -54,7 +50,6 @@ function DesignPreviewContent() {
   const fileRef = useRef<HTMLInputElement>(null);
   const patternFileRef = useRef<HTMLInputElement>(null);
 
-  const [treatments, setTreatments] = useState<FabricTreatment[]>(preset.treatments);
   const [fabricImage, setFabricImage] = useState(preset.fabricImage);
   const [fabricLabel, setFabricLabel] = useState(preset.fabric);
   const [patternImage, setPatternImage] = useState<string | null>(null);
@@ -76,7 +71,6 @@ function DesignPreviewContent() {
 
   useEffect(() => {
     const draft = readStudioDraft(preset.categoryId);
-    setTreatments(draft?.treatments?.length ? draft.treatments : preset.treatments);
     setFabricImage(draft?.fabricImage || preset.fabricImage);
     setFabricLabel(draft?.fabricLabel || preset.fabric);
     setPatternImage(draft?.patternImage || null);
@@ -98,7 +92,6 @@ function DesignPreviewContent() {
   const persistDraft = (next?: {
     fabricImage?: string;
     fabricLabel?: string;
-    treatments?: FabricTreatment[];
     patternImage?: string | null;
     patternLabel?: string | null;
     aiRender?: string | null;
@@ -106,7 +99,7 @@ function DesignPreviewContent() {
     patchStudioDraft(preset.categoryId, {
       fabricImage: next?.fabricImage ?? fabricImage,
       fabricLabel: next?.fabricLabel ?? fabricLabel,
-      treatments: next?.treatments ?? treatments,
+      treatments: [],
       patternImage:
         next && 'patternImage' in next
           ? (next.patternImage ?? undefined)
@@ -195,7 +188,6 @@ function DesignPreviewContent() {
           silhouette: preset.silhouette,
           fabricImage,
           patternImage: currentPatternImage,
-          treatments,
           customization,
         }),
       });
@@ -211,7 +203,6 @@ function DesignPreviewContent() {
         updateSession({
           customerDesigns: refreshFavoritedImage(session.customerDesigns, designId, data.image, {
             fabric: fabricLabel,
-            treatments,
           }),
         });
       }
@@ -243,7 +234,6 @@ function DesignPreviewContent() {
     categoryId: preset.categoryId,
     garment: preset.garment,
     fabric: fabricLabel,
-    treatments,
     patternImage: currentPatternImage,
     patternLabel: currentPatternLabel,
   };
@@ -410,27 +400,6 @@ function DesignPreviewContent() {
                 </dd>
               </div>
             </dl>
-          </div>
-
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.16em] text-thy-subtle mb-2">Treatments on this piece</p>
-            <div className="flex flex-wrap gap-2">
-              {FABRIC_TREATMENTS.map((treatment) => {
-                const active = treatments.includes(treatment);
-                return (
-                  <span
-                    key={treatment}
-                    className={`inline-flex items-center px-3 min-h-9 text-[11px] uppercase tracking-[0.12em] border ${
-                      active
-                        ? 'border-thy-brand/40 bg-thy-mist text-thy-brand'
-                        : 'border-thy-ink/10 bg-thy-bg text-thy-subtle'
-                    }`}
-                  >
-                    {treatment}
-                  </span>
-                );
-              })}
-            </div>
           </div>
 
           <div className="bg-thy-mist/90 border border-thy-ink/10 p-4 space-y-4">

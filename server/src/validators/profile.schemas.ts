@@ -39,15 +39,48 @@ export const updateAddressSchema = z.object({
 
 export const addressIdSchema = z.object({ addressId: z.string().uuid() });
 
+export const tailorAvailabilitySchema = z.object({
+  isAvailable: z.boolean().optional(),
+  vacationMode: z.boolean().optional(),
+  maxActiveCapacity: z.coerce.number().int().min(1).max(50).optional(),
+  schedule: z
+    .array(
+      z.object({
+        day: trimmed(16),
+        isOpen: z.boolean(),
+        openTime: z.string().trim().max(8),
+        closeTime: z.string().trim().max(8),
+      })
+    )
+    .max(7)
+    .optional(),
+});
+
 export const tailorProfileSchema = z.object({
   fullName: trimmed(120).optional(),
   shopName: trimmed(160).optional(),
   yearsOfExperience: z.coerce.number().int().min(0).max(80).optional(),
   shopAddress: trimmed(1_000).optional(),
+  city: optionalTrimmed(120),
+  availability: tailorAvailabilitySchema.optional(),
 }).refine((value) => Object.values(value).some((item) => item !== undefined), 'At least one profile field is required.');
 
 export const tailorVerificationSchema = z.object({
   idType: trimmed(64),
   idNumber: z.string().trim().min(4).max(128),
   documentName: trimmed(255),
+});
+
+export const tailorPortfolioSchema = z.object({
+  portfolio: z
+    .array(
+      z.object({
+        id: z.string().trim().max(80).optional(),
+        title: trimmed(160),
+        image: z.string().min(1).max(8_000_000),
+        category: z.string().trim().min(1).max(80).default('general'),
+        isFeatured: z.boolean().optional(),
+      })
+    )
+    .max(40),
 });

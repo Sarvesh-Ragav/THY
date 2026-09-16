@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { RequireCustomerAuth } from '@/components/customer/RequireCustomerAuth';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { formatPaise, getOrder } from '@/lib/payment-api';
+import { placeCustomerWorkspaceOrder } from '@/lib/notifications';
 import type { PersistedOrder } from '@/types/payment';
 
 export default function CheckoutConfirmationPage() {
@@ -20,7 +21,7 @@ export default function CheckoutConfirmationPage() {
 
 function Confirmation() {
   const searchParams = useSearchParams();
-  const { accessToken } = useTailorSession();
+  const { accessToken, updateSession } = useTailorSession();
   const [order, setOrder] = useState<PersistedOrder | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,9 +29,24 @@ function Confirmation() {
     const id = searchParams.get('order');
     if (!accessToken || !id) return;
     void getOrder(accessToken, id)
-      .then(({ order: saved }) => setOrder(saved))
+      .then(({ order: saved }) => {
+        setOrder(saved);
+        if (saved.paymentStatus === 'paid') {
+          updateSession((current) => {
+            if (current.customerOrders.some((item) => item.id === saved.id)) return {};
+            return placeCustomerWorkspaceOrder(current, {
+              title: saved.garmentName,
+              tailorName: saved.tailorName,
+              total: Math.round(saved.amountPaise / 100),
+              paymentMode: 'Paid',
+              deliveryAddress: current.customerProfile?.address || '',
+              fabric: saved.garmentName,
+            });
+          });
+        }
+      })
       .catch((reason) => setError(reason instanceof Error ? reason.message : 'Unable to load order.'));
-  }, [accessToken, searchParams]);
+  }, [accessToken, searchParams, updateSession]);
 
   const paid = order?.paymentStatus === 'paid';
 

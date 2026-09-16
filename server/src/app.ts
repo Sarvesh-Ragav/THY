@@ -45,7 +45,7 @@ app.use(
 );
 // Razorpay signs the exact payload bytes, so this route must precede express.json().
 app.post('/api/v1/payments/webhook', express.raw({ type: 'application/json' }), razorpayWebhook);
-app.use(express.json({ limit: '16kb' }));
+app.use(express.json({ limit: '8mb' }));
 app.use(cookieParser());
 app.get('/api/v1/health', async (_request, response, next) => {
   try {

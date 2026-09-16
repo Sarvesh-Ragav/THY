@@ -4,17 +4,11 @@ import React, { Suspense, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { BadgeCheck, MapPin, Search, SlidersHorizontal, Star, X } from 'lucide-react';
-import {
-  CITIES,
-  TAILOR_AVAILABILITY_LABELS,
-  TAILOR_SPECIALTIES,
-  TAILORS,
-  specialtyForCategory,
-  type DirectoryTailor,
-  type TailorAvailability,
-} from '@/lib/customer-home-data';
+import { CITIES, specialtyForCategory } from '@/lib/customer-home-data';
 import { chatHref } from '@/lib/c31';
 import { useCustomerLocation } from '@/hooks/useCustomerLocation';
+import { useDirectoryTailors } from '@/hooks/useDirectoryTailors';
+import type { PublicDirectoryTailor } from '@/lib/directory';
 import {
   NEAR_ME_RADIUS_KM,
   distanceToCity,
@@ -36,16 +30,25 @@ export default function TailorsPage() {
 function TailorDirectory() {
   const searchParams = useSearchParams();
   const presetSpecialty = specialtyForCategory(searchParams.get('category'));
+  const { tailors, loading, error: loadError } = useDirectoryTailors();
   const { label, coords, detecting, error, detect } = useCustomerLocation();
   const [query, setQuery] = useState('');
   const [nearMe, setNearMe] = useState(false);
   const [cities, setCities] = useState<string[]>([]);
   const [specialties, setSpecialties] = useState<string[]>(presetSpecialty ? [presetSpecialty] : []);
-  const [availability, setAvailability] = useState<TailorAvailability[]>([]);
   const [minRating, setMinRating] = useState(0);
   const [minExperience, setMinExperience] = useState(0);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const directoryCities = useMemo(() => {
+    const live = Array.from(new Set(tailors.map((tailor) => tailor.city).filter(Boolean)));
+    return live.length > 0 ? live : [...CITIES];
+  }, [tailors]);
+  const directorySpecialties = useMemo(
+    () => Array.from(new Set(tailors.flatMap((tailor) => tailor.specialties.length ? tailor.specialties : [tailor.specialty]))),
+    [tailors]
+  );
 
   const toggleNearMe = () => {
     const next = !nearMe;
@@ -58,7 +61,7 @@ function TailorDirectory() {
 
   const results = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    const ranked = TAILORS.map((tailor) => ({
+    const ranked = tailors.map((tailor) => ({
       tailor,
       distanceKm: coords ? distanceToCity(coords, tailor.city) : null,
     })).filter(({ tailor }) => {
@@ -66,15 +69,17 @@ function TailorDirectory() {
         !needle ||
         tailor.name.toLowerCase().includes(needle) ||
         tailor.studio.toLowerCase().includes(needle) ||
-        tailor.headline.toLowerCase().includes(needle) ||
+        tailor.bio.toLowerCase().includes(needle) ||
         tailor.specialty.toLowerCase().includes(needle) ||
+        tailor.specialties.some((item) => item.toLowerCase().includes(needle)) ||
         tailor.city.toLowerCase().includes(needle);
-      const matchesSpecialty = specialties.length === 0 || specialties.includes(tailor.specialty);
-      const matchesAvailability = availability.length === 0 || availability.includes(tailor.availability);
+      const matchesSpecialty =
+        specialties.length === 0 ||
+        specialties.some((item) => tailor.specialty === item || tailor.specialties.includes(item));
       const matchesRating = tailor.rating >= minRating;
       const matchesExperience = tailor.yearsExperience >= minExperience;
       const matchesVerified = !verifiedOnly || tailor.verified;
-      return matchesQuery && matchesSpecialty && matchesAvailability && matchesRating && matchesExperience && matchesVerified;
+      return matchesQuery && matchesSpecialty && matchesRating && matchesExperience && matchesVerified;
     });
 
     if (nearMe && coords) {
@@ -93,14 +98,13 @@ function TailorDirectory() {
     }
 
     return ranked;
-  }, [query, cities, specialties, availability, minRating, minExperience, verifiedOnly, nearMe, coords]);
+  }, [tailors, query, cities, specialties, minRating, minExperience, verifiedOnly, nearMe, coords]);
 
   const clearFilters = () => {
     setQuery('');
     setNearMe(false);
     setCities([]);
     setSpecialties([]);
-    setAvailability([]);
     setMinRating(0);
     setMinExperience(0);
     setVerifiedOnly(false);
@@ -110,7 +114,6 @@ function TailorDirectory() {
     (nearMe ? 1 : 0) +
     cities.length +
     specialties.length +
-    availability.length +
     (minRating > 0 ? 1 : 0) +
     (minExperience > 0 ? 1 : 0) +
     (verifiedOnly ? 1 : 0) +
@@ -123,14 +126,14 @@ function TailorDirectory() {
       nearMe={nearMe}
       onToggleNearMe={toggleNearMe}
       cities={cities}
+      cityOptions={directoryCities}
       onToggleCity={(city) => {
         setNearMe(false);
         toggleValue(cities, city, setCities);
       }}
       specialties={specialties}
+      specialtyOptions={directorySpecialties}
       onToggleSpecialty={(item) => toggleValue(specialties, item, setSpecialties)}
-      availability={availability}
-      onToggleAvailability={(item) => toggleValue(availability, item, setAvailability)}
       minRating={minRating}
       onMinRating={setMinRating}
       minExperience={minExperience}
@@ -151,7 +154,7 @@ function TailorDirectory() {
         Tailors
       </h1>
       <p className="mt-3 max-w-xl text-sm text-thy-muted">
-        Browse portfolio work while you compare makers, then open a full profile to message or request an estimate.
+        Browse signed-up ateliers and the same public portfolio they publish from their dashboard.
         {label ? ` Your location: ${label}.` : detecting ? ' Detecting your location…' : ''}
       </p>
 
@@ -168,7 +171,7 @@ function TailorDirectory() {
         <section>
           <div className="flex flex-wrap items-end justify-between gap-3">
             <p className="text-sm text-thy-muted">
-              {results.length} {results.length === 1 ? 'profile' : 'profiles'}
+              {loading ? 'Loading profiles…' : `${results.length} ${results.length === 1 ? 'profile' : 'profiles'}`}
               {presetSpecialty && specialties.includes(presetSpecialty) ? ` · ${presetSpecialty}` : ''}
               {nearMe ? ' · Near me' : ''}
             </p>
@@ -185,6 +188,9 @@ function TailorDirectory() {
               </button>
             </p>
           )}
+          {loadError && (
+            <p className="mt-3 text-sm text-rose-700">{loadError}</p>
+          )}
 
           <ul className="mt-4 space-y-3">
             {results.map(({ tailor, distanceKm }) => (
@@ -194,14 +200,18 @@ function TailorDirectory() {
             ))}
           </ul>
 
-          {results.length === 0 && (
+          {!loading && results.length === 0 && !loadError && (
             <div className="thy-card p-6 text-sm text-thy-muted">
-              {nearMe
-                ? 'No tailors found near your location yet. Try another city filter, or clear Near me.'
-                : 'No tailors match these filters.'}
-              <button type="button" className="ml-2 text-thy-burgundy underline cursor-pointer" onClick={clearFilters}>
-                Clear filters
-              </button>
+              {tailors.length === 0
+                ? 'No signed-up tailors are in the directory yet.'
+                : nearMe
+                  ? 'No tailors found near your location yet. Try another city filter, or clear Near me.'
+                  : 'No tailors match these filters.'}
+              {tailors.length > 0 && (
+                <button type="button" className="ml-2 text-thy-burgundy underline cursor-pointer" onClick={clearFilters}>
+                  Clear filters
+                </button>
+              )}
             </div>
           )}
         </section>
@@ -229,7 +239,7 @@ function TailorResultCard({
   tailor,
   distanceKm,
 }: {
-  tailor: DirectoryTailor;
+  tailor: PublicDirectoryTailor;
   distanceKm?: number | null;
 }) {
   const portfolioPreview = tailor.portfolio.slice(0, 4);
@@ -251,7 +261,7 @@ function TailorResultCard({
               className="text-xl leading-tight hover:text-thy-burgundy"
               style={{ fontFamily: 'var(--font-cormorant), serif' }}
             >
-              {tailor.name}
+              {tailor.studio}
             </Link>
             {tailor.verified && (
               <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-thy-burgundy font-semibold">
@@ -260,21 +270,25 @@ function TailorResultCard({
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-thy-ink">{tailor.headline}</p>
+          <p className="mt-1 text-sm text-thy-ink">{tailor.name}</p>
+          <p className="mt-1 text-sm text-thy-muted">{tailor.bio}</p>
           <p className="mt-1 text-sm text-thy-muted inline-flex items-center gap-1">
             <MapPin size={13} />
             {tailor.studio} · {tailor.city}
             {distanceKm != null ? ` · ${formatDistanceKm(distanceKm)} away` : ''}
           </p>
           <p className="mt-2 text-xs text-thy-subtle">
-            {tailor.specialty} · {tailor.yearsExperience}+ yrs · {tailor.ordersCompleted} orders ·{' '}
-            {TAILOR_AVAILABILITY_LABELS[tailor.availability]}
+            {tailor.specialty}
+            {tailor.yearsExperience > 0 ? ` · ${tailor.yearsExperience}+ yrs` : ''}
+            {` · ${tailor.acceptingOrders === false ? 'Temporarily booked' : 'Accepting orders'}`}
           </p>
-          <p className="mt-1 inline-flex items-center gap-1 text-sm text-thy-ink">
-            <Star size={14} className="text-thy-burgundy fill-thy-burgundy" />
-            {tailor.rating.toFixed(1)}
-            <span className="text-thy-muted">({tailor.reviewCount})</span>
-          </p>
+          {tailor.reviewCount > 0 && (
+            <p className="mt-1 inline-flex items-center gap-1 text-sm text-thy-ink">
+              <Star size={14} className="text-thy-burgundy fill-thy-burgundy" />
+              {tailor.rating.toFixed(1)}
+              <span className="text-thy-muted">({tailor.reviewCount})</span>
+            </p>
+          )}
         </div>
         <div className="flex sm:flex-col gap-2 sm:w-40 shrink-0">
           <Link
@@ -298,15 +312,15 @@ function TailorResultCard({
             </Link>
           </div>
           <div className="grid grid-cols-4 gap-2">
-            {portfolioPreview.map((image, index) => (
+            {portfolioPreview.map((item) => (
               <Link
-                key={`${tailor.id}-preview-${index}`}
+                key={item.id}
                 href={`/tailors/${tailor.id}`}
                 className="group overflow-hidden border border-thy-ink/10 bg-thy-mist/40"
               >
                 <img
-                  src={image}
-                  alt=""
+                  src={item.image}
+                  alt={item.title}
                   className="h-16 sm:h-20 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </Link>
@@ -324,11 +338,11 @@ function Filters({
   nearMe,
   onToggleNearMe,
   cities,
+  cityOptions,
   onToggleCity,
   specialties,
+  specialtyOptions,
   onToggleSpecialty,
-  availability,
-  onToggleAvailability,
   minRating,
   onMinRating,
   minExperience,
@@ -342,11 +356,11 @@ function Filters({
   nearMe: boolean;
   onToggleNearMe: () => void;
   cities: string[];
+  cityOptions: string[];
   onToggleCity: (city: string) => void;
   specialties: string[];
+  specialtyOptions: string[];
   onToggleSpecialty: (specialty: string) => void;
-  availability: TailorAvailability[];
-  onToggleAvailability: (value: TailorAvailability) => void;
   minRating: number;
   onMinRating: (value: number) => void;
   minExperience: number;
@@ -376,27 +390,18 @@ function Filters({
 
       <FilterGroup title="Location">
         <CheckRow label="Near me" checked={nearMe} onChange={onToggleNearMe} />
-        {CITIES.map((city) => (
+        {cityOptions.map((city) => (
           <CheckRow key={city} label={city} checked={cities.includes(city)} onChange={() => onToggleCity(city)} />
         ))}
       </FilterGroup>
 
-      <FilterGroup title="Specialty">
-        {TAILOR_SPECIALTIES.map((item) => (
-          <CheckRow key={item} label={item} checked={specialties.includes(item)} onChange={() => onToggleSpecialty(item)} />
-        ))}
-      </FilterGroup>
-
-      <FilterGroup title="Availability">
-        {(Object.keys(TAILOR_AVAILABILITY_LABELS) as TailorAvailability[]).map((item) => (
-          <CheckRow
-            key={item}
-            label={TAILOR_AVAILABILITY_LABELS[item]}
-            checked={availability.includes(item)}
-            onChange={() => onToggleAvailability(item)}
-          />
-        ))}
-      </FilterGroup>
+      {specialtyOptions.length > 0 && (
+        <FilterGroup title="Specialty">
+          {specialtyOptions.map((item) => (
+            <CheckRow key={item} label={item} checked={specialties.includes(item)} onChange={() => onToggleSpecialty(item)} />
+          ))}
+        </FilterGroup>
+      )}
 
       <FilterGroup title="Rating">
         {[0, 4, 4.5].map((value) => (

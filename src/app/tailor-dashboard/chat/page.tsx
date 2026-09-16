@@ -12,9 +12,10 @@ import {
 import { ThreadList } from '@/components/chat/ThreadList';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { TailorPage } from '@/components/tailor/TailorPage';
+import { notifyFromIncomingChat, recordQuotationForCustomer } from '@/lib/notifications';
 
 export default function TailorChatPage() {
-  const { accessToken } = useTailorSession();
+  const { updateSession, accessToken } = useTailorSession();
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [loadingThreads, setLoadingThreads] = useState(true);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -62,7 +63,9 @@ export default function TailorChatPage() {
     isTyping,
     send,
     sendTyping,
-  } = useSocketChat(activeId, accessToken, activeThread, 'tailor');
+  } = useSocketChat(activeId, accessToken, activeThread, 'tailor', (message) => {
+    updateSession((current) => notifyFromIncomingChat(current, 'tailor', message, activeThread?.customerName || 'Customer') || {});
+  });
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -87,19 +90,27 @@ export default function TailorChatPage() {
 
   const sendPrice = () => {
     if (!activeId || !price.trim()) return;
+    const amount = price.trim();
 
     send({
       kind: 'quotation',
-      text: `Quotation: ₹${price.trim()}`,
+      text: `Quotation: ₹${amount}`,
       quotation: {
         id: `q-${Date.now()}`,
-        price: price.trim(),
+        price: amount,
         notes: note,
         status: 'pending',
       },
     });
 
     setPrice('');
+    updateSession((current) =>
+      recordQuotationForCustomer(current, {
+        garmentType: activeThread?.lastMessage?.text || 'Custom garment',
+        customerName: activeThread?.customerName || 'Customer',
+        amount,
+      })
+    );
   };
 
   if (loadingThreads) {

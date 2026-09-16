@@ -9,6 +9,7 @@ import { useAppearance } from '@/components/providers/AppearanceProvider';
 import { ThyLogo } from '@/components/auth/ThyLogo';
 import { AppearanceControls } from '@/components/customer/AppearanceControls';
 import { TAILOR_NAV_I18N } from '@/lib/i18n';
+import { ensureStudioWorkspace } from '@/lib/tailor-studio';
 
 const NAV_LINKS = [
   { label: 'Dashboard', href: '/tailor-dashboard' },
@@ -26,7 +27,7 @@ export default function TailorDashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { session, isReady, logout } = useTailorSession();
+  const { session, isReady, logout, updateSession } = useTailorSession();
   const { t } = useAppearance();
   const router = useRouter();
   const pathname = usePathname();
@@ -38,6 +39,12 @@ export default function TailorDashboardLayout({
       router.replace('/login');
     }
   }, [isReady, session.isAuthenticated, router]);
+
+  useEffect(() => {
+    if (!isReady || !session.isAuthenticated || session.role !== 'tailor') return;
+    const seeded = ensureStudioWorkspace(session);
+    if (seeded) updateSession(seeded);
+  }, [isReady, session, updateSession]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -63,6 +70,7 @@ export default function TailorDashboardLayout({
 
   const displayName = session.profile?.fullName || 'Tailor Account';
   const displayEmail = session.identifier.includes('@') ? session.identifier : session.profile?.phone || '';
+  const unreadCount = (session.notifications ?? []).filter((item) => !item.isRead).length;
 
   return (
     <div
@@ -88,9 +96,14 @@ export default function TailorDashboardLayout({
             <Link
               href="/tailor-dashboard/notifications"
               aria-label="Notifications"
-              className="thy-nav-icon inline-flex items-center justify-center h-11 w-11"
+              className="thy-nav-icon relative inline-flex items-center justify-center h-11 w-11"
             >
               <Bell size={18} />
+              {unreadCount > 0 ? (
+                <span className="absolute top-1.5 right-1.5 min-w-4 h-4 px-1 rounded-full bg-white text-thy-burgundy text-[9px] font-bold leading-4 text-center">
+                  {unreadCount}
+                </span>
+              ) : null}
             </Link>
 
             <div className="relative" ref={dropdownRef}>

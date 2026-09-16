@@ -6,7 +6,8 @@ import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { useAppearance } from '@/components/providers/AppearanceProvider';
 import { HeroCarousel } from '@/components/customer/HeroCarousel';
 import { CategoryGrid } from '@/components/customer/CategoryGrid';
-import { DESIGNS, TAILORS } from '@/lib/customer-home-data';
+import { DESIGNS } from '@/lib/customer-home-data';
+import { useDirectoryTailors } from '@/hooks/useDirectoryTailors';
 import { hasCustomerActivity, isCustomerOnboardingComplete } from '@/lib/tailor-session';
 import { useCustomerLocation } from '@/hooks/useCustomerLocation';
 import { NEAR_ME_RADIUS_KM, distanceToCity, nearestCity } from '@/lib/geo';
@@ -19,15 +20,17 @@ export function CustomerHome() {
   const activity = loggedIn && hasCustomerActivity(session);
   const picked = DESIGNS.filter((design) => design.popular);
   const trending = DESIGNS.filter((design) => design.trending);
+  const { tailors } = useDirectoryTailors();
   const nearbyTailors = React.useMemo(() => {
-    if (!coords) return TAILORS.slice(0, 4);
-    const ranked = [...TAILORS]
+    if (tailors.length === 0) return [];
+    if (!coords) return tailors.slice(0, 4);
+    const ranked = [...tailors]
       .map((tailor) => ({ tailor, km: distanceToCity(coords, tailor.city) ?? Number.POSITIVE_INFINITY }))
       .sort((a, b) => a.km - b.km);
     const nearby = ranked.filter((item) => item.km <= NEAR_ME_RADIUS_KM);
     const source = nearby.length > 0 ? nearby : ranked.filter((item) => item.tailor.city === nearestCity(coords).city);
     return (source.length > 0 ? source : ranked).slice(0, 4).map((item) => item.tailor);
-  }, [coords]);
+  }, [coords, tailors]);
 
   return (
     <>
@@ -58,6 +61,7 @@ export function CustomerHome() {
             {t('homeFindTailor')}
           </h2>
           {label && <p className="mt-1 text-sm text-thy-muted">{t('homeNear')} {label}</p>}
+          {nearbyTailors.length > 0 ? (
           <div className="mt-5 sm:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {nearbyTailors.map((tailor) => {
               const samples = tailor.portfolio.slice(0, 3);
@@ -65,14 +69,17 @@ export function CustomerHome() {
                 <Link key={tailor.id} href={`/tailors/${tailor.id}`} className="thy-card overflow-hidden hover:border-black transition-colors">
                   <img src={tailor.image} alt="" className="h-36 sm:h-40 w-full object-cover" />
                   <div className="p-4">
-                    <h3 className="text-xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{tailor.name}</h3>
-                    <p className="text-sm text-thy-muted">{tailor.specialty} · {tailor.city}</p>
+                    <h3 className="text-xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>{tailor.studio}</h3>
+                    <p className="text-sm text-thy-muted">
+                      {tailor.specialty} · {tailor.city}
+                      {tailor.acceptingOrders === false ? ' · Booked' : ' · Available'}
+                    </p>
                     {samples.length > 0 && (
                       <div className="mt-3 grid grid-cols-3 gap-1.5">
-                        {samples.map((image, index) => (
+                        {samples.map((item) => (
                           <img
-                            key={`${tailor.id}-sample-${index}`}
-                            src={image}
+                            key={item.id}
+                            src={item.image}
                             alt=""
                             className="h-12 w-full object-cover border border-black"
                           />
@@ -84,6 +91,9 @@ export function CustomerHome() {
               );
             })}
           </div>
+          ) : (
+            <p className="mt-5 text-sm text-thy-muted">Signed-up tailors and their public portfolios will appear here.</p>
+          )}
         </div>
 
         <div>

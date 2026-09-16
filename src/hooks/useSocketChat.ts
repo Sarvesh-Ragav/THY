@@ -36,7 +36,8 @@ export function useSocketChat(
   threadId: string | null,
   accessToken: string | null,
   initialThread: ChatThread | null = null,
-  role: 'customer' | 'tailor' = 'customer'
+  role: 'customer' | 'tailor' = 'customer',
+  onIncoming?: (message: ChatMessage) => void
 ) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [thread, setThread] = useState<ChatThread | null>(initialThread);
@@ -44,6 +45,8 @@ export function useSocketChat(
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const incomingRef = useRef(onIncoming);
+  incomingRef.current = onIncoming;
   const socketRef = useRef<Socket | null>(null);
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastTypingSentRef = useRef<number>(0);
@@ -109,6 +112,7 @@ export function useSocketChat(
             return prev.map((m) => (m._id === message._id || m.id === message.id ? message : m));
           }
 
+          incomingRef.current?.(message);
           return [...prev, message];
         });
         socket.emit('chat:read', { threadId });

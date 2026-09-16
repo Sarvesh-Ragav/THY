@@ -19,6 +19,10 @@ const TailorPortfolioItemSchema = new Schema(
       type: Number,
       default: 0,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -133,6 +137,29 @@ const TailorProfileSchema = new Schema(
       type: Boolean,
       default: true,
       index: true,
+    },
+    isAvailable: {
+      type: Boolean,
+      default: true,
+    },
+    vacationMode: {
+      type: Boolean,
+      default: false,
+    },
+    maxActiveCapacity: {
+      type: Number,
+      default: 10,
+    },
+    schedule: {
+      type: [
+        {
+          day: { type: String, required: true },
+          isOpen: { type: Boolean, default: true },
+          openTime: { type: String, default: '09:00' },
+          closeTime: { type: String, default: '19:00' },
+        },
+      ],
+      default: [],
     },
     verification: {
       type: TailorVerificationSchema,

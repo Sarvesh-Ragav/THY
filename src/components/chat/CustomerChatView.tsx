@@ -8,17 +8,17 @@ import { useSocketChat } from '@/hooks/useSocketChat';
 import {
   ensureThread,
   listCustomerDesigns,
-  listCustomerMeasurements,
   resolveMediaUrl,
   type ChatAttachment,
-  type ChatMessage,
   type ChatThread,
   type CustomerDesign,
-  type SavedCustomerMeasurement,
 } from '@/lib/chat-api';
+import { toShareableMeasurement } from '@/lib/measurements';
+import { useSavedMeasurements } from '@/hooks/useSavedMeasurements';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { tailorDirectoryEntry, estimateHref, type ChatEntry } from '@/lib/c31';
 import type { CustomerDesignSave } from '@/lib/tailor-session';
+import { notifyFromIncomingChat, recordEstimateRequest } from '@/lib/notifications';
 
 const ghostBtn =
   'inline-flex items-center justify-center min-h-11 px-4 text-sm border border-thy-ink/15 bg-thy-surface text-thy-ink hover:bg-thy-mist transition-colors';
@@ -32,7 +32,8 @@ export function CustomerChatView({
   from?: ChatEntry | string | null;
   designs?: CustomerDesignSave[];
 }) {
-  const { accessToken } = useTailorSession();
+  const { updateSession, accessToken } = useTailorSession();
+  const { measurements: savedMeasurements } = useSavedMeasurements();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [activeThread, setActiveThread] = useState<ChatThread | null>(null);
@@ -47,7 +48,6 @@ export function CustomerChatView({
 
   // MongoDB sourced options
   const [serverDesigns, setServerDesigns] = useState<CustomerDesign[]>([]);
-  const [serverMeasurements, setServerMeasurements] = useState<SavedCustomerMeasurement[]>([]);
 
   // Voice recording state
   const [recording, setRecording] = useState(false);
@@ -87,10 +87,6 @@ export function CustomerChatView({
     listCustomerDesigns(accessToken)
       .then(setServerDesigns)
       .catch((err) => console.warn('Could not load designs from MongoDB:', err));
-
-    listCustomerMeasurements(accessToken)
-      .then(setServerMeasurements)
-      .catch((err) => console.warn('Could not load measurements from MongoDB:', err));
   }, [accessToken]);
 
   const activeThreadId = activeThread?._id || activeThread?.id || null;
@@ -103,15 +99,22 @@ export function CustomerChatView({
     send,
     sendTyping,
     uploadMedia,
-  } = useSocketChat(activeThreadId, accessToken, activeThread);
+  } = useSocketChat(activeThreadId, accessToken, activeThread, 'customer', (message) => {
+    updateSession((current) => {
+      const counterpart = current.role === 'customer'
+        ? activeThread?.tailorName || 'Your tailor'
+        : 'Customer';
+      return notifyFromIncomingChat(current, 'customer', message, counterpart) || {};
+    });
+  });
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length, isTyping]);
 
   const fallbackTailor = useMemo(() => tailorDirectoryEntry(tailorId), [tailorId]);
-  const tailorName = thread?.tailorName || fallbackTailor.name;
-  const tailorStudio = thread?.tailorStudio || fallbackTailor.studio;
+  const tailorName = thread?.tailorName || fallbackTailor?.name || 'Tailor';
+  const tailorStudio = thread?.tailorStudio || fallbackTailor?.studio || 'Atelier';
 
   const sendText = () => {
     const value = text.trim();
@@ -155,7 +158,7 @@ export function CustomerChatView({
     }
   };
 
-  const sendMeasurementCard = (item: SavedCustomerMeasurement) => {
+  const sendMeasurementCard = (item: ReturnType<typeof toShareableMeasurement>) => {
     send({
       kind: 'measurements',
       text: `Measurements: ${item.label}`,
@@ -228,6 +231,13 @@ export function CustomerChatView({
       kind: 'system',
       text: 'Place Order sent. Requirements are finalized. Tailor will review and send a fixed price quotation.',
     });
+    updateSession((current) =>
+      recordEstimateRequest(current, {
+        garmentType: thread?.activeQuotation ? 'Quoted garment' : 'Custom stitch',
+        tailorName: thread?.tailorName || tailorName,
+        description: 'Order placed from live chat',
+      })
+    );
   };
 
   const fabrics = [
@@ -631,7 +641,7 @@ export function CustomerChatView({
             {sheet === 'measurements' && (
               <div className="space-y-3">
                 <p className="text-xs text-thy-muted">Select a measurement set to share with the tailor:</p>
-                {serverMeasurements.length === 0 ? (
+                {savedMeasurements.length === 0 ? (
                   <div className="p-4 text-center border border-dashed border-thy-ink/20 rounded-sm">
                     <p className="text-xs text-thy-muted mb-2">No saved measurements found.</p>
                     <Link href="/my-measurements" className="text-xs text-thy-brand underline">
@@ -640,22 +650,23 @@ export function CustomerChatView({
                   </div>
                 ) : (
                   <ul className="space-y-2">
-                    {serverMeasurements.map((m) => (
-                      <li key={m._id || m.id}>
+                    {savedMeasurements.map((m) => (
+                      <li key={m.id}>
                         <button
                           type="button"
                           className={`${ghostBtn} w-full justify-between gap-2 text-left p-3`}
-                          onClick={() => sendMeasurementCard(m)}
+                          onClick={() => sendMeasurementCard(toShareableMeasurement(m))}
                         >
                           <div className="flex items-center gap-2">
                             <Ruler size={16} className="text-thy-brand shrink-0" />
                             <div>
                               <p className="text-xs font-medium">{m.label}</p>
                               <p className="text-[11px] text-thy-muted">
-                                {Object.entries(m.values || {})
-                                  .slice(0, 3)
-                                  .map(([k, v]) => `${k}: ${v}`)
-                                  .join(' · ')}
+                                {m.details ||
+                                  Object.entries(m.values || {})
+                                    .slice(0, 3)
+                                    .map(([k, v]) => `${k}: ${v}`)
+                                    .join(' · ')}
                               </p>
                             </div>
                           </div>

@@ -34,6 +34,7 @@ export interface AuthTailorPortfolioItem {
   title: string;
   image: string;
   category: string;
+  isFeatured?: boolean;
 }
 
 export interface AuthTailorProfile {
@@ -96,11 +97,12 @@ export async function getAccountBundle(user: AuthUser): Promise<AccountBundle> {
           portfolio: (tailor.portfolio ?? [])
             .filter((item) => item.isActive !== false)
             .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
-            .map((item) => ({
+            .map((item, index) => ({
               id: item._id?.toString?.() || `${item.title}-${item.imageUrl}`,
               title: item.title,
               image: item.imageUrl,
               category: item.category || 'general',
+              isFeatured: Boolean(item.isFeatured) || index < 2,
             })),
         }
       : null,
@@ -249,9 +251,11 @@ export async function registerWithPassword(
             yearsOfExperience: input.yearsOfExperience,
             shopAddress: input.shopAddress,
             city: cityFromAddress(input.shopAddress),
+            isDirectoryActive: true,
           },
           $setOnInsert: {
             publicId: `t-${user._id.toString()}`,
+            specialties: ['Custom stitching'],
           },
         },
         { upsert: true, new: true }

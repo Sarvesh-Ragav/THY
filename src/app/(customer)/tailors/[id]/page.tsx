@@ -1,22 +1,38 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { notFound, useParams } from 'next/navigation';
-import { ArrowLeft, BadgeCheck, MapPin, MessageSquare, Star } from 'lucide-react';
-import { getTailorById, TAILOR_AVAILABILITY_LABELS } from '@/lib/customer-home-data';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { chatHref } from '@/lib/c31';
-import { useCustomerLocation } from '@/hooks/useCustomerLocation';
-import { distanceToCity, formatDistanceKm } from '@/lib/geo';
+import { fetchDirectoryTailor } from '@/lib/directory-api';
+import type { PublicDirectoryTailor } from '@/lib/directory';
+import { PublicTailorProfile } from '@/components/tailor/PublicTailorProfile';
 
 export default function TailorProfilePage() {
   const params = useParams<{ id: string }>();
-  const tailor = getTailorById(params.id);
-  const { coords } = useCustomerLocation();
-  const distanceKm = tailor && coords ? distanceToCity(coords, tailor.city) : null;
-  const featured = tailor?.portfolio.slice(0, 3) ?? [];
+  const [tailor, setTailor] = useState<PublicDirectoryTailor | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!tailor) notFound();
+  useEffect(() => {
+    if (!params.id) return;
+    let cancelled = false;
+    setLoading(true);
+    fetchDirectoryTailor(params.id)
+      .then((item) => {
+        if (!cancelled) setTailor(item);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Tailor was not found.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [params.id]);
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
@@ -25,150 +41,36 @@ export default function TailorProfilePage() {
         Back to tailors
       </Link>
 
-      <section className="mt-6 thy-card overflow-hidden">
-        <div className="relative h-36 sm:h-48">
-          <img src={tailor.coverImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-thy-deep/25" />
+      {loading && <p className="mt-6 text-sm text-thy-muted">Loading public profile…</p>}
+      {error && !loading && (
+        <div className="mt-6 thy-card p-6 text-sm text-thy-muted">
+          {error} This page only shows tailors who have signed up on THY.
         </div>
-        <div className="px-5 sm:px-7 pb-6">
-          <img
-            src={tailor.image}
-            alt={tailor.name}
-            className="relative -mt-12 h-24 w-24 sm:h-28 sm:w-28 rounded-full object-cover border-4 border-thy-surface"
-          />
-          <div className="mt-4 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-3xl sm:text-4xl leading-tight" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-                  {tailor.name}
-                </h1>
-                {tailor.verified && (
-                  <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-thy-brand font-semibold">
-                    <BadgeCheck size={16} />
-                    Verified
-                  </span>
-                )}
-              </div>
-              <p className="mt-1 text-sm sm:text-base text-thy-ink">{tailor.headline}</p>
-              <p className="mt-2 text-sm text-thy-muted inline-flex items-center gap-1">
-                <MapPin size={14} />
-                {tailor.studio} · {tailor.city}, {tailor.state}
-                {distanceKm != null ? ` · ${formatDistanceKm(distanceKm)} from you` : ''}
-              </p>
-              <p className="mt-2 text-sm text-thy-muted">
-                {tailor.specialty} · {TAILOR_AVAILABILITY_LABELS[tailor.availability]} · {tailor.yearsExperience}+ years ·{' '}
-                {tailor.ordersCompleted} orders
-              </p>
-              <p className="mt-2 inline-flex items-center gap-1 text-sm">
-                <Star size={15} className="text-thy-brand fill-thy-brand" />
-                {tailor.rating.toFixed(1)}
-                <span className="text-thy-muted">({tailor.reviewCount} reviews)</span>
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 shrink-0">
-              <Link
-                href={chatHref(tailor.id, 'profile')}
-                className="hero-leather-btn inline-flex items-center justify-center gap-2 min-h-11 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-center leading-none"
-              >
-                <MessageSquare size={14} />
-                Message
-              </Link>
-              <Link
-                href={`/request-estimate?tailor=${encodeURIComponent(tailor.id)}`}
-                className="inline-flex items-center justify-center min-h-11 px-4 text-sm text-center leading-none border border-thy-ink/15 hover:border-thy-brand/40"
-              >
-                Request estimate
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-4 thy-card p-5 sm:p-7">
-        <h2 className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle font-semibold">About</h2>
-        <p className="mt-3 text-sm leading-relaxed text-thy-ink">{tailor.about}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {tailor.languages.map((language) => (
-            <span key={language} className="px-3 min-h-8 inline-flex items-center text-xs border border-thy-brand/20 bg-thy-mist text-thy-ink">
-              {language}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      {featured.length > 0 && (
-        <section className="mt-4 thy-card p-5 sm:p-7">
-          <h2 className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle font-semibold">Featured work</h2>
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {featured.map((image, index) => (
-              <article key={`${tailor.id}-featured-${index}`} className="overflow-hidden border border-thy-ink/10 bg-thy-surface">
-                <div className="h-44 overflow-hidden">
-                  <img src={image} alt="" className="h-full w-full object-cover" />
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
       )}
-
-      <section className="mt-4 thy-card p-5 sm:p-7">
-        <h2 className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle font-semibold">Portfolio</h2>
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {tailor.portfolio.map((image, index) => (
-            <article key={`${tailor.id}-portfolio-${index}`} className="overflow-hidden border border-thy-ink/10 bg-thy-mist/40">
-              <img src={image} alt="" className="h-36 w-full object-cover" />
-            </article>
-          ))}
+      {tailor && (
+        <div className="mt-6">
+          <PublicTailorProfile
+            tailor={tailor}
+            actions={
+              <>
+                <Link
+                  href={chatHref(tailor.id, 'profile')}
+                  className="hero-leather-btn inline-flex items-center justify-center gap-2 min-h-11 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-center leading-none"
+                >
+                  <MessageSquare size={14} />
+                  Message
+                </Link>
+                <Link
+                  href={`/request-estimate?tailor=${encodeURIComponent(tailor.id)}`}
+                  className="inline-flex items-center justify-center min-h-11 px-4 text-sm text-center leading-none border border-thy-ink/15 hover:border-thy-brand/40"
+                >
+                  Request estimate
+                </Link>
+              </>
+            }
+          />
         </div>
-        {tailor.portfolio.length === 0 && (
-          <p className="mt-4 text-sm text-thy-muted">No portfolio pieces yet.</p>
-        )}
-      </section>
-
-      <section className="mt-4 thy-card p-5 sm:p-7">
-        <h2 className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle font-semibold">Experience</h2>
-        <ul className="mt-4 space-y-4">
-          {tailor.experience.map((item) => (
-            <li key={`${item.title}-${item.years}`} className="border-b border-thy-ink/10 pb-4 last:border-0 last:pb-0">
-              <p className="font-medium text-thy-ink">{item.title}</p>
-              <p className="text-sm text-thy-muted">
-                {item.studio} · {item.years}
-              </p>
-              <p className="mt-1 text-sm text-thy-ink">{item.summary}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mt-4 thy-card p-5 sm:p-7">
-        <h2 className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle font-semibold">Skills</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {tailor.skills.map((skill) => (
-            <span key={skill} className="px-3 min-h-9 inline-flex items-center text-sm border border-thy-brand/30 bg-thy-mist text-thy-ink">
-              {skill}
-            </span>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-4 thy-card p-5 sm:p-7">
-        <h2 className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle font-semibold">Reviews</h2>
-        <ul className="mt-4 space-y-4">
-          {tailor.reviews.map((review) => (
-            <li key={`${review.author}-${review.date}`} className="border-b border-thy-ink/10 pb-4 last:border-0 last:pb-0">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-medium text-thy-ink">{review.author}</p>
-                <p className="text-xs text-thy-subtle">{review.date}</p>
-              </div>
-              <p className="mt-1 inline-flex items-center gap-1 text-sm">
-                <Star size={13} className="text-thy-brand fill-thy-brand" />
-                {review.rating.toFixed(1)}
-              </p>
-              <p className="mt-1 text-sm text-thy-muted">{review.text}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
+      )}
     </main>
   );
 }

@@ -1,8 +1,11 @@
 'use client';
 
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useSavedMeasurements } from '@/hooks/useSavedMeasurements';
+import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { recordEstimateRequest } from '@/lib/notifications';
 
 export default function RequestEstimatePage() {
   return (
@@ -22,15 +25,19 @@ function RequestEstimateContent() {
   const [description, setDescription] = useState('');
   const [measurementType, setMeasurementType] = useState<'profile' | 'manual'>('profile');
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // Sample Saved Measurements from Customer Profile
-  const savedMeasurements = {
-    bust: '36 in',
-    waist: '30 in',
-    shoulder: '14.5 in',
-    armLength: '10 in',
-    neckDepth: '7 in',
-  };
+  const { measurements } = useSavedMeasurements();
+  const { updateSession } = useTailorSession();
+  const profileSet = measurements[0];
+  const savedValues = useMemo(() => {
+    if (profileSet?.values && Object.keys(profileSet.values).length > 0) {
+      return profileSet.values;
+    }
+    return {
+      Bust: '—',
+      Waist: '—',
+      Shoulder: '—',
+    };
+  }, [profileSet]);
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +46,13 @@ function RequestEstimateContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    updateSession((current) =>
+      recordEstimateRequest(current, {
+        garmentType,
+        tailorName,
+        description,
+      })
+    );
     setIsSubmitted(true);
   };
 
@@ -185,14 +199,22 @@ function RequestEstimateContent() {
 
             {measurementType === 'profile' ? (
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-2">
-                <p className="text-xs font-bold text-slate-800">Attached Profile Measurements:</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                  <div className="bg-white p-2 rounded-xl border border-slate-100"><span className="text-slate-400">Bust:</span> {savedMeasurements.bust}</div>
-                  <div className="bg-white p-2 rounded-xl border border-slate-100"><span className="text-slate-400">Waist:</span> {savedMeasurements.waist}</div>
-                  <div className="bg-white p-2 rounded-xl border border-slate-100"><span className="text-slate-400">Shoulder:</span> {savedMeasurements.shoulder}</div>
-                  <div className="bg-white p-2 rounded-xl border border-slate-100"><span className="text-slate-400">Arm Length:</span> {savedMeasurements.armLength}</div>
-                  <div className="bg-white p-2 rounded-xl border border-slate-100"><span className="text-slate-400">Neck Depth:</span> {savedMeasurements.neckDepth}</div>
-                </div>
+                <p className="text-xs font-bold text-slate-800">
+                  {profileSet ? profileSet.label : 'No saved measurements yet'}
+                </p>
+                {profileSet ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                    {Object.entries(savedValues).map(([key, value]) => (
+                      <div key={key} className="bg-white p-2 rounded-xl border border-slate-100">
+                        <span className="text-slate-400">{key}:</span> {value}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-slate-500">
+                    Save measurements from the stitching flow to attach them here.
+                  </p>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-3 text-xs">

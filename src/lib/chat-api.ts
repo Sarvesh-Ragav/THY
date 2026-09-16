@@ -196,3 +196,25 @@ export async function listCustomerMeasurements(accessToken?: string | null): Pro
   );
   return data.measurements;
 }
+
+export async function saveCustomerMeasurement(
+  payload: {
+    label: string;
+    category?: string;
+    values: Record<string, string>;
+    unit?: 'inch' | 'cm';
+    notes?: string;
+  },
+  accessToken?: string | null
+): Promise<SavedCustomerMeasurement> {
+  const data = await chatFetch<{ measurement: SavedCustomerMeasurement }>(
+    '/measurements',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    },
+    accessToken
+  );
+  return data.measurement;
+}
