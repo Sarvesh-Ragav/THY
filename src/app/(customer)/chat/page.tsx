@@ -10,7 +10,7 @@ import type { ChatEntry } from '@/lib/c31';
 export default function CustomerChatPage() {
   return (
     <RequireCustomerAuth>
-      <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading chat...</p>}>
+      <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading chat...</div>}>
         <ChatRoute />
       </Suspense>
     </RequireCustomerAuth>

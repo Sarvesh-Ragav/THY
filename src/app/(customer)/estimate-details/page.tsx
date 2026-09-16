@@ -13,7 +13,7 @@ const ghostBtn =
 export default function EstimateDetailsPage() {
   return (
     <RequireCustomerAuth>
-      <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading estimate...</p>}>
+      <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading estimate...</div>}>
         <EstimateDetails />
       </Suspense>
     </RequireCustomerAuth>
@@ -26,7 +26,7 @@ function EstimateDetails() {
   const { state, ready, save } = useC31();
   const thread = findThread(state, searchParams.get('thread'));
 
-  if (!ready) return <p className="p-8 text-sm text-thy-subtle">Loading...</p>;
+  if (!ready) return <div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading...</div>;
   const quotation = thread?.quotation;
   if (!thread || !quotation) {
     return (

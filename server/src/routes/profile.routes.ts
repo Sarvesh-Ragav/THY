@@ -18,4 +18,4 @@ tailorRouter.get('/me', authenticate, requireRole('tailor'), readTailorProfile);
 // A previously unassigned authenticated user may claim the tailor role only while creating this profile.
 tailorRouter.patch('/me', authenticate, patchTailorProfile);
 tailorRouter.put('/me/portfolio', authenticate, putTailorPortfolio);
-tailorRouter.post('/me/verification', authenticate, requireRole('tailor'), addTailorVerification);
+tailorRouter.post('/me/verification', authenticate, addTailorVerification);

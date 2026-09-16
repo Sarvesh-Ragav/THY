@@ -27,7 +27,7 @@ type ViewMode = 'vto' | 'overlay' | 'original';
 
 export default function TryOnPage() {
   return (
-    <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading try-on...</p>}>
+    <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading try-on...</div>}>
       <TryOnContent />
     </Suspense>
   );

@@ -35,7 +35,7 @@ export function CustomerLocationControl({
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="thy-nav-link thy-nav-link-tall inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] min-h-11 px-2 max-w-[10.5rem] sm:max-w-[14rem]"
+        className="thy-nav-link thy-nav-link-tall inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] min-h-11 px-2 max-w-[7.5rem] sm:max-w-[14rem]"
         aria-label={`Location: ${display}`}
         title={label || 'Detect location'}
         suppressHydrationWarning

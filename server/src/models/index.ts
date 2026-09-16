@@ -7,4 +7,5 @@ export * from './Catalog.js';
 export * from './StudioDesign.js';
 export * from './Chat.js';
 export * from './ChatMedia.js';
+export * from './Notification.js';
 export * from './Order.js';

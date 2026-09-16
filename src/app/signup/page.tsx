@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ThySignUpForm } from '@/components/auth/ThySignUpForm';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath } from '@/lib/tailor-session';
+import { AuthMain } from '@/components/ui/AppScreen';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -18,8 +19,8 @@ export default function SignUpPage() {
   }, [isReady, session, router]);
 
   return (
-    <main className="min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <AuthMain>
       <ThySignUpForm />
-    </main>
+    </AuthMain>
   );
 }

@@ -11,6 +11,7 @@ import { meRouter, tailorRouter } from './routes/profile.routes.js';
 import { razorpayWebhook } from './controllers/payment.controller.js';
 import { categoryRouter, designRouter, directoryTailorRouter } from './routes/catalogue.routes.js';
 import { chatRouter } from './routes/chat.routes.js';
+import { notificationRouter } from './routes/notification.routes.js';
 import { mongoose } from './db/mongo.js';
 
 function isAllowedOrigin(origin?: string): boolean {
@@ -73,5 +74,6 @@ app.use('/api/v1/tailors', tailorRouter);
 app.use('/api/v1/tailors', directoryTailorRouter);
 app.use('/api/v1/payments', paymentRouter);
 app.use('/api/v1/chat', chatRouter);
+app.use('/api/v1/notifications', notificationRouter);
 app.use(notFound);
 app.use(errorHandler);

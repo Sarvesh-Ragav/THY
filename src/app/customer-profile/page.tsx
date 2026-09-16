@@ -22,7 +22,6 @@ import {
   Scissors, 
   Eye, 
   ExternalLink,
-  ShieldCheck,
   Tag,
   X,
   FileText,
@@ -241,24 +240,6 @@ export default function App() {
 
   return (
     <div className="thy-app-glow min-h-dvh bg-transparent text-thy-ink pb-20 md:pb-12">
-      
-      {}
-      <header className="thy-silk-bar text-white py-3 px-4 sticky top-0 z-30 border-b border-white/20">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="bg-white text-[#5C1A24] p-1.5 rounded-lg font-bold text-lg leading-none tracking-wider">THY</div>
-            <span className="font-semibold text-lg tracking-wide hidden sm:inline">Tailor Community Hub</span>
-          </div>
-          <div className="flex items-center space-x-3 text-sm">
-            <span className="bg-[#4A1520] px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 border border-white/20">
-              <ShieldCheck className="w-3.5 h-3.5 text-thy-cream" />
-              Verified Customer
-            </span>
-          </div>
-        </div>
-      </header>
-
-      {/* MAIN CONTAINER */}
       <main className="max-w-6xl mx-auto px-0 sm:px-4 py-0 sm:py-6">
         
         {}

@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { CustomerPage } from '@/components/customer/CustomerPage';
 import { RequireCustomerAuth } from '@/components/customer/RequireCustomerAuth';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { markInboxRead, unreadCount } from '@/lib/notifications';
+import { markInboxAllRead, markInboxItemRead } from '@/lib/notification-api';
 
 const TYPE_LABEL: Record<string, string> = {
   order: 'Order',
@@ -20,11 +21,18 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 export default function NotificationsPage() {
-  const { session, updateSession } = useTailorSession();
+  const router = useRouter();
+  const { session, updateSession, accessToken } = useTailorSession();
   const [tab, setTab] = useState<'all' | 'unread'>('all');
   const items = session.customerNotifications ?? [];
   const unread = unreadCount(items);
   const visible = items.filter((item) => (tab === 'unread' ? !item.isRead : true));
+
+  const openItem = (id: string, linkUrl?: string) => {
+    updateSession({ customerNotifications: markInboxRead(items, id) });
+    if (accessToken) void markInboxItemRead(id, accessToken).catch(() => undefined);
+    if (linkUrl) router.push(linkUrl);
+  };
 
   return (
     <RequireCustomerAuth>
@@ -53,7 +61,10 @@ export default function NotificationsPage() {
           {unread > 0 ? (
             <button
               type="button"
-              onClick={() => updateSession({ customerNotifications: markInboxRead(items) })}
+              onClick={() => {
+                updateSession({ customerNotifications: markInboxRead(items) });
+                if (accessToken) void markInboxAllRead(accessToken).catch(() => undefined);
+              }}
               className="text-[11px] font-semibold uppercase tracking-[0.14em] text-thy-burgundy"
             >
               Mark all read
@@ -73,34 +84,26 @@ export default function NotificationsPage() {
         ) : (
           <ul className="space-y-3">
             {visible.map((item) => (
-              <li
-                key={item.id}
-                className={`thy-card p-4 ${item.isRead ? '' : 'border-thy-burgundy/40 bg-thy-mist/40'}`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[10px] uppercase tracking-[0.16em] font-semibold text-thy-burgundy">
-                      {TYPE_LABEL[item.type] || item.type}
-                    </p>
-                    <p className="text-sm font-semibold text-thy-ink mt-1">{item.title}</p>
-                    <p className="text-sm text-thy-muted mt-1">{item.description}</p>
-                    <p className="text-[11px] text-thy-subtle mt-2">{item.timestamp}</p>
-                    {item.linkUrl ? (
-                      <Link href={item.linkUrl} className="inline-block mt-2 text-xs font-bold text-thy-burgundy">
-                        Open →
-                      </Link>
-                    ) : null}
+              <li key={item.id}>
+                <button
+                  type="button"
+                  onClick={() => openItem(item.id, item.linkUrl)}
+                  className={`w-full text-left thy-card p-4 ${item.isRead ? '' : 'border-thy-burgundy/40 bg-thy-mist/40'}`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[10px] uppercase tracking-[0.16em] font-semibold text-thy-burgundy">
+                        {TYPE_LABEL[item.type] || item.type}
+                      </p>
+                      <p className="text-sm font-semibold text-thy-ink mt-1">{item.title}</p>
+                      <p className="text-sm text-thy-muted mt-1">{item.description}</p>
+                      <p className="text-[11px] text-thy-subtle mt-2">{item.timestamp}</p>
+                      {item.linkUrl ? (
+                        <span className="inline-block mt-2 text-xs font-bold text-thy-burgundy">Open →</span>
+                      ) : null}
+                    </div>
                   </div>
-                  {!item.isRead ? (
-                    <button
-                      type="button"
-                      onClick={() => updateSession({ customerNotifications: markInboxRead(items, item.id) })}
-                      className="text-[10px] font-bold text-thy-burgundy shrink-0"
-                    >
-                      Mark read
-                    </button>
-                  ) : null}
-                </div>
+                </button>
               </li>
             ))}
           </ul>

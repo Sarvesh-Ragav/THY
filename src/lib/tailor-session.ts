@@ -5,7 +5,7 @@ import type {
 } from '@/lib/auth-api';
 
 export type UserRole = 'tailor' | 'customer' | 'admin';
-export type VerificationStatus = 'pending';
+export type VerificationStatus = 'pending' | 'approved' | 'rejected';
 export type RequestStatus = 'Pending Quotation' | 'Quotation Submitted' | 'Declined';
 export type OrderStatus = 'In Progress' | 'Fitting Scheduled' | 'Ready to Stitch/Deliver' | 'Completed';
 export type StudioNotificationType = 'order' | 'quotation' | 'chat' | 'pickup' | 'delivery' | 'request' | 'message' | 'payout' | 'system';
@@ -389,11 +389,15 @@ export function hasTailorProfile(session: TailorSession): boolean {
 }
 
 export function hasSubmittedVerification(session: TailorSession): boolean {
-  return Boolean(session.verification?.idNumber);
+  return Boolean(
+    session.verification?.idNumber ||
+    session.verification?.documentName ||
+    session.verification?.status
+  );
 }
 
 export function isTailorOnboardingComplete(session: TailorSession): boolean {
-  return hasTailorProfile(session) && hasSubmittedVerification(session);
+  return hasTailorProfile(session);
 }
 
 export function hasCustomerProfile(session: TailorSession): boolean {
@@ -438,7 +442,6 @@ export function getPostAuthPath(session: TailorSession): string {
 
   // Tailor Onboarding Route Guard Logic
   if (!hasTailorProfile(session)) return '/tailor-registration';
-  if (!hasSubmittedVerification(session)) return '/tailor-verification';
   return '/tailor-dashboard';
 }
 
@@ -523,6 +526,20 @@ export function applyAccountToSession(
     sessionPatch?.tailorPortfolio ??
     (tailorProfile?.portfolio?.length ? tailorProfile.portfolio : current.tailorPortfolio ?? []);
 
+  const nextVerification =
+    sessionPatch?.verification ??
+    (tailorProfile?.verification?.submitted
+      ? {
+          idType: tailorProfile.verification.idType || current.verification?.idType || 'Government ID',
+          idNumber: current.verification?.idNumber || 'on-file',
+          documentName:
+            tailorProfile.verification.documentName ||
+            current.verification?.documentName ||
+            'Identity proof',
+          status: (tailorProfile.verification.status as VerificationStatus) || 'pending',
+        }
+      : current.verification);
+
   return {
     ...merged,
     isAuthenticated: true,
@@ -532,6 +549,7 @@ export function applyAccountToSession(
     customerProfile: nextCustomer,
     profile: nextTailor,
     tailorPortfolio: nextPortfolio,
+    verification: nextVerification,
     selectedLocation:
       merged.selectedLocation ||
       customerProfile?.city ||

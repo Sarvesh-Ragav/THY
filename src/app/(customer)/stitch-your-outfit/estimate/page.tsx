@@ -10,7 +10,7 @@ import { useC31 } from '@/hooks/useC31';
 
 export default function StudioEstimatePage() {
   return (
-    <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading...</p>}>
+    <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading...</div>}>
       <EstimateContent />
     </Suspense>
   );

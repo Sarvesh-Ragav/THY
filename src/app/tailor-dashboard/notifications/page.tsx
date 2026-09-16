@@ -1,12 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { TailorPage } from '@/components/tailor/TailorPage';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { markInboxAllRead, markInboxItemRead } from '@/lib/notification-api';
 
 export default function TailorNotificationsPage() {
-  const { session, updateSession } = useTailorSession();
+  const router = useRouter();
+  const { session, updateSession, accessToken } = useTailorSession();
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
   const notifications = session.notifications;
   const unreadCount = notifications.filter((item) => !item.isRead).length;
@@ -14,12 +16,15 @@ export default function TailorNotificationsPage() {
 
   const markAllAsRead = () => {
     updateSession({ notifications: notifications.map((item) => ({ ...item, isRead: true })) });
+    if (accessToken) void markInboxAllRead(accessToken).catch(() => undefined);
   };
 
-  const markAsRead = (id: string) => {
+  const openItem = (id: string, linkUrl?: string) => {
     updateSession({
       notifications: notifications.map((item) => (item.id === id ? { ...item, isRead: true } : item)),
     });
+    if (accessToken) void markInboxItemRead(id, accessToken).catch(() => undefined);
+    if (linkUrl) router.push(linkUrl);
   };
 
   const deleteNotification = (id: string) => {
@@ -78,7 +83,7 @@ export default function TailorNotificationsPage() {
                     !note.isRead ? 'bg-thy-mist/30 border-thy-burgundy/40 shadow-xs' : 'bg-thy-surface border-thy-burgundy/15'
                   }`}
                 >
-                  <div className="space-y-1">
+                  <button type="button" onClick={() => openItem(note.id, note.linkUrl)} className="space-y-1 text-left min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="text-xs font-bold text-thy-ink">{note.title}</h3>
                       {!note.isRead ? <span className="w-2 h-2 rounded-full bg-thy-burgundy" /> : null}
@@ -86,17 +91,10 @@ export default function TailorNotificationsPage() {
                     <p className="text-xs text-thy-muted leading-relaxed">{note.description}</p>
                     <span className="text-[10px] font-medium text-thy-subtle block pt-1">{note.timestamp}</span>
                     {note.linkUrl ? (
-                      <Link href={note.linkUrl} className="text-[11px] font-bold text-thy-burgundy hover:underline">
-                        Open →
-                      </Link>
+                      <span className="text-[11px] font-bold text-thy-burgundy">Open →</span>
                     ) : null}
-                  </div>
+                  </button>
                   <div className="flex items-center gap-2 shrink-0">
-                    {!note.isRead ? (
-                      <button type="button" onClick={() => markAsRead(note.id)} className="text-[10px] font-bold text-thy-burgundy hover:underline">
-                        Mark read
-                      </button>
-                    ) : null}
                     <button type="button" onClick={() => deleteNotification(note.id)} className="text-thy-subtle hover:text-rose-500 text-xs px-1">
                       ✕
                     </button>

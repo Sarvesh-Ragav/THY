@@ -196,6 +196,10 @@ html.dark .thy-section-title {
     0 10px 28px rgba(60, 12, 20, 0.2);
 }
 
+.thy-silk-subbar {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.08));
+}
+
 .thy-card {
   position: relative;
   background-color: rgba(252, 248, 240, 0.92);

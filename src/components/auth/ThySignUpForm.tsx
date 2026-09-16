@@ -127,7 +127,7 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
         )}
 
         <div className="text-center">
-          <p className="text-sm text-thy-muted font-medium">
+          <div className="text-sm text-thy-muted font-medium">
             Already have an account?{' '}
             {onNavigateLogin ? (
               <button
@@ -142,7 +142,7 @@ export const ThySignUpForm: React.FC<ThySignUpFormProps> = ({
                 Log in
               </Link>
             )}
-          </p>
+          </div>
         </div>
       </div>
     </div>

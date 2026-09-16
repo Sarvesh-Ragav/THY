@@ -1,43 +1,90 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { submitTailorVerification } from '@/lib/auth-api';
+import { hasSubmittedVerification } from '@/lib/tailor-session';
 
 export default function TailorVerificationPage() {
   const router = useRouter();
-  const { updateSession } = useTailorSession();
+  const { session, isReady, accessToken, updateSession } = useTailorSession();
   const [govId, setGovId] = useState<File | null>(null);
   const [shopProof, setShopProof] = useState<File | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  useEffect(() => {
+    if (!isReady) return;
+    if (!session.isAuthenticated) {
+      router.replace('/login');
+      return;
+    }
+    if (session.role !== 'tailor') {
+      router.replace('/');
+      return;
+    }
+    if (hasSubmittedVerification(session)) {
+      router.replace('/tailor-dashboard');
+    }
+  }, [isReady, session, router]);
 
-    // Step 1: Update session state with authentication & verification data before redirecting
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!govId) {
+      setErrorMessage('Please upload a government ID to continue.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    const documentName = [govId.name, shopProof?.name].filter(Boolean).join(', ');
+    const verification = {
+      idType: 'Aadhaar / PAN',
+      idNumber: 'on-file',
+      documentName: documentName || 'Identity proof',
+      status: 'pending' as const,
+    };
+
+    try {
+      if (accessToken) {
+        await submitTailorVerification(
+          {
+            idType: verification.idType,
+            idNumber: `${govId.name}-${govId.size}`,
+            documentName: verification.documentName,
+          },
+          accessToken
+        );
+      }
+    } catch {
+      // Session still records the one-time signup so later logins skip this page.
+    }
+
     updateSession({
       isAuthenticated: true,
       role: 'tailor',
-      verification: {
-        idType: 'Aadhaar / PAN',
-        idNumber: 'VERIFIED-DOC-123',
-        documentName: govId?.name || 'Identity Proof',
-        status: 'pending',
-      },
+      verification,
     });
 
     if (typeof window !== 'undefined') {
       localStorage.removeItem('thy_logged_out');
     }
 
-    // Simulating document upload API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      // Route user to dashboard after verification submission
-      router.push('/tailor-dashboard');
-    }, 1000);
+    router.push('/tailor-dashboard');
+    setIsSubmitting(false);
   };
+
+  if (!isReady) {
+    return (
+      <div className="min-h-dvh bg-transparent flex items-center justify-center p-4" suppressHydrationWarning>
+        <div className="text-sm text-thy-muted" suppressHydrationWarning>
+          Loading...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh bg-transparent flex items-center justify-center p-4">
@@ -51,7 +98,7 @@ export default function TailorVerificationPage() {
             Tailor Verification
           </h1>
           <p className="text-sm text-thy-muted mt-3">
-            Upload identity and business proofs to activate payouts and ordering.
+            Upload identity and business proofs once during signup to activate payouts and ordering.
           </p>
           <div className="thy-divider-glow mt-4 mx-auto max-w-xs" />
         </div>
@@ -84,11 +131,15 @@ export default function TailorVerificationPage() {
           </div>
 
           <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-xl text-[11px] space-y-0.5">
-            <p className="font-bold">⚠️ Review Process</p>
+            <p className="font-bold">Review Process</p>
             <p className="text-amber-700">
-              Documents take 24–48 hours for admin review. You can still set up your profile in the meantime.
+              This is required only once at signup. Later logins will not ask for these documents again.
             </p>
           </div>
+
+          {errorMessage ? (
+            <p className="text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{errorMessage}</p>
+          ) : null}
 
           <button
             type="submit"

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { ThyLogo } from './ThyLogo';
@@ -16,12 +16,17 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
   onNavigateSignUp,
   isLoading = false,
 }) => {
-  const [email, setEmail] = useState(initialEmail);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!initialEmail) return;
+    setEmail((current) => current || initialEmail);
+  }, [initialEmail]);
 
   const fieldClass = (hasError: boolean) =>
     `w-full px-4 py-3 text-sm text-thy-ink bg-thy-surface border rounded-xl placeholder:text-thy-subtle transition-all duration-200 focus:outline-none disabled:opacity-60 ${
@@ -225,7 +230,7 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
         )}
 
         <div className="text-center mt-6">
-          <p className="text-sm text-thy-muted font-medium">
+          <div className="text-sm text-thy-muted font-medium">
             New to THY?{' '}
             {onNavigateSignUp ? (
               <button
@@ -240,7 +245,7 @@ export const ThyLoginForm: React.FC<ThyLoginCardProps> = ({
                 Sign Up
               </Link>
             )}
-          </p>
+          </div>
         </div>
 
         <p className="text-[11px] text-thy-subtle text-center leading-relaxed mt-6 px-2">

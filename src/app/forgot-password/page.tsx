@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ThyLogo } from '@/components/auth/ThyLogo';
 import { AuthApiError, requestPasswordReset } from '@/lib/auth-api';
+import { AuthMain } from '@/components/ui/AppScreen';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RESET_SESSION_KEY = 'thy-password-reset';
@@ -42,7 +43,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <AuthMain>
       <div className="w-full max-w-sm mx-auto bg-thy-surface overflow-hidden border border-thy-ink/10 shadow-[0_24px_60px_rgba(11,51,47,0.12)]">
         <div className="thy-auth-header px-6 py-10 text-center flex flex-col items-center justify-center relative select-none">
           <ThyLogo size={52} className="mb-2 text-white" />
@@ -93,6 +94,6 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
       </div>
-    </main>
+    </AuthMain>
   );
 }

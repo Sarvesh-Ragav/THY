@@ -20,6 +20,9 @@ import {
   refreshAuthentication,
   type AuthenticationResult,
 } from '@/lib/auth-api';
+import { getSocket, disconnectSocket } from '@/lib/socket';
+import { applyInboxItem, mergeNotifications } from '@/lib/notifications';
+import { listInbox, type InboxItem } from '@/lib/notification-api';
 
 interface TailorSessionContextValue {
   session: TailorSession;
@@ -51,7 +54,11 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
         setAccessToken(result.accessToken);
         setSession((current) => {
           const next = applyAccountToSession(
-            { ...localSession, ...current },
+            {
+              ...current,
+              ...localSession,
+              verification: current.verification || localSession.verification,
+            },
             result.user,
             result.customerProfile,
             result.tailorProfile
@@ -63,6 +70,40 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
       .catch(() => undefined)
       .finally(() => setIsReady(true));
   }, []);
+
+  useEffect(() => {
+    if (!isReady || !accessToken) return;
+
+    listInbox(accessToken)
+      .then(({ notifications }) => {
+        setSession((current) => {
+          const mine =
+            current.role === 'tailor'
+              ? notifications.filter((item) => item.audience !== 'customer')
+              : notifications.filter((item) => item.audience !== 'tailor');
+          const key = current.role === 'tailor' ? 'notifications' : 'customerNotifications';
+          const next = { ...current, [key]: mergeNotifications(current[key], mine) };
+          persistTailorSession(next);
+          return next;
+        });
+      })
+      .catch(() => undefined);
+
+    const socket = getSocket(accessToken);
+    const onNote = (item: InboxItem) => {
+      setSession((current) => {
+        const patch = applyInboxItem(current, item);
+        if (!patch) return current;
+        const next = { ...current, ...patch };
+        persistTailorSession(next);
+        return next;
+      });
+    };
+    socket.on('notification:new', onNote);
+    return () => {
+      socket.off('notification:new', onNote);
+    };
+  }, [accessToken, isReady]);
 
   const updateSession = useCallback(
     (partial: Partial<TailorSession> | ((current: TailorSession) => Partial<TailorSession>)) => {
@@ -80,8 +121,13 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
 
   const completeAuthentication = useCallback(
     (result: AuthenticationResult, sessionPatch?: Partial<TailorSession>) => {
+      const localSession = loadTailorSession();
       const next = applyAccountToSession(
-        session,
+        {
+          ...localSession,
+          ...session,
+          verification: session.verification || localSession.verification,
+        },
         result.user,
         result.customerProfile,
         result.tailorProfile,
@@ -100,6 +146,7 @@ export function TailorSessionProvider({ children }: { children: React.ReactNode 
     setAccessToken(null);
     setSession(next);
     persistTailorSession(next);
+    disconnectSocket();
     void logoutAuthentication();
   }, [session]);
 

@@ -9,7 +9,7 @@ import { recordEstimateRequest } from '@/lib/notifications';
 
 export default function RequestEstimatePage() {
   return (
-    <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading...</p>}>
+    <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading...</div>}>
       <RequestEstimateContent />
     </Suspense>
   );

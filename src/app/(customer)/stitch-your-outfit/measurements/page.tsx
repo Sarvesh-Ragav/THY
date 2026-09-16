@@ -36,7 +36,7 @@ type MethodView = 'home' | 'manual' | 'size' | 'sample' | 'guide';
 
 export default function StudioMeasurementsPage() {
   return (
-    <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading measurements...</p>}>
+    <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading measurements...</div>}>
       <MeasurementsContent />
     </Suspense>
   );

@@ -1,6 +1,7 @@
 import type { Server, Socket } from 'socket.io';
 import { Types } from 'mongoose';
 import { ChatThread, ChatMessage } from '../models/Chat.js';
+import { createChatNotification } from '../services/notification.service.js';
 
 interface ChatSendPayload {
   threadId: string;
@@ -168,11 +169,26 @@ export function registerChatHandler(io: Server, socket: Socket): void {
       io.to(room).emit('chat:message', messagePayload);
       io.to(room).emit('chat:thread_update', thread);
 
-      // 2. Also emit to both participants' user rooms (ensures tailor/customer receives updates even if they haven't joined the thread room yet)
-      io.to(customerUserRoom).emit('chat:message', messagePayload);
       io.to(customerUserRoom).emit('chat:thread_update', thread);
-      io.to(tailorUserRoom).emit('chat:message', messagePayload);
       io.to(tailorUserRoom).emit('chat:thread_update', thread);
+
+      if (sender === 'customer') {
+        io.to(tailorUserRoom).emit('chat:message', messagePayload);
+      } else {
+        io.to(customerUserRoom).emit('chat:message', messagePayload);
+      }
+
+      const inboxItem = await createChatNotification({
+        thread,
+        messageId: message._id.toString(),
+        sender,
+        kind,
+        preview: previewText,
+      });
+      if (inboxItem) {
+        const recipientRoom = sender === 'customer' ? tailorUserRoom : customerUserRoom;
+        io.to(recipientRoom).emit('notification:new', inboxItem);
+      }
     } catch (err) {
       console.error('Error in chat:send:', err);
       socket.emit('chat:error', { code: 'SERVER_ERROR', message: 'Failed to send message' });

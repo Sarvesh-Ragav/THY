@@ -8,7 +8,7 @@ import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath } from '@/lib/tailor-session';
 import { LoginFormData } from '@/types/auth';
 import { AuthApiError, googleAuth, loginWithPassword, type AuthenticationResult } from '@/lib/auth-api';
-import { AppearanceControls } from '@/components/customer/AppearanceControls';
+import { AuthMain } from '@/components/ui/AppScreen';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,36 +50,23 @@ export default function LoginPage() {
     }
   };
 
-  if (!isReady || session.isAuthenticated) {
-    return (
-      <main className="min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <p className="text-sm text-thy-muted">Loading...</p>
-      </main>
-    );
-  }
-
-  const initialEmail = session.identifier.includes('@') ? session.identifier : '';
+  const initialEmail = isReady && session.identifier.includes('@') ? session.identifier : '';
 
   return (
-    <main className="min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
-      <div className="fixed top-3 right-3 z-50 thy-silk-bar px-2 rounded-lg">
-        <AppearanceControls />
-      </div>
-      {view === 'login' && (
+    <AuthMain>
+      {view === 'login' ? (
         <ThyLoginForm
           initialEmail={initialEmail}
           onSubmit={handleLoginContinue}
           onGoogleSignIn={handleGoogleSignIn}
           onNavigateSignUp={() => setView('signup')}
         />
-      )}
-
-      {view === 'signup' && (
+      ) : (
         <ThySignUpForm
           onNavigateLogin={() => setView('login')}
           onGoogleSignIn={handleGoogleSignIn}
         />
       )}
-    </main>
+    </AuthMain>
   );
 }

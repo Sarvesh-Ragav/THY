@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Outfit } from 'next/font/google';
 import "./globals.css";
 import { TailorSessionProvider } from '@/components/providers/TailorSessionProvider';
 import { AppearanceProvider } from '@/components/providers/AppearanceProvider';
+import { GlobalCustomerHeader } from '@/components/layout/GlobalCustomerHeader';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -51,7 +52,10 @@ export default function RootLayout({
           }}
         />
         <AppearanceProvider>
-          <TailorSessionProvider>{children}</TailorSessionProvider>
+          <TailorSessionProvider>
+            <GlobalCustomerHeader />
+            {children}
+          </TailorSessionProvider>
         </AppearanceProvider>
       </body>
     </html>

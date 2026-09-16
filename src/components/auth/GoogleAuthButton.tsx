@@ -79,8 +79,8 @@ export function GoogleAuthButton({ onCredential, text = 'continue_with' }: Googl
   return (
     <div
       ref={containerRef}
-      id="google-signin-button"
       className="w-full flex items-center justify-center min-h-[44px]"
+      suppressHydrationWarning
     />
   );
 }

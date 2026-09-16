@@ -24,7 +24,11 @@ export function RequireCustomerAuth({ children }: { children: React.ReactNode })
   }, [isReady, session, router]);
 
   if (!allowed) {
-    return null;
+    return (
+      <div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>
+        Loading...
+      </div>
+    );
   }
 
   return <>{children}</>;

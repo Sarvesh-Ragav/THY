@@ -41,7 +41,7 @@ export default function TailorProfilePage() {
         Back to tailors
       </Link>
 
-      {loading && <p className="mt-6 text-sm text-thy-muted">Loading public profile…</p>}
+      {loading && <div className="mt-6 text-sm text-thy-muted" suppressHydrationWarning>Loading public profile…</div>}
       {error && !loading && (
         <div className="mt-6 thy-card p-6 text-sm text-thy-muted">
           {error} This page only shows tailors who have signed up on THY.

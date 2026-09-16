@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath } from '@/lib/tailor-session';
@@ -16,8 +16,14 @@ export function HeroSection() {
   const { session, isReady } = useTailorSession();
   const rootRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
-  const loginHref = isReady && session.isAuthenticated ? getPostAuthPath(session) : '/login';
-  const loginLabel = isReady && session.isAuthenticated ? 'Studio' : 'Log In';
+  const [mounted, setMounted] = useState(false);
+  const authed = mounted && isReady && session.isAuthenticated;
+  const loginHref = authed ? getPostAuthPath(session) : '/login';
+  const loginLabel = authed ? 'Studio' : 'Log In';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const html = document.documentElement;

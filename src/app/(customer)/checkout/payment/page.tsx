@@ -11,7 +11,7 @@ import { createPaymentOrder, formatPaise, loadRazorpayCheckout, quoteToPaise, ve
 export default function CheckoutPaymentPage() {
   return (
     <RequireCustomerAuth>
-      <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading...</p>}>
+      <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading...</div>}>
         <PaymentStep />
       </Suspense>
     </RequireCustomerAuth>

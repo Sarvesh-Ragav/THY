@@ -6,6 +6,7 @@ import { ThyOtpVerificationForm } from '@/components/auth/ThyOtpVerificationForm
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getPostAuthPath } from '@/lib/tailor-session';
 import { resendOtp, verifyOtp } from '@/lib/auth-api';
+import { AuthMain } from '@/components/ui/AppScreen';
 
 export default function VerifyOtpPage() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function VerifyOtpPage() {
   }, [session.identifier, challengeId]);
 
   return (
-    <main className="min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <AuthMain>
       <ThyOtpVerificationForm
         identifier={session.identifier}
         onVerifyOtp={async (otp) => {
@@ -35,6 +36,6 @@ export default function VerifyOtpPage() {
         }}
         onNavigateBack={() => router.push('/')}
       />
-    </main>
+    </AuthMain>
   );
 }

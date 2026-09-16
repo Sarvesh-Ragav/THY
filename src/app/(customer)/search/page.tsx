@@ -87,7 +87,7 @@ function SearchResults() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<CustomerPage titleKey="pageSearch"><p className="text-sm text-thy-subtle">Loading...</p></CustomerPage>}>
+    <Suspense fallback={<CustomerPage titleKey="pageSearch"><div className="text-sm text-thy-subtle" suppressHydrationWarning>Loading...</div></CustomerPage>}>
       <SearchResults />
     </Suspense>
   );

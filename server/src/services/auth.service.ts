@@ -45,6 +45,12 @@ export interface AuthTailorProfile {
   city: string;
   phone: string | null;
   portfolio: AuthTailorPortfolioItem[];
+  verification?: {
+    status: 'pending' | 'approved' | 'rejected';
+    idType?: string;
+    documentName?: string;
+    submitted: boolean;
+  } | null;
 }
 
 export interface AccountBundle {
@@ -104,6 +110,14 @@ export async function getAccountBundle(user: AuthUser): Promise<AccountBundle> {
               category: item.category || 'general',
               isFeatured: Boolean(item.isFeatured) || index < 2,
             })),
+          verification: tailor.verification?.documentName || tailor.verification?.idNumberHash
+            ? {
+                status: tailor.verification.status || 'pending',
+                idType: tailor.verification.idType,
+                documentName: tailor.verification.documentName,
+                submitted: true,
+              }
+            : null,
         }
       : null,
   };

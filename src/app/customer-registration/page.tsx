@@ -133,8 +133,10 @@ export default function CustomerRegistration() {
 
   if (!isReady) {
     return (
-      <div className="min-h-dvh bg-transparent flex items-center justify-center">
-        <p className="text-sm text-thy-muted">Loading...</p>
+      <div className="min-h-dvh bg-transparent flex items-center justify-center" suppressHydrationWarning>
+        <div className="text-sm text-thy-muted" suppressHydrationWarning>
+          Loading...
+        </div>
       </div>
     );
   }

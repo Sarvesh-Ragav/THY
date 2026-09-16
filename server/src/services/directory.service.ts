@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { TailorProfile } from '../models/TailorProfile.js';
 import { User } from '../models/User.js';
 import { ApiError } from '../utils/api-error.js';
+import { hashValue } from '../utils/crypto.js';
 
 type DirectoryQuery = { city?: string; q?: string; page: number; limit: number };
 
@@ -257,4 +258,40 @@ export async function updateDirectoryTailorDetails(
 
   await profile.save();
   return mapPublicTailor(profile);
+}
+
+export async function saveTailorVerification(
+  userId: string,
+  input: { idType: string; idNumber: string; documentName: string }
+) {
+  const profile = await TailorProfile.findOne({ userId });
+  if (!profile) {
+    throw new ApiError(404, 'Tailor profile was not found.', 'TAILOR_NOT_FOUND');
+  }
+
+  const alreadySubmitted = Boolean(profile.verification?.documentName || profile.verification?.idNumberHash);
+  if (alreadySubmitted) {
+    return {
+      status: profile.verification?.status || 'pending',
+      idType: profile.verification?.idType || input.idType,
+      documentName: profile.verification?.documentName || input.documentName,
+      submitted: true,
+    };
+  }
+
+  profile.set('verification', {
+    status: 'pending',
+    idType: input.idType,
+    idNumberHash: hashValue(input.idNumber),
+    documentName: input.documentName,
+    submittedAt: new Date(),
+    reviewedAt: null,
+  });
+  await profile.save();
+  return {
+    status: 'pending' as const,
+    idType: input.idType,
+    documentName: input.documentName,
+    submitted: true,
+  };
 }

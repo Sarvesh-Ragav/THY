@@ -18,7 +18,7 @@ import { useSavedMeasurements } from '@/hooks/useSavedMeasurements';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { tailorDirectoryEntry, estimateHref, type ChatEntry } from '@/lib/c31';
 import type { CustomerDesignSave } from '@/lib/tailor-session';
-import { notifyFromIncomingChat, recordEstimateRequest } from '@/lib/notifications';
+import { recordEstimateRequest } from '@/lib/notifications';
 
 const ghostBtn =
   'inline-flex items-center justify-center min-h-11 px-4 text-sm border border-thy-ink/15 bg-thy-surface text-thy-ink hover:bg-thy-mist transition-colors';
@@ -99,14 +99,7 @@ export function CustomerChatView({
     send,
     sendTyping,
     uploadMedia,
-  } = useSocketChat(activeThreadId, accessToken, activeThread, 'customer', (message) => {
-    updateSession((current) => {
-      const counterpart = current.role === 'customer'
-        ? activeThread?.tailorName || 'Your tailor'
-        : 'Customer';
-      return notifyFromIncomingChat(current, 'customer', message, counterpart) || {};
-    });
-  });
+  } = useSocketChat(activeThreadId, accessToken, activeThread, 'customer');
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });

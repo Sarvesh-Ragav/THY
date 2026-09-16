@@ -12,7 +12,7 @@ import type { PersistedOrder } from '@/types/payment';
 export default function CheckoutConfirmationPage() {
   return (
     <RequireCustomerAuth>
-      <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading...</p>}>
+      <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading...</div>}>
         <Confirmation />
       </Suspense>
     </RequireCustomerAuth>
@@ -63,7 +63,7 @@ function Confirmation() {
 
       <section className="thy-card p-6 mt-8 space-y-2">
         {error && <p className="text-sm text-rose-700">{error}</p>}
-        {!order && !error && <p className="text-sm text-thy-muted">Loading your order...</p>}
+        {!order && !error && <div className="text-sm text-thy-muted" suppressHydrationWarning>Loading your order...</div>}
         {order && (
           <>
             <p className="text-xs font-mono text-thy-subtle">{order.id}</p>

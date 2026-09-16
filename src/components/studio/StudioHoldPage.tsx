@@ -54,7 +54,7 @@ export function StudioHoldPage({
 
 export function StudioHoldRoute(props: React.ComponentProps<typeof StudioHoldPage>) {
   return (
-    <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading...</p>}>
+    <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading...</div>}>
       <StudioHoldPage {...props} />
     </Suspense>
   );

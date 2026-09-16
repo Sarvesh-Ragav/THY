@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Ruler, CheckCheck, Clock, Send, Image as ImageIcon } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { useSocketChat } from '@/hooks/useSocketChat';
@@ -13,10 +14,20 @@ import {
 import { ThreadList } from '@/components/chat/ThreadList';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { TailorPage } from '@/components/tailor/TailorPage';
-import { notifyFromIncomingChat, recordQuotationForCustomer } from '@/lib/notifications';
+import { recordQuotationForCustomer } from '@/lib/notifications';
 
 export default function TailorChatPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-sm text-thy-subtle">Loading chat...</div>}>
+      <TailorChatWorkspace />
+    </Suspense>
+  );
+}
+
+function TailorChatWorkspace() {
   const { updateSession, accessToken } = useTailorSession();
+  const searchParams = useSearchParams();
+  const wantedThread = searchParams.get('thread');
   const [threads, setThreads] = useState<ChatThread[]>([]);
   const [loadingThreads, setLoadingThreads] = useState(true);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -39,7 +50,13 @@ export default function TailorChatPage() {
     listThreads(accessToken)
       .then((loadedThreads) => {
         setThreads(loadedThreads);
-        if (loadedThreads.length > 0 && !activeId) {
+        const wanted = wantedThread;
+        const match = wanted
+          ? loadedThreads.find((item) => String(item._id || item.id || '') === String(wanted))
+          : null;
+        if (match) {
+          setActiveId(match._id || match.id || null);
+        } else if (loadedThreads.length > 0 && !activeId) {
           const firstId = loadedThreads[0]._id || loadedThreads[0].id || null;
           setActiveId(firstId);
         }
@@ -50,7 +67,11 @@ export default function TailorChatPage() {
       .finally(() => {
         setLoadingThreads(false);
       });
-  }, [accessToken]);
+  }, [accessToken, wantedThread]);
+
+  useEffect(() => {
+    if (wantedThread) setActiveId(wantedThread);
+  }, [wantedThread]);
 
   // Listen to live cross-thread updates on the tailor's user room
   useEffect(() => {
@@ -92,19 +113,27 @@ export default function TailorChatPage() {
     isTyping,
     send,
     sendTyping,
-  } = useSocketChat(activeId, accessToken, activeThread, 'tailor', (message) => {
-    updateSession((current) => notifyFromIncomingChat(current, 'tailor', message, activeThread?.customerName || 'Customer') || {});
-  });
+  } = useSocketChat(activeId, accessToken, activeThread, 'tailor');
 
-  // Keep thread in threads state synchronized with active conversation state
   useEffect(() => {
     if (!thread) return;
     setThreads((prev) => {
       const targetId = String(thread._id || thread.id || '');
-      const index = prev.findIndex((t) => String(t._id || t.id || '') === targetId);
+      const index = prev.findIndex((item) => String(item._id || item.id || '') === targetId);
       if (index === -1) return prev;
+      const existing = prev[index];
+      if (
+        existing.updatedAt === thread.updatedAt &&
+        existing.status === thread.status &&
+        existing.unreadCountCustomer === thread.unreadCountCustomer &&
+        existing.unreadCountTailor === thread.unreadCountTailor &&
+        existing.lastMessage?.sentAt === thread.lastMessage?.sentAt &&
+        existing.lastMessage?.text === thread.lastMessage?.text
+      ) {
+        return prev;
+      }
       const next = [...prev];
-      next[index] = { ...next[index], ...thread };
+      next[index] = { ...existing, ...thread };
       return next;
     });
   }, [thread]);

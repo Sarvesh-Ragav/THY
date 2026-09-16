@@ -21,7 +21,7 @@ const ghostBtn =
 
 export default function TailorsPage() {
   return (
-    <Suspense fallback={<p className="p-8 text-sm text-thy-subtle">Loading tailors...</p>}>
+    <Suspense fallback={<div className="p-8 text-sm text-thy-subtle" suppressHydrationWarning>Loading tailors...</div>}>
       <TailorDirectory />
     </Suspense>
   );

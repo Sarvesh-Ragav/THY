@@ -26,6 +26,12 @@ export interface AccountTailorProfile {
   city: string;
   phone?: string | null;
   portfolio: Array<{ id: string; title: string; image: string; category: string; isFeatured?: boolean }>;
+  verification?: {
+    status: 'pending' | 'approved' | 'rejected';
+    idType?: string;
+    documentName?: string;
+    submitted: boolean;
+  } | null;
 }
 
 export interface AuthenticationResult {
@@ -170,6 +176,24 @@ export function updateTailorAccount(
 ): Promise<{ profile: AccountTailorProfile }> {
   return request('/tailors/me', {
     method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function submitTailorVerification(
+  payload: { idType: string; idNumber: string; documentName: string },
+  accessToken: string
+): Promise<{
+  verification: {
+    status: 'pending' | 'approved' | 'rejected';
+    idType?: string;
+    documentName?: string;
+    submitted: boolean;
+  };
+}> {
+  return request('/tailors/me/verification', {
+    method: 'POST',
     headers: { Authorization: `Bearer ${accessToken}` },
     body: JSON.stringify(payload),
   });

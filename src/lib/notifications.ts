@@ -8,7 +8,6 @@ import {
   type TailorSession,
 } from '@/lib/tailor-session';
 import { ORDER_STAGES, addStudioNotification, orderStatusFromStage } from '@/lib/tailor-studio';
-import type { ChatMessage } from '@/lib/chat-api';
 
 const CUSTOMER_STEPS = [
   'Order confirmed',
@@ -195,16 +194,6 @@ export function recordQuotationForCustomer(
   input: { garmentType: string; customerName: string; amount: string }
 ): Partial<TailorSession> {
   return {
-    customerNotifications: notifyCustomer(
-      session,
-      stamp(
-        'quotation',
-        'New quotation',
-        `A tailor sent ₹${input.amount} for ${input.garmentType}.`,
-        '/stitch-your-outfit/cart',
-        `cust-quote-${input.garmentType}-${input.amount}`
-      )
-    ),
     notifications: notifyTailor(
       session,
       stamp('quotation', 'Quotation sent', `₹${input.amount} quote sent to ${input.customerName}.`, '/tailor-dashboard/new-requests')
@@ -262,42 +251,27 @@ export function applyStageNotifications(
   return { orders: nextOrders, customerOrders, customerNotifications, notifications };
 }
 
-export function notifyFromIncomingChat(
+export function mergeNotifications(
+  local: StudioNotification[] | undefined,
+  remote: StudioNotification[]
+): StudioNotification[] {
+  const merged = new Map<string, StudioNotification>();
+  for (const item of local ?? []) merged.set(item.id, item);
+  for (const item of remote) merged.set(item.id, item);
+  return [...merged.values()].slice(0, 40);
+}
+
+export function applyInboxItem(
   session: TailorSession,
-  viewer: 'customer' | 'tailor',
-  message: ChatMessage,
-  counterpart: string
+  item: StudioNotification & { audience?: 'customer' | 'tailor' }
 ): Partial<TailorSession> | null {
-  if (message.sender === viewer || message.sender === 'system') return null;
-
-  if (message.kind === 'quotation' && viewer === 'customer') {
-    return {
-      customerNotifications: notifyCustomer(
-        session,
-        stamp(
-          'quotation',
-          'New quotation',
-          `${counterpart} sent a quote${message.quotation?.price ? ` of ₹${message.quotation.price}` : ''}.`,
-          '/chat',
-          `cust-chat-quote-${message._id}`
-        )
-      ),
-    };
+  if (item.audience === 'tailor' && session.role !== 'tailor') return null;
+  if (item.audience === 'customer' && session.role !== 'customer') return null;
+  if (session.role === 'tailor') {
+    return { notifications: notifyTailor(session, item) };
   }
-
-  const preview = (message.text || (message.kind === 'voice' ? 'Voice note' : 'New message')).slice(0, 120);
-  if (viewer === 'customer') {
-    return {
-      customerNotifications: notifyCustomer(
-        session,
-        stamp('chat', `Message from ${counterpart}`, preview, '/chat', `cust-chat-${message._id}`)
-      ),
-    };
+  if (session.role === 'customer') {
+    return { customerNotifications: notifyCustomer(session, item) };
   }
-  return {
-    notifications: notifyTailor(
-      session,
-      stamp('chat', `Chat from ${counterpart}`, preview, '/tailor-dashboard/chat', `tailor-chat-${message._id}`)
-    ),
-  };
+  return null;
 }

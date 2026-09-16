@@ -50,13 +50,19 @@ export function useSocketChat(
   const socketRef = useRef<Socket | null>(null);
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastTypingSentRef = useRef<number>(0);
+  const initialThreadRef = useRef(initialThread);
+  initialThreadRef.current = initialThread;
+  const initialThreadId = initialThread ? String(initialThread._id || initialThread.id || '') : '';
 
-  // Sync initial thread
   useEffect(() => {
-    if (initialThread) {
-      setThread(initialThread);
-    }
-  }, [initialThread]);
+    if (!initialThreadId) return;
+    const next = initialThreadRef.current;
+    if (!next) return;
+    setThread((current) => {
+      const currentId = String(current?._id || current?.id || '');
+      return currentId === initialThreadId ? current : next;
+    });
+  }, [initialThreadId]);
 
   // Connect socket and listen to room events
   useEffect(() => {

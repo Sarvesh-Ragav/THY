@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { TailorPage } from '@/components/tailor/TailorPage';
-import { getTailorFirstName } from '@/lib/tailor-session';
+import { getTailorFirstName, hasSubmittedVerification } from '@/lib/tailor-session';
 import { updateTailorAccount } from '@/lib/auth-api';
 import {
   activeOrders,
@@ -26,7 +26,7 @@ export default function TailorDashboardPage() {
   const available = session.availability.isAvailable && !session.availability.vacationMode;
   const recentNotes = session.notifications.slice(0, 3);
   const portfolio = session.tailorPortfolio.slice(0, 5);
-  const verified = Boolean(session.verification?.idNumber);
+  const verified = hasSubmittedVerification(session);
 
   return (
     <TailorPage
@@ -171,10 +171,14 @@ export default function TailorDashboardPage() {
                   <p className="text-xs text-thy-muted">No notifications yet.</p>
                 ) : (
                   recentNotes.map((note) => (
-                    <div key={note.id} className="flex justify-between text-thy-muted text-[11px] gap-3">
+                    <Link
+                      key={note.id}
+                      href={note.linkUrl || '/tailor-dashboard/notifications'}
+                      className="flex justify-between text-thy-muted text-[11px] gap-3 hover:text-thy-burgundy"
+                    >
                       <span className="font-medium">• {note.title}</span>
                       <span className="text-thy-subtle text-[10px] shrink-0">{note.timestamp}</span>
-                    </div>
+                    </Link>
                   ))
                 )}
               </div>
