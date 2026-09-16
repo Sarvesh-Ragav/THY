@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Ruler, CheckCheck, Clock, Send, Image as ImageIcon } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { useSocketChat } from '@/hooks/useSocketChat';
+import { getSocket } from '@/lib/socket';
 import {
   listThreads,
   resolveMediaUrl,
@@ -51,6 +52,34 @@ export default function TailorChatPage() {
       });
   }, [accessToken]);
 
+  // Listen to live cross-thread updates on the tailor's user room
+  useEffect(() => {
+    if (!accessToken) return;
+    const socket = getSocket(accessToken);
+
+    const onLiveThreadUpdate = (updatedThread: ChatThread) => {
+      setThreads((prev) => {
+        const targetId = String(updatedThread._id || updatedThread.id || '');
+        const index = prev.findIndex((t) => String(t._id || t.id || '') === targetId);
+        if (index !== -1) {
+          const next = [...prev];
+          next[index] = { ...next[index], ...updatedThread };
+          const [moved] = next.splice(index, 1);
+          return [moved, ...next];
+        }
+        return [updatedThread, ...prev];
+      });
+
+      setActiveId((current) => current || updatedThread._id || updatedThread.id || null);
+    };
+
+    socket.on('chat:thread_update', onLiveThreadUpdate);
+
+    return () => {
+      socket.off('chat:thread_update', onLiveThreadUpdate);
+    };
+  }, [accessToken]);
+
   const activeThread = useMemo(
     () => threads.find((t) => (t._id || t.id) === activeId) ?? null,
     [threads, activeId]
@@ -66,6 +95,19 @@ export default function TailorChatPage() {
   } = useSocketChat(activeId, accessToken, activeThread, 'tailor', (message) => {
     updateSession((current) => notifyFromIncomingChat(current, 'tailor', message, activeThread?.customerName || 'Customer') || {});
   });
+
+  // Keep thread in threads state synchronized with active conversation state
+  useEffect(() => {
+    if (!thread) return;
+    setThreads((prev) => {
+      const targetId = String(thread._id || thread.id || '');
+      const index = prev.findIndex((t) => String(t._id || t.id || '') === targetId);
+      if (index === -1) return prev;
+      const next = [...prev];
+      next[index] = { ...next[index], ...thread };
+      return next;
+    });
+  }, [thread]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });

@@ -44,7 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${cormorant.variable} ${outfit.variable}`}>
-      <body className="antialiased bg-thy-cream text-thy-ink min-h-dvh font-sans">
+      <body suppressHydrationWarning className="antialiased bg-thy-cream text-thy-ink min-h-dvh font-sans">
         <script
           dangerouslySetInnerHTML={{
             __html: `try{var a=JSON.parse(localStorage.getItem('thy-appearance')||'{}');if(a.darkMode)document.documentElement.classList.add('dark');if(a.language)document.documentElement.lang=a.language;document.documentElement.style.colorScheme=a.darkMode?'dark':'light';}catch(e){}`,

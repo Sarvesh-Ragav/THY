@@ -35,6 +35,12 @@ interface ChatSendPayload {
 export function registerChatHandler(io: Server, socket: Socket): void {
   const userId = socket.data.userId;
 
+  // Immediately join dedicated user room for personal notifications and live cross-thread updates
+  if (userId) {
+    const userRoom = `user:${userId}`;
+    void socket.join(userRoom);
+  }
+
   socket.on('chat:join', async ({ threadId }: { threadId: string }) => {
     try {
       if (!threadId || !Types.ObjectId.isValid(threadId)) {
@@ -150,13 +156,23 @@ export function registerChatHandler(io: Server, socket: Socket): void {
       await thread.save();
 
       const room = `thread:${threadId}`;
+      const customerUserRoom = `user:${thread.customerId.toString()}`;
+      const tailorUserRoom = `user:${thread.tailorId.toString()}`;
+
       const messagePayload = message.toObject() as any;
       if (payload.clientId) {
         messagePayload.clientId = payload.clientId;
       }
 
+      // 1. Emit to active thread room
       io.to(room).emit('chat:message', messagePayload);
       io.to(room).emit('chat:thread_update', thread);
+
+      // 2. Also emit to both participants' user rooms (ensures tailor/customer receives updates even if they haven't joined the thread room yet)
+      io.to(customerUserRoom).emit('chat:message', messagePayload);
+      io.to(customerUserRoom).emit('chat:thread_update', thread);
+      io.to(tailorUserRoom).emit('chat:message', messagePayload);
+      io.to(tailorUserRoom).emit('chat:thread_update', thread);
     } catch (err) {
       console.error('Error in chat:send:', err);
       socket.emit('chat:error', { code: 'SERVER_ERROR', message: 'Failed to send message' });
@@ -182,8 +198,14 @@ export function registerChatHandler(io: Server, socket: Socket): void {
       }
 
       await thread.save();
+
       const room = `thread:${threadId}`;
+      const customerUserRoom = `user:${thread.customerId.toString()}`;
+      const tailorUserRoom = `user:${thread.tailorId.toString()}`;
+
       io.to(room).emit('chat:thread_update', thread);
+      io.to(customerUserRoom).emit('chat:thread_update', thread);
+      io.to(tailorUserRoom).emit('chat:thread_update', thread);
     } catch (err) {
       console.error('Error in chat:read:', err);
     }

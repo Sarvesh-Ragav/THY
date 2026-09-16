@@ -74,8 +74,8 @@ export function useSocketChat(
     socket.on('disconnect', onDisconnect);
 
     const onChatMessage = (message: ChatMessage) => {
-      const msgThreadId = (message.threadId as any)?._id || message.threadId;
-      if (msgThreadId === threadId) {
+      const msgThreadId = String((message.threadId as any)?._id || message.threadId || '');
+      if (threadId && msgThreadId === String(threadId)) {
         setMessages((prev) => {
           // 1. Reconcile optimistic message by clientId or temporary _id
           if (message.clientId) {
@@ -107,9 +107,9 @@ export function useSocketChat(
           }
 
           // 3. Prevent duplicate by MongoDB _id or id
-          const exists = prev.some((m) => m._id === message._id || (m.id && m.id === message.id));
+          const exists = prev.some((m) => String(m._id) === String(message._id) || (m.id && String(m.id) === String(message.id)));
           if (exists) {
-            return prev.map((m) => (m._id === message._id || m.id === message.id ? message : m));
+            return prev.map((m) => (String(m._id) === String(message._id) || (m.id && String(m.id) === String(message.id)) ? message : m));
           }
 
           incomingRef.current?.(message);
@@ -120,22 +120,22 @@ export function useSocketChat(
     };
 
     const onThreadUpdate = (updatedThread: ChatThread) => {
-      const updatedId = updatedThread._id || updatedThread.id;
-      if (updatedId === threadId) {
+      const updatedId = String(updatedThread._id || updatedThread.id || '');
+      if (threadId && updatedId === String(threadId)) {
         setThread(updatedThread);
       }
     };
 
     const onChatHistory = ({ threadId: hThreadId, messages: hMessages }: { threadId: string; messages: ChatMessage[] }) => {
-      if (hThreadId === threadId) {
+      if (threadId && String(hThreadId) === String(threadId)) {
         setMessages((prev) => {
           const messageMap = new Map<string, ChatMessage>();
           for (const m of hMessages) {
-            const key = m._id || m.id || '';
+            const key = String(m._id || m.id || '');
             if (key) messageMap.set(key, m);
           }
           const pending = prev.filter(
-            (m) => m.status === 'sending' && !messageMap.has(m._id) && (!m.clientId || !messageMap.has(m.clientId))
+            (m) => m.status === 'sending' && !messageMap.has(String(m._id)) && (!m.clientId || !messageMap.has(m.clientId))
           );
           return [...Array.from(messageMap.values()), ...pending];
         });
@@ -144,7 +144,7 @@ export function useSocketChat(
     };
 
     const onChatTyping = ({ threadId: tThreadId, typing }: { threadId: string; typing: boolean }) => {
-      if (tThreadId === threadId) {
+      if (threadId && String(tThreadId) === String(threadId)) {
         setIsTyping(typing);
         if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
         if (typing) {
