@@ -389,11 +389,18 @@ export function hasTailorProfile(session: TailorSession): boolean {
 }
 
 export function hasSubmittedVerification(session: TailorSession): boolean {
+  const status = session.verification?.status;
   return Boolean(
     session.verification?.idNumber ||
-    session.verification?.documentName ||
-    session.verification?.status
+      session.verification?.documentName ||
+      status === 'pending' ||
+      status === 'approved' ||
+      status === 'rejected'
   );
+}
+
+export function isTailorVerified(session: TailorSession): boolean {
+  return session.verification?.status === 'approved';
 }
 
 export function isTailorOnboardingComplete(session: TailorSession): boolean {
@@ -419,7 +426,8 @@ export function hasCustomerPreferences(session: TailorSession): boolean {
 }
 
 export function isCustomerOnboardingComplete(session: TailorSession): boolean {
-  return hasCustomerProfile(session) && hasCustomerPreferences(session);
+  // Preferences are collected once during signup, not required again on login.
+  return hasCustomerProfile(session);
 }
 
 export function hasCustomerActivity(session: TailorSession): boolean {
@@ -434,9 +442,10 @@ export function getCustomerFirstName(session: TailorSession): string {
 
 // STEP 2 INTEGRATION: Accurate Post-Auth Path evaluation
 export function getPostAuthPath(session: TailorSession): string {
+  if (session.role === 'admin') return '/admin';
+
   if (session.role === 'customer') {
     if (!hasCustomerProfile(session)) return '/customer-registration';
-    if (!hasCustomerPreferences(session)) return '/customer-preferences';
     return '/';
   }
 
@@ -509,6 +518,21 @@ export function applyAccountToSession(
             }
           : current.customerProfile);
 
+  const prefsFromServer = customerProfile?.preferences;
+  const nextPreferences =
+    sessionPatch?.customerPreferences ??
+    (prefsFromServer?.shoppingFor &&
+    prefsFromServer.contactMethod &&
+    Array.isArray(prefsFromServer.services) &&
+    prefsFromServer.services.length
+      ? {
+          shoppingFor: prefsFromServer.shoppingFor as CustomerShoppingFor,
+          contactMethod: prefsFromServer.contactMethod as CustomerContactMethod,
+          services: prefsFromServer.services as CustomerService[],
+          garmentTypes: (prefsFromServer.garmentTypes || []) as CustomerGarmentType[],
+        }
+      : current.customerPreferences);
+
   const nextTailor =
     sessionPatch?.profile ??
     (tailorProfile
@@ -547,6 +571,7 @@ export function applyAccountToSession(
     role,
     identifier,
     customerProfile: nextCustomer,
+    customerPreferences: nextPreferences,
     profile: nextTailor,
     tailorPortfolio: nextPortfolio,
     verification: nextVerification,

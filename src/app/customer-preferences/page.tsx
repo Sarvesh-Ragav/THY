@@ -12,18 +12,20 @@ import {
   CustomerGarmentType,
   CustomerService,
   CustomerShoppingFor,
+  hasCustomerPreferences,
   hasCustomerProfile,
-  isCustomerOnboardingComplete,
 } from '@/lib/tailor-session';
+import { AuthApiError, saveCustomerPreferences } from '@/lib/auth-api';
 
 export default function CustomerPreferences() {
   const router = useRouter();
-  const { session, isReady, updateSession } = useTailorSession();
+  const { session, isReady, updateSession, accessToken } = useTailorSession();
   const [shoppingFor, setShoppingFor] = useState<CustomerShoppingFor>('Myself');
   const [contactMethod, setContactMethod] = useState<CustomerContactMethod>('WhatsApp');
   const [services, setServices] = useState<CustomerService[]>(['Stitching']);
   const [garmentTypes, setGarmentTypes] = useState<CustomerGarmentType[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isReady) return;
@@ -38,7 +40,8 @@ export default function CustomerPreferences() {
       return;
     }
 
-    if (session.isAuthenticated && isCustomerOnboardingComplete(session)) {
+    // Preferences are signup-only: returning customers who already set them go home.
+    if (session.isAuthenticated && hasCustomerPreferences(session)) {
       router.replace('/');
       return;
     }
@@ -65,7 +68,7 @@ export default function CustomerPreferences() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (services.length === 0) {
@@ -73,18 +76,32 @@ export default function CustomerPreferences() {
       return;
     }
 
-    updateSession({
-      isAuthenticated: true,
-      role: 'customer',
-      customerPreferences: {
-        shoppingFor,
-        contactMethod,
-        services,
-        garmentTypes,
-      },
-    });
+    const preferences = {
+      shoppingFor,
+      contactMethod,
+      services,
+      garmentTypes,
+    };
 
-    router.push('/');
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    try {
+      if (accessToken) {
+        await saveCustomerPreferences(preferences, accessToken);
+      }
+      updateSession({
+        isAuthenticated: true,
+        role: 'customer',
+        customerPreferences: preferences,
+      });
+      router.push('/');
+    } catch (error) {
+      setErrorMessage(
+        error instanceof AuthApiError ? error.message : 'Unable to save preferences. Please try again.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isReady) {
@@ -195,9 +212,10 @@ export default function CustomerPreferences() {
           <div className="md:col-span-2 mt-4">
             <button
               type="submit"
-              className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors"
+              disabled={isSubmitting}
+              className="w-full py-3 bg-thy-brand hover:bg-thy-brand-hover text-white font-semibold rounded-lg transition-colors disabled:opacity-60"
             >
-              Create Customer Account
+              {isSubmitting ? 'Saving...' : 'Save preferences'}
             </button>
           </div>
         </form>

@@ -27,6 +27,12 @@ export interface AuthCustomerProfile {
   address: string;
   phone: string | null;
   avatarUrl: string | null;
+  preferences?: {
+    shoppingFor?: string;
+    contactMethod?: string;
+    services?: string[];
+    garmentTypes?: string[];
+  } | null;
 }
 
 export interface AuthTailorPortfolioItem {
@@ -90,6 +96,14 @@ export async function getAccountBundle(user: AuthUser): Promise<AccountBundle> {
           address: defaultAddress?.addressLine1 || '',
           phone: user.phoneNumber ?? null,
           avatarUrl: customer.avatarUrl ?? user.avatarUrl ?? null,
+          preferences: customer.preferences
+            ? {
+                shoppingFor: customer.preferences.shoppingFor,
+                contactMethod: customer.preferences.contactMethod,
+                services: customer.preferences.services || [],
+                garmentTypes: customer.preferences.garmentTypes || [],
+              }
+            : null,
         }
       : null,
     tailorProfile: tailor

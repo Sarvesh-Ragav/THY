@@ -113,13 +113,13 @@ export default function CustomerRegistration() {
         password,
         confirmPassword,
       });
-      const next = completeAuthentication(result, {
+      completeAuthentication(result, {
         role: 'customer',
         hasPassword: true,
         identifier: trimmedEmail,
         customerProfile,
       });
-      router.push(getPostAuthPath(next));
+      router.push('/customer-preferences');
     } catch (error) {
       setErrorMessage(
         error instanceof AuthApiError

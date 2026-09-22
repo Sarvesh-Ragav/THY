@@ -31,6 +31,31 @@ const TailorPortfolioItemSchema = new Schema(
   { _id: true, timestamps: true }
 );
 
+const TailorVerificationDocumentSchema = new Schema(
+  {
+    kind: {
+      type: String,
+      enum: ['government_id', 'shop_proof'],
+      required: true,
+    },
+    fileName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    mimeType: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    dataUrl: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false }
+);
+
 const TailorVerificationSchema = new Schema(
   {
     status: {
@@ -49,6 +74,15 @@ const TailorVerificationSchema = new Schema(
     documentName: {
       type: String,
       default: '',
+    },
+    documents: {
+      type: [TailorVerificationDocumentSchema],
+      default: [],
+    },
+    reviewNotes: {
+      type: String,
+      default: '',
+      trim: true,
     },
     submittedAt: {
       type: Date,

@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { TailorPage } from '@/components/tailor/TailorPage';
-import { getTailorFirstName, hasSubmittedVerification } from '@/lib/tailor-session';
+import { getTailorFirstName, hasSubmittedVerification, isTailorVerified } from '@/lib/tailor-session';
 import { updateTailorAccount } from '@/lib/auth-api';
 import {
   activeOrders,
@@ -26,7 +26,8 @@ export default function TailorDashboardPage() {
   const available = session.availability.isAvailable && !session.availability.vacationMode;
   const recentNotes = session.notifications.slice(0, 3);
   const portfolio = session.tailorPortfolio.slice(0, 5);
-  const verified = hasSubmittedVerification(session);
+  const verified = isTailorVerified(session);
+  const verificationPending = hasSubmittedVerification(session) && !verified;
 
   return (
     <TailorPage
@@ -77,7 +78,13 @@ export default function TailorDashboardPage() {
             <div className="space-y-0.5">
               <p className="text-xs font-semibold text-thy-muted">Verification Status</p>
               <span className="bg-thy-mist/80 text-thy-ink text-[10px] font-bold px-2 py-0.5 rounded-full inline-block">
-                {verified ? '✓ Verified Tailor' : 'Pending verification'}
+                {verified
+                  ? '✓ Verified Tailor'
+                  : session.verification?.status === 'rejected'
+                    ? 'Verification rejected'
+                    : verificationPending
+                      ? 'Pending admin review'
+                      : 'Verification required'}
               </span>
               <p className="text-[10px] text-thy-subtle block pt-0.5">
                 {session.profile?.shopName || 'Your atelier'}

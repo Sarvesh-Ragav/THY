@@ -262,20 +262,34 @@ export async function updateDirectoryTailorDetails(
 
 export async function saveTailorVerification(
   userId: string,
-  input: { idType: string; idNumber: string; documentName: string }
+  input: {
+    idType: string;
+    idNumber: string;
+    documentName: string;
+    documents: Array<{ kind: 'government_id' | 'shop_proof'; fileName: string; mimeType: string; dataUrl: string }>;
+  }
 ) {
   const profile = await TailorProfile.findOne({ userId });
   if (!profile) {
     throw new ApiError(404, 'Tailor profile was not found.', 'TAILOR_NOT_FOUND');
   }
 
-  const alreadySubmitted = Boolean(profile.verification?.documentName || profile.verification?.idNumberHash);
+  const alreadySubmitted = Boolean(
+    profile.verification?.documentName ||
+      profile.verification?.idNumberHash ||
+      (profile.verification?.documents && profile.verification.documents.length > 0)
+  );
   if (alreadySubmitted) {
     return {
       status: profile.verification?.status || 'pending',
       idType: profile.verification?.idType || input.idType,
       documentName: profile.verification?.documentName || input.documentName,
       submitted: true,
+      documents: (profile.verification?.documents || []).map((doc) => ({
+        kind: doc.kind,
+        fileName: doc.fileName,
+        mimeType: doc.mimeType,
+      })),
     };
   }
 
@@ -284,6 +298,8 @@ export async function saveTailorVerification(
     idType: input.idType,
     idNumberHash: hashValue(input.idNumber),
     documentName: input.documentName,
+    documents: input.documents,
+    reviewNotes: '',
     submittedAt: new Date(),
     reviewedAt: null,
   });
@@ -293,5 +309,10 @@ export async function saveTailorVerification(
     idType: input.idType,
     documentName: input.documentName,
     submitted: true,
+    documents: input.documents.map((doc) => ({
+      kind: doc.kind,
+      fileName: doc.fileName,
+      mimeType: doc.mimeType,
+    })),
   };
 }

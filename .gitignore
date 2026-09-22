@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/server/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -19,10 +20,13 @@
 
 # production
 /build
+/server/dist
 
 # misc
 .DS_Store
 *.pem
+*.p12
+*.key
 
 # debug
 npm-debug.log*
@@ -30,8 +34,16 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env / secrets — keep examples trackable
+.env
+.env.*
+!.env.example
+!server/.env.example
+**/.env
+**/.env.local
+**/.env.production
+**/.env.development
+!**/.env.example
 
 # vercel
 .vercel
@@ -39,6 +51,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-server/node_modules/
 
-public/application_default_credentials.json
+# Google ADC / service account keys
+**/application_default_credentials.json
+**/*credentials*.json
+!**/.env.example

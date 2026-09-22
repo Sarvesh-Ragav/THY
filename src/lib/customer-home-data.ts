@@ -5,17 +5,16 @@ export const MAIN_NAV = [
   { label: 'Explore', href: '/explore' },
   { label: 'Categories', href: '/categories' },
   { label: 'Tailors', href: '/tailors' },
-  { label: 'My Orders', href: '/my-orders' },
 ] as const;
 
 export const PROFILE_MENU = [
   { label: 'My Profile', href: '/profile' },
+  { label: 'My Orders', href: '/my-orders' },
   { label: 'My Measurements', href: '/my-measurements' },
   { label: 'Saved Addresses', href: '/saved-addresses' },
   { label: 'Payment Methods', href: '/payment-methods' },
   { label: 'Settings', href: '/settings' },
   { label: 'Help & Support', href: '/help' },
-  { label: 'About THY', href: '/about' },
 ] as const;
 
 export const AUTH_PATHS = [

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Bell, Heart, Menu, Search, ShoppingBag, User, X, LogOut } from 'lucide-react';
+import { Bell, Heart, Menu, MessageCircle, Search, ShoppingBag, User, X, LogOut } from 'lucide-react';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { getAccountDisplayName, getCustomerFirstName } from '@/lib/tailor-session';
 import { AUTH_PATHS, MAIN_NAV, PROFILE_MENU } from '@/lib/customer-home-data';
@@ -147,6 +147,9 @@ export function CustomerNavbar() {
   const utilityIcons = (
     <div className="flex items-center gap-0.5 shrink-0">
       <AppearanceControls />
+      <button type="button" aria-label={t('navChat')} className={iconBtn} onClick={() => goAuthPath('/chat')}>
+        <MessageCircle size={18} />
+      </button>
       <button type="button" aria-label={t('navNotifications')} className={`${iconBtn} relative`} onClick={() => goAuthPath('/notifications')}>
         <Bell size={18} />
         {notificationCount > 0 ? (

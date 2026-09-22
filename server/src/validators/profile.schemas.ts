@@ -69,6 +69,24 @@ export const tailorVerificationSchema = z.object({
   idType: trimmed(64),
   idNumber: z.string().trim().min(4).max(128),
   documentName: trimmed(255),
+  documents: z
+    .array(
+      z.object({
+        kind: z.enum(['government_id', 'shop_proof']),
+        fileName: trimmed(255),
+        mimeType: z
+          .string()
+          .trim()
+          .regex(/^(image\/(jpeg|jpg|png|webp|gif)|application\/pdf)$/i, 'Unsupported file type'),
+        dataUrl: z
+          .string()
+          .min(32)
+          .max(6_000_000)
+          .refine((value) => value.startsWith('data:'), 'Document must be a data URL'),
+      })
+    )
+    .min(1)
+    .max(2),
 });
 
 export const tailorPortfolioSchema = z.object({

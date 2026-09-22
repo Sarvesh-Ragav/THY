@@ -29,7 +29,7 @@ export default function TailorProfilePreviewPage() {
     yearsExperience: years,
     rating: 0,
     reviewCount: 0,
-    verified: session.verification?.status === 'pending' ? false : Boolean(session.verification),
+    verified: session.verification?.status === 'approved',
     pricingStartingAt: 800,
     turnaroundDays: 5,
     acceptingOrders: session.availability.isAvailable && !session.availability.vacationMode,

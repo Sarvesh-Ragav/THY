@@ -6,6 +6,17 @@ import { useTailorSession } from '@/components/providers/TailorSessionProvider';
 import { submitTailorVerification } from '@/lib/auth-api';
 import { hasSubmittedVerification } from '@/lib/tailor-session';
 
+const MAX_FILE_BYTES = 2.5 * 1024 * 1024;
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(new Error(`Unable to read ${file.name}`));
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function TailorVerificationPage() {
   const router = useRouter();
   const { session, isReady, accessToken, updateSession } = useTailorSession();
@@ -31,49 +42,70 @@ export default function TailorVerificationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!govId) {
-      setErrorMessage('Please upload a government ID to continue.');
+    if (!govId || !shopProof) {
+      setErrorMessage('Please upload both government ID and shop/studio proof.');
+      return;
+    }
+    if (govId.size > MAX_FILE_BYTES || shopProof.size > MAX_FILE_BYTES) {
+      setErrorMessage('Each file must be under 2.5 MB.');
       return;
     }
 
     setIsSubmitting(true);
     setErrorMessage(null);
 
-    const documentName = [govId.name, shopProof?.name].filter(Boolean).join(', ');
-    const verification = {
-      idType: 'Aadhaar / PAN',
-      idNumber: 'on-file',
-      documentName: documentName || 'Identity proof',
-      status: 'pending' as const,
-    };
-
     try {
+      const [govDataUrl, shopDataUrl] = await Promise.all([readFileAsDataUrl(govId), readFileAsDataUrl(shopProof)]);
+      const documents = [
+        {
+          kind: 'government_id' as const,
+          fileName: govId.name,
+          mimeType: govId.type || 'application/octet-stream',
+          dataUrl: govDataUrl,
+        },
+        {
+          kind: 'shop_proof' as const,
+          fileName: shopProof.name,
+          mimeType: shopProof.type || 'application/octet-stream',
+          dataUrl: shopDataUrl,
+        },
+      ];
+      const documentName = documents.map((doc) => doc.fileName).join(', ');
+      const verification = {
+        idType: 'Aadhaar / PAN',
+        idNumber: `${govId.name}-${govId.size}`,
+        documentName,
+        status: 'pending' as const,
+      };
+
       if (accessToken) {
         await submitTailorVerification(
           {
             idType: verification.idType,
-            idNumber: `${govId.name}-${govId.size}`,
+            idNumber: verification.idNumber,
             documentName: verification.documentName,
+            documents,
           },
           accessToken
         );
       }
-    } catch {
-      // Session still records the one-time signup so later logins skip this page.
+
+      updateSession({
+        isAuthenticated: true,
+        role: 'tailor',
+        verification,
+      });
+
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('thy_logged_out');
+      }
+
+      router.push('/tailor-dashboard');
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Unable to submit verification documents.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    updateSession({
-      isAuthenticated: true,
-      role: 'tailor',
-      verification,
-    });
-
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('thy_logged_out');
-    }
-
-    router.push('/tailor-dashboard');
-    setIsSubmitting(false);
   };
 
   if (!isReady) {
@@ -98,7 +130,7 @@ export default function TailorVerificationPage() {
             Tailor Verification
           </h1>
           <p className="text-sm text-thy-muted mt-3">
-            Upload identity and business proofs once during signup to activate payouts and ordering.
+            Upload identity and business proofs once during signup. An admin will review them before you are marked verified.
           </p>
           <div className="thy-divider-glow mt-4 mx-auto max-w-xs" />
         </div>
@@ -111,10 +143,11 @@ export default function TailorVerificationPage() {
             <input
               type="file"
               required
-              accept="image/*,.pdf"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
               onChange={(e) => setGovId(e.target.files?.[0] || null)}
               className="w-full text-xs text-thy-muted file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-thy-mist file:text-thy-brand hover:file:bg-thy-mist cursor-pointer"
             />
+            {govId ? <p className="mt-1 text-thy-subtle">{govId.name}</p> : null}
           </div>
 
           <div>
@@ -124,16 +157,17 @@ export default function TailorVerificationPage() {
             <input
               type="file"
               required
-              accept="image/*,.pdf"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
               onChange={(e) => setShopProof(e.target.files?.[0] || null)}
               className="w-full text-xs text-thy-muted file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-thy-mist file:text-thy-brand hover:file:bg-thy-mist cursor-pointer"
             />
+            {shopProof ? <p className="mt-1 text-thy-subtle">{shopProof.name}</p> : null}
           </div>
 
           <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-xl text-[11px] space-y-0.5">
             <p className="font-bold">Review Process</p>
             <p className="text-amber-700">
-              This is required only once at signup. Later logins will not ask for these documents again.
+              Required only once at signup. Files stay on file for admin review. Max 2.5 MB each (JPG, PNG, WebP, or PDF).
             </p>
           </div>
 

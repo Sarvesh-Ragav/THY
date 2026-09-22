@@ -1,48 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# THY
 
-## Getting Started
+Bespoke Indian wear marketplace — customer + tailor apps, chat, orders, payments, and an admin console.
 
-First, configure the frontend and API:
+## Stack
+
+- **Frontend:** Next.js 15 (App Router) on port `3000`
+- **API:** Express + Socket.IO on port `4000`
+- **Data:** MongoDB (primary). Optional Postgres for payments migrations.
+- **Payments:** Razorpay Checkout + webhooks
+
+## Local setup
 
 ```bash
+# 1) Frontend env
 cp .env.example .env.local
+
+# 2) API env
 cp server/.env.example server/.env
-cd server && npm install && npm run migrate && npm run dev
+# fill MongoDB, JWT secrets, Razorpay, Google OAuth
+
+# 3) Install + seed admin (optional)
+cd server
+npm install
+npm run seed:mongo
+npm run dev
+
+# 4) Frontend (second terminal, repo root)
+cd ..
+npm install
+npm run dev
 ```
 
-Set the three Razorpay values in `server/.env`. Configure Razorpay's webhook URL as
-`https://<your-api-host>/api/v1/payments/webhook`, using the same webhook secret,
-and subscribe to `payment.captured`, `payment.failed`, and `order.paid`.
+- Site: http://localhost:3000  
+- API health: http://localhost:4000/api/v1/health  
+- Admin: http://localhost:3000/admin/login  
+  Seeded admin (after `npm run seed:mongo`): `admin@thy.local` / `admin123` — change in production.
 
-Then, in a second terminal, run the frontend:
+## Production deploy checklist
+
+### 1. Frontend (e.g. Vercel)
+
+Set environment variables:
+
+| Variable | Example |
+|----------|---------|
+| `NEXT_PUBLIC_AUTH_API_URL` | `https://api.yourdomain.com/api/v1` |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | your OAuth web client ID |
+| `GOOGLE_CLOUD_PROJECT` | optional, for studio AI |
+| `GOOGLE_CLOUD_LOCATION` | `global` |
+
+Build command: `npm run build`  
+Output: Next.js default (`next start` or Vercel).
+
+Point Google OAuth authorized origins / redirect URIs at your production frontend URL.
+
+### 2. API (e.g. Render, Railway, Fly, VM)
+
+Set environment from `server/.env.example`, especially:
+
+| Variable | Notes |
+|----------|--------|
+| `NODE_ENV` | `production` |
+| `MONGODB_URI` | Atlas connection string |
+| `FRONTEND_ORIGIN` | exact frontend URL, e.g. `https://thy.vercel.app` |
+| `FRONTEND_ORIGINS` | optional comma-separated extras |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | long random values |
+| `EXPOSE_MOCK_OTP` | **must be `false`** |
+| `RAZORPAY_*` | live or test keys |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | OAuth |
+
+Start command:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd server && npm install && npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Health check path: `/api/v1/health`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Razorpay webhook URL:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`https://<api-host>/api/v1/payments/webhook`
 
-## Learn More
+Subscribe to `payment.captured`, `payment.failed`, and `order.paid`. Use the same `RAZORPAY_WEBHOOK_SECRET`.
 
-To learn more about Next.js, take a look at the following resources:
+### 3. After first deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Confirm `GET /api/v1/health` returns Mongo connected.
+2. Run `npm run seed:mongo` once on the API host (or locally against Atlas) to create the admin user if needed.
+3. Sign in at `/admin/login`, change the admin password, approve tailor documents.
+4. Smoke-test customer signup → preferences → login (should not re-ask preferences).
+5. Smoke-test tailor signup → document upload → admin approve.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
+| Location | Command | Purpose |
+|----------|---------|---------|
+| root | `npm run dev` | Next.js dev |
+| root | `npm run build` / `npm start` | Next.js production |
+| `server/` | `npm run dev` | API + Socket.IO watch |
+| `server/` | `npm start` | API production |
+| `server/` | `npm run seed:mongo` | seed demo users + admin |
+| `server/` | `npm test` | payment util tests |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Security notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Never commit `.env`, ADC JSON, or service-account keys (ignored by git).
+- Keep Razorpay and JWT secrets only in the host secret store.
+- Tailor verification documents are stored for admin review — treat Mongo access as sensitive.

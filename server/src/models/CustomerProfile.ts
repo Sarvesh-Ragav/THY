@@ -56,11 +56,11 @@ const CustomerPreferenceSchema = new Schema(
     },
     services: {
       type: [String],
-      default: ['Bespoke Stitching'],
+      default: [],
     },
     garmentTypes: {
       type: [String],
-      default: ['sarees', 'salwars'],
+      default: [],
     },
   },
   { _id: false }

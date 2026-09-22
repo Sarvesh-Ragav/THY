@@ -12,11 +12,19 @@ import { razorpayWebhook } from './controllers/payment.controller.js';
 import { categoryRouter, designRouter, directoryTailorRouter } from './routes/catalogue.routes.js';
 import { chatRouter } from './routes/chat.routes.js';
 import { notificationRouter } from './routes/notification.routes.js';
+import { adminRouter } from './routes/admin.routes.js';
 import { mongoose } from './db/mongo.js';
 
 function isAllowedOrigin(origin?: string): boolean {
   if (!origin) return true;
-  if (origin === env.FRONTEND_ORIGIN) return true;
+  const allowed = new Set<string>([
+    env.FRONTEND_ORIGIN,
+    ...(process.env.FRONTEND_ORIGINS || '')
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean),
+  ]);
+  if (allowed.has(origin)) return true;
   if (env.NODE_ENV !== 'production') {
     return /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
   }
@@ -75,5 +83,6 @@ app.use('/api/v1/tailors', directoryTailorRouter);
 app.use('/api/v1/payments', paymentRouter);
 app.use('/api/v1/chat', chatRouter);
 app.use('/api/v1/notifications', notificationRouter);
+app.use('/api/v1/admin', adminRouter);
 app.use(notFound);
 app.use(errorHandler);

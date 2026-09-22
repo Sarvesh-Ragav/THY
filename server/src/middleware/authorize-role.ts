@@ -1,13 +1,26 @@
 import type { NextFunction, Request, Response } from 'express';
-import { getUserRole } from '../services/profile.service.js';
+import { User } from '../models/User.js';
 import { ApiError } from '../utils/api-error.js';
 
-export function requireRole(role: 'customer' | 'tailor') {
+export type AppRole = 'customer' | 'tailor' | 'admin';
+
+async function resolveRole(request: Request): Promise<string | null> {
+  if (request.auth?.role) return request.auth.role;
+  const user = await User.findById(request.auth!.userId).select('role isActive');
+  if (!user || user.isActive === false) return null;
+  return user.role ?? null;
+}
+
+export function requireRole(...roles: AppRole[]) {
   return async (request: Request, _response: Response, next: NextFunction): Promise<void> => {
     try {
-      const currentRole = await getUserRole(request.auth!.userId);
-      if (currentRole !== role) throw new ApiError(403, 'You are not authorized to access this resource.', 'FORBIDDEN');
+      const currentRole = await resolveRole(request);
+      if (!currentRole || !roles.includes(currentRole as AppRole)) {
+        throw new ApiError(403, 'You are not authorized to access this resource.', 'FORBIDDEN');
+      }
       next();
-    } catch (error) { next(error); }
+    } catch (error) {
+      next(error);
+    }
   };
 }

@@ -16,6 +16,12 @@ export interface AccountCustomerProfile {
   address: string;
   phone?: string | null;
   avatarUrl?: string | null;
+  preferences?: {
+    shoppingFor?: string;
+    contactMethod?: string;
+    services?: string[];
+    garmentTypes?: string[];
+  } | null;
 }
 
 export interface AccountTailorProfile {
@@ -158,6 +164,22 @@ export function updateCustomerAccount(
   });
 }
 
+export function saveCustomerPreferences(
+  payload: {
+    shoppingFor: 'Myself' | 'Family' | 'Both';
+    contactMethod: 'Phone' | 'WhatsApp' | 'Email';
+    services: Array<'Stitching' | 'Alterations' | 'Custom outfits'>;
+    garmentTypes: Array<'Ethnic wear' | 'Western wear' | 'Formal wear' | 'Kids wear'>;
+  },
+  accessToken: string
+): Promise<{ preferences: AccountCustomerProfile['preferences'] }> {
+  return request('/me/preferences', {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify(payload),
+  });
+}
+
 export function updateTailorAccount(
   payload: {
     fullName?: string;
@@ -182,7 +204,17 @@ export function updateTailorAccount(
 }
 
 export function submitTailorVerification(
-  payload: { idType: string; idNumber: string; documentName: string },
+  payload: {
+    idType: string;
+    idNumber: string;
+    documentName: string;
+    documents: Array<{
+      kind: 'government_id' | 'shop_proof';
+      fileName: string;
+      mimeType: string;
+      dataUrl: string;
+    }>;
+  },
   accessToken: string
 ): Promise<{
   verification: {

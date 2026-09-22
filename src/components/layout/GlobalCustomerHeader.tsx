@@ -5,6 +5,6 @@ import { CustomerNavbar } from '@/components/customer/CustomerNavbar';
 
 export function GlobalCustomerHeader() {
   const pathname = usePathname() || '';
-  if (pathname.startsWith('/tailor-dashboard')) return null;
+  if (pathname.startsWith('/tailor-dashboard') || pathname.startsWith('/admin')) return null;
   return <CustomerNavbar />;
 }

@@ -4,10 +4,50 @@ import { createAddressSchema, addressIdSchema, customerPreferencesSchema, custom
 import { createAddress, deleteAddress, getCustomerProfile, getTailorProfile, listAddresses, submitTailorVerification, updateAddress, updateCustomerPreferences, updateCustomerProfile, updateTailorProfile } from '../services/profile.service.js';
 import { replaceTailorPortfolio, saveTailorVerification, updateDirectoryTailorDetails } from '../services/directory.service.js';
 import { User } from '../models/User.js';
+import { CustomerProfile } from '../models/CustomerProfile.js';
 
 export const readCustomerProfile: RequestHandler = async (request, response, next) => { try { response.json({ success: true, data: await getCustomerProfile(request.auth!.userId) }); } catch (error) { next(error); } };
 export const patchCustomerProfile: RequestHandler = async (request, response, next) => { try { response.json({ success: true, data: { profile: await updateCustomerProfile(request.auth!.userId, customerProfileSchema.parse(request.body)) } }); } catch (error) { next(error); } };
-export const patchCustomerPreferences: RequestHandler = async (request, response, next) => { try { response.json({ success: true, data: { preferences: await updateCustomerPreferences(request.auth!.userId, customerPreferencesSchema.parse(request.body)) } }); } catch (error) { next(error); } };
+export const patchCustomerPreferences: RequestHandler = async (request, response, next) => {
+  try {
+    const input = customerPreferencesSchema.parse(request.body);
+    const profile = await CustomerProfile.findOneAndUpdate(
+      { userId: request.auth!.userId },
+      {
+        $set: {
+          preferences: {
+            shoppingFor: input.shoppingFor,
+            contactMethod: input.contactMethod,
+            services: input.services,
+            garmentTypes: input.garmentTypes,
+          },
+        },
+      },
+      { new: true }
+    );
+    if (!profile) {
+      throw new ApiError(404, 'Customer profile was not found.', 'PROFILE_NOT_FOUND');
+    }
+    try {
+      await updateCustomerPreferences(request.auth!.userId, input);
+    } catch {
+      // Postgres is optional; Mongo is the source of truth.
+    }
+    response.json({
+      success: true,
+      data: {
+        preferences: {
+          shoppingFor: profile.preferences?.shoppingFor,
+          contactMethod: profile.preferences?.contactMethod,
+          services: profile.preferences?.services || [],
+          garmentTypes: profile.preferences?.garmentTypes || [],
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export const readAddresses: RequestHandler = async (request, response, next) => { try { response.json({ success: true, data: { addresses: await listAddresses(request.auth!.userId) } }); } catch (error) { next(error); } };
 export const addAddress: RequestHandler = async (request, response, next) => { try { response.status(201).json({ success: true, data: { address: await createAddress(request.auth!.userId, createAddressSchema.parse(request.body)) } }); } catch (error) { next(error); } };
 export const patchAddress: RequestHandler = async (request, response, next) => { try { const { addressId } = addressIdSchema.parse(request.params); response.json({ success: true, data: { address: await updateAddress(request.auth!.userId, addressId, updateAddressSchema.parse(request.body)) } }); } catch (error) { next(error); } };
