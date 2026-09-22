@@ -1,9 +1,8 @@
+import { API_URL } from '@/lib/api-base';
 import type {
   AuthenticatedUser,
   AuthenticationResult,
 } from '@/lib/auth-api';
-
-const API_URL = (process.env.NEXT_PUBLIC_AUTH_API_URL ?? 'http://localhost:4000/api/v1').replace(/\/$/, '');
 
 export class AdminApiError extends Error {
   constructor(message: string, public readonly code?: string) {

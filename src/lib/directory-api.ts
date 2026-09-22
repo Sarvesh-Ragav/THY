@@ -1,3 +1,4 @@
+import { API_URL } from '@/lib/api-base';
 import type { DirectoryPortfolioItem, PublicDirectoryTailor } from '@/lib/directory';
 
 export class DirectoryApiError extends Error {
@@ -5,8 +6,6 @@ export class DirectoryApiError extends Error {
     super(message);
   }
 }
-
-const API_URL = (process.env.NEXT_PUBLIC_AUTH_API_URL ?? 'http://localhost:4000/api/v1').replace(/\/$/, '');
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   let response: Response;

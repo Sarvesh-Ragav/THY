@@ -1,6 +1,5 @@
+import { API_URL } from '@/lib/api-base';
 import type { CreatePaymentOrderInput, PersistedOrder, RazorpayCheckoutResponse } from '@/types/payment';
-
-const API_URL = (process.env.NEXT_PUBLIC_AUTH_API_URL ?? 'http://localhost:4000/api/v1').replace(/\/$/, '');
 
 export class PaymentApiError extends Error {
   constructor(message: string, public readonly code?: string) { super(message); }

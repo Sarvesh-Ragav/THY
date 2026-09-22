@@ -1,12 +1,5 @@
 import { io, type Socket } from 'socket.io-client';
-
-const API_ROOT = (
-  process.env.NEXT_PUBLIC_SOCKET_URL ||
-  process.env.NEXT_PUBLIC_AUTH_API_URL ||
-  'http://localhost:4000'
-)
-  .replace(/\/api\/v1\/?$/, '')
-  .replace(/\/$/, '');
+import { API_ROOT } from '@/lib/api-base';
 
 let socket: Socket | null = null;
 let currentToken: string | null = null;

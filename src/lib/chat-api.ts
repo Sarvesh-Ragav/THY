@@ -1,5 +1,6 @@
-const API_URL = (process.env.NEXT_PUBLIC_AUTH_API_URL ?? 'http://localhost:4000/api/v1').replace(/\/$/, '');
-const SERVER_ORIGIN = API_URL.replace(/\/api\/v1\/?$/, '');
+import { API_ROOT, API_URL } from '@/lib/api-base';
+
+const SERVER_ORIGIN = API_ROOT;
 
 export interface ChatProduct {
   id: string;
