@@ -189,11 +189,143 @@ export async function updateOrderFulfillment(orderId: string, fulfillmentStatus:
 }
 
 export async function getAdminOverview() {
-  const [tailors, customers, orders, pendingVerifications] = await Promise.all([
-    TailorProfile.countDocuments(),
-    CustomerProfile.countDocuments(),
-    Order.countDocuments(),
-    TailorProfile.countDocuments({ 'verification.status': 'pending' }),
+  const [tailorProfiles, customerProfiles, orders, inactiveUsers] = await Promise.all([
+    TailorProfile.find()
+      .select('userId fullName shopName city verification isDirectoryActive createdAt updatedAt')
+      .sort({ updatedAt: -1 })
+      .lean(),
+    CustomerProfile.find().select('userId fullName city createdAt updatedAt').sort({ updatedAt: -1 }).lean(),
+    Order.find().sort({ createdAt: -1 }).limit(300).lean(),
+    User.find({ isActive: false, role: { $in: ['customer', 'tailor'] } })
+      .select('_id role')
+      .lean(),
   ]);
-  return { tailors, customers, orders, pendingVerifications };
+
+  const inactiveTailorIds = new Set(
+    inactiveUsers.filter((user) => user.role === 'tailor').map((user) => user._id.toString())
+  );
+  const inactiveCustomerIds = new Set(
+    inactiveUsers.filter((user) => user.role === 'customer').map((user) => user._id.toString())
+  );
+
+  let verified = 0;
+  let pendingVerifications = 0;
+  let rejected = 0;
+  let notSubmitted = 0;
+  let directoryListed = 0;
+  let directoryHidden = 0;
+  let disabledTailors = 0;
+
+  const pendingQueue: Array<{
+    id: string;
+    shopName: string;
+    fullName: string;
+    city: string;
+    documentCount: number;
+    submittedAt: Date | null;
+  }> = [];
+
+  for (const profile of tailorProfiles) {
+    const docs = profile.verification?.documents || [];
+    const hasSubmission = Boolean(
+      docs.length || profile.verification?.documentName || profile.verification?.idNumberHash
+    );
+    const status = profile.verification?.status || (hasSubmission ? 'pending' : 'not_submitted');
+
+    if (status === 'approved') verified += 1;
+    else if (status === 'rejected') rejected += 1;
+    else if (status === 'pending' || (status === 'not_submitted' && hasSubmission)) {
+      pendingVerifications += 1;
+      if (pendingQueue.length < 8) {
+        pendingQueue.push({
+          id: profile.userId.toString(),
+          shopName: profile.shopName,
+          fullName: profile.fullName,
+          city: profile.city,
+          documentCount: docs.length,
+          submittedAt: profile.verification?.submittedAt || profile.updatedAt || null,
+        });
+      }
+    } else {
+      notSubmitted += 1;
+    }
+
+    if (profile.isDirectoryActive !== false) directoryListed += 1;
+    else directoryHidden += 1;
+
+    if (inactiveTailorIds.has(profile.userId.toString())) disabledTailors += 1;
+  }
+
+  let disabledCustomers = 0;
+  for (const profile of customerProfiles) {
+    if (inactiveCustomerIds.has(profile.userId.toString())) disabledCustomers += 1;
+  }
+
+  const payment = { pending: 0, paid: 0, failed: 0, cancelled: 0 };
+  const fulfillment = { pending: 0, in_progress: 0, completed: 0, cancelled: 0 };
+  let paidRevenuePaise = 0;
+  let attentionCount = 0;
+  const attentionOrders: Array<{
+    id: string;
+    garmentName: string;
+    tailorName: string;
+    amountPaise: number;
+    paymentStatus: string;
+    fulfillmentStatus: string;
+    createdAt: Date | null;
+  }> = [];
+
+  for (const order of orders) {
+    const pay = order.paymentStatus || 'pending';
+    const fulfill = order.fulfillmentStatus || 'pending';
+    if (pay in payment) payment[pay as keyof typeof payment] += 1;
+    if (fulfill in fulfillment) fulfillment[fulfill as keyof typeof fulfillment] += 1;
+    if (pay === 'paid') paidRevenuePaise += order.amountPaise || 0;
+
+    const needsAttention =
+      pay === 'paid' && (fulfill === 'pending' || fulfill === 'in_progress');
+    if (needsAttention) {
+      attentionCount += 1;
+      if (attentionOrders.length < 8) {
+        attentionOrders.push({
+          id: order._id.toString(),
+          garmentName: order.garmentName,
+          tailorName: order.tailorName,
+          amountPaise: order.amountPaise,
+          paymentStatus: pay,
+          fulfillmentStatus: fulfill,
+          createdAt: order.createdAt || null,
+        });
+      }
+    }
+  }
+
+  const recentCustomers = customerProfiles.slice(0, 6).map((profile) => ({
+    id: profile.userId.toString(),
+    fullName: profile.fullName,
+    city: profile.city,
+    createdAt: profile.createdAt || null,
+  }));
+
+  return {
+    tailors: tailorProfiles.length,
+    customers: customerProfiles.length,
+    orders: orders.length,
+    pendingVerifications,
+    verified,
+    rejected,
+    notSubmitted,
+    directoryListed,
+    directoryHidden,
+    disabledTailors,
+    activeCustomers: customerProfiles.length - disabledCustomers,
+    disabledCustomers,
+    payment,
+    fulfillment,
+    paidRevenuePaise,
+    attentionCount,
+    pendingQueue,
+    attentionOrders,
+    recentCustomers,
+  };
 }

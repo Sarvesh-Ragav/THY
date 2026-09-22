@@ -33,7 +33,7 @@ npm run dev
 
 - Site: http://localhost:3000  
 - API health: http://localhost:4000/api/v1/health  
-- Admin: http://localhost:3000/admin/login  
+- Admin dashboard: http://localhost:3000/admin (sign in via `/login` with an admin account)  
   Seeded admin (after `npm run seed:mongo`): `admin@thy.local` / `admin123` — change in production.
 
 ## Production deploy checklist
@@ -87,7 +87,7 @@ Subscribe to `payment.captured`, `payment.failed`, and `order.paid`. Use the sam
 
 1. Confirm `GET /api/v1/health` returns Mongo connected.
 2. Run `npm run seed:mongo` once on the API host (or locally against Atlas) to create the admin user if needed.
-3. Sign in at `/admin/login`, change the admin password, approve tailor documents.
+3. Sign in at `/login` with the admin account, open `/admin`, change the admin password, approve tailor documents.
 4. Smoke-test customer signup → preferences → login (should not re-ask preferences).
 5. Smoke-test tailor signup → document upload → admin approve.
 

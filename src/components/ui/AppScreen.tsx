@@ -3,7 +3,7 @@
 import React from 'react';
 
 export const AUTH_MAIN_CLASS =
-  'min-h-[calc(100dvh-7.25rem)] bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]';
+  'min-h-dvh bg-transparent flex items-center justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]';
 
 export function AuthMain({
   children,

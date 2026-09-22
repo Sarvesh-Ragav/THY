@@ -33,6 +33,41 @@ export interface AdminOverview {
   customers: number;
   orders: number;
   pendingVerifications: number;
+  verified: number;
+  rejected: number;
+  notSubmitted: number;
+  directoryListed: number;
+  directoryHidden: number;
+  disabledTailors: number;
+  activeCustomers: number;
+  disabledCustomers: number;
+  payment: { pending: number; paid: number; failed: number; cancelled: number };
+  fulfillment: { pending: number; in_progress: number; completed: number; cancelled: number };
+  paidRevenuePaise: number;
+  attentionCount: number;
+  pendingQueue: Array<{
+    id: string;
+    shopName: string;
+    fullName: string;
+    city: string;
+    documentCount: number;
+    submittedAt: string | null;
+  }>;
+  attentionOrders: Array<{
+    id: string;
+    garmentName: string;
+    tailorName: string;
+    amountPaise: number;
+    paymentStatus: string;
+    fulfillmentStatus: string;
+    createdAt: string | null;
+  }>;
+  recentCustomers: Array<{
+    id: string;
+    fullName: string;
+    city: string;
+    createdAt: string | null;
+  }>;
 }
 
 export interface AdminTailor {

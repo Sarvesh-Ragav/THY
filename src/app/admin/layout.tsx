@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTailorSession } from '@/components/providers/TailorSessionProvider';
+import { getPostAuthPath } from '@/lib/tailor-session';
 import { ThyLogo } from '@/components/auth/ThyLogo';
 
 const LINKS = [
@@ -17,18 +18,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const { session, isReady, logout, accessToken } = useTailorSession();
-  const isLogin = pathname === '/admin/login';
 
   useEffect(() => {
-    if (!isReady || isLogin) return;
-    if (!session.isAuthenticated || session.role !== 'admin' || !accessToken) {
-      router.replace('/admin/login');
+    if (!isReady) return;
+    if (!session.isAuthenticated || !accessToken) {
+      router.replace('/login');
+      return;
     }
-  }, [accessToken, isLogin, isReady, router, session.isAuthenticated, session.role]);
-
-  if (isLogin) {
-    return <>{children}</>;
-  }
+    if (session.role !== 'admin') {
+      router.replace(getPostAuthPath(session));
+    }
+  }, [accessToken, isReady, router, session]);
 
   if (!isReady || !session.isAuthenticated || session.role !== 'admin') {
     return (
@@ -67,7 +67,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="text-[11px] uppercase tracking-[0.14em] text-white/85 hover:text-white"
             onClick={() => {
               logout();
-              router.push('/admin/login');
+              router.push('/login');
             }}
           >
             Logout

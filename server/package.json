@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "migrate": "tsx src/db/migrate.ts",
     "seed:mongo": "tsx src/db/seed-mongo.ts",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "build": "echo Nothing to build"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",
