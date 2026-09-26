@@ -46,7 +46,7 @@ export function CustomerHome() {
             </p>
             <Link
               href="/stitch-your-outfit"
-              className="hero-leather-btn inline-flex items-center justify-center mt-6 sm:mt-8 w-full sm:w-auto px-7 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em]"
+              className="thy-stitch-cta hero-leather-btn inline-flex items-center justify-center mt-6 sm:mt-8 w-full sm:w-auto px-8 py-4 text-[12px] font-semibold uppercase tracking-[0.2em]"
             >
               {t('homeCta')}
             </Link>
@@ -155,7 +155,7 @@ export function CustomerHome() {
               <p className="text-sm text-thy-subtle mt-1">{t('homeStart')}</p>
               <Link
                 href="/stitch-your-outfit"
-                className="inline-flex items-center justify-center mt-5 w-full sm:w-auto px-6 py-3 text-[11px] uppercase tracking-[0.18em] font-semibold bg-thy-burgundy text-thy-cream hover:bg-[#4A1520]"
+                className="thy-stitch-cta inline-flex items-center justify-center mt-5 w-full sm:w-auto px-7 py-3.5 text-[12px] uppercase tracking-[0.2em] font-semibold bg-thy-burgundy text-thy-cream hover:bg-[#4A1520]"
               >
                 {t('homeCta')}
               </Link>

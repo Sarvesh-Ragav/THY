@@ -603,6 +603,40 @@ html.dark .thy-section-title {
   animation: fadeIn 0.35s ease both;
 }
 
+@keyframes thy-stitch-pulse {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(255, 244, 214, 0.85),
+      0 0 0 0 rgba(92, 26, 36, 0.4),
+      0 14px 32px rgba(60, 12, 20, 0.28);
+    transform: translateY(0) scale(1);
+  }
+  55% {
+    box-shadow:
+      0 0 0 8px rgba(255, 244, 214, 0),
+      0 0 0 16px rgba(92, 26, 36, 0),
+      0 18px 40px rgba(92, 26, 36, 0.32);
+    transform: translateY(-2px) scale(1.035);
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(255, 244, 214, 0),
+      0 0 0 0 rgba(92, 26, 36, 0),
+      0 14px 32px rgba(60, 12, 20, 0.28);
+    transform: translateY(0) scale(1);
+  }
+}
+
+.thy-stitch-cta {
+  position: relative;
+  z-index: 1;
+  animation: thy-stitch-pulse 1.7s ease-in-out infinite;
+  box-shadow:
+    0 0 0 3px rgba(255, 244, 214, 0.9),
+    0 0 28px rgba(255, 214, 140, 0.75),
+    0 14px 32px rgba(60, 12, 20, 0.28);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .thy-reveal,
   .thy-fade-in,
@@ -614,6 +648,7 @@ html.dark .thy-section-title {
   .thy-card,
   .hero-leather-btn,
   .thy-btn,
+  .thy-stitch-cta,
   .thy-media img,
   .thy-media video,
   .thy-nav-link,

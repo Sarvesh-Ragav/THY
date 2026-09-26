@@ -15,7 +15,7 @@ export const C15_AUDIENCE_LABELS: Record<C15Audience, string> = {
   women: 'Women',
   men: 'Men',
   girls: 'Girls',
-  boys: 'Gents',
+  boys: 'Men',
 };
 
 const categoryImage = (file: string) => `/garment_categories/${encodeURIComponent(file)}`;

@@ -251,8 +251,8 @@ export function CustomerChatView({
     return (
       <div className="max-w-7xl mx-auto px-4 py-12 text-center text-sm text-red-600">
         <p>{threadError}</p>
-        <Link href="/tailors" className={`${ghostBtn} mt-4`}>
-          Back to tailors
+        <Link href="/chat" className={`${ghostBtn} mt-4`}>
+          Back to chats
         </Link>
       </div>
     );
@@ -264,8 +264,8 @@ export function CustomerChatView({
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
       <header className="thy-card p-4 sm:p-5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <Link href="/tailors" className={`${ghostBtn} min-w-20`}>
-            Back
+          <Link href="/chat" className={`${ghostBtn} min-w-20`}>
+            Chats
           </Link>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] uppercase tracking-[0.18em] text-thy-brand font-semibold">

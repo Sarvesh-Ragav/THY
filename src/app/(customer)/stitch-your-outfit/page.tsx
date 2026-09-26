@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
 import {
   C15_AUDIENCE_LABELS,
@@ -14,8 +15,14 @@ import {
 } from '@/lib/c15-catalog';
 import { useAppearance } from '@/components/providers/AppearanceProvider';
 
+function audienceWearLabel(audience: C15Audience) {
+  const label = C15_AUDIENCE_LABELS[audience];
+  return `${label}${/s$/i.test(label) ? '’' : '’s'} wear`;
+}
+
 export default function StitchYourOutfitPage() {
   const { t } = useAppearance();
+  const router = useRouter();
   const [audience, setAudience] = useState<C15Audience | null>(null);
   const [garmentId, setGarmentId] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -24,8 +31,6 @@ export default function StitchYourOutfitPage() {
   const matches = useMemo(() => searchC15Garments(query), [query]);
   const audienceGarments = audience ? garmentsForAudience(audience) : [];
   const visible: C15Garment[] = searching ? matches : audienceGarments;
-  const canContinue = Boolean(audience && garmentId);
-  const selectedLabel = audienceGarments.find((item) => item.id === garmentId)?.label;
 
   const selectAudience = (next: C15Audience) => {
     if (audience && audience !== next && garmentId) {
@@ -102,7 +107,7 @@ export default function StitchYourOutfitPage() {
 
       <section className="mt-8">
         <p className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle">
-          {searching ? 'Matching categories' : audience ? `${C15_AUDIENCE_LABELS[audience]}${audience === 'women' ? '’s' : '’'} wear` : 'Garment category'}
+          {searching ? 'Matching categories' : audience ? audienceWearLabel(audience) : 'Garment category'}
         </p>
 
         {!searching && !audience && (
@@ -134,6 +139,7 @@ export default function StitchYourOutfitPage() {
                   onClick={() => {
                     setAudience(garment.audience);
                     setGarmentId(garment.id);
+                    router.push(c13UploadHref(garment.audience, garment.id));
                   }}
                   className={`text-left overflow-hidden border ${
                     selected ? 'border-thy-brand' : 'border-thy-ink/10'
@@ -163,33 +169,6 @@ export default function StitchYourOutfitPage() {
         )}
       </section>
 
-      {audience && garmentId && selectedLabel && (
-        <p className="mt-6 text-sm text-thy-ink">
-          Selected · {C15_AUDIENCE_LABELS[audience]} · {selectedLabel}
-        </p>
-      )}
-
-      <div className="mt-8 max-w-md">
-        {canContinue && audience && garmentId ? (
-          <Link
-            href={c13UploadHref(audience, garmentId)}
-            className="hero-leather-btn inline-flex w-full items-center justify-center min-h-12 text-[11px] uppercase tracking-[0.16em]"
-          >
-            Continue
-          </Link>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="inline-flex w-full items-center justify-center min-h-12 text-[11px] uppercase tracking-[0.16em] border border-thy-ink/10 text-thy-subtle bg-thy-mist cursor-not-allowed"
-          >
-            Continue
-          </button>
-        )}
-        <p className="mt-2 text-[10px] uppercase tracking-[0.14em] text-thy-subtle">
-          Continue stays off until audience and garment are both selected
-        </p>
-      </div>
     </main>
   );
 }
