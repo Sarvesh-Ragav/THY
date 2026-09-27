@@ -58,7 +58,7 @@ export function readStudioDraft(categoryId?: string | null): StudioDraft | null 
     if (categoryId && parsed.categoryId !== categoryId) return null;
     return {
       categoryId: parsed.categoryId,
-      fabricImage: parsed.fabricImage,
+      fabricImage: parsed.fabricImage || '',
       fabricLabel: parsed.fabricLabel || 'Customer uploaded fabric',
       treatments: asFabricTreatments(parsed.treatments),
       bodyPhoto: parsed.bodyPhoto,
