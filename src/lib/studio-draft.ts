@@ -54,7 +54,7 @@ export function readStudioDraft(categoryId?: string | null): StudioDraft | null 
     const raw = window.sessionStorage.getItem(STUDIO_DRAFT_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<StudioDraft>;
-    if (!parsed.categoryId || !parsed.fabricImage) return null;
+    if (!parsed.categoryId) return null;
     if (categoryId && parsed.categoryId !== categoryId) return null;
     return {
       categoryId: parsed.categoryId,

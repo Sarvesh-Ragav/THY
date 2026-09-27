@@ -66,5 +66,5 @@ export function c15ToStudio(garment: C15Garment): StudioGarment {
 }
 
 export function c13UploadHref(audience: C15Audience, garmentId: string) {
-  return `/stitch-your-outfit/preview?category=${encodeURIComponent(garmentId)}&audience=${audience}`;
+  return `/stitch-your-outfit/customize?category=${encodeURIComponent(garmentId)}&audience=${audience}`;
 }
