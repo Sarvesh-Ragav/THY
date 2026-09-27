@@ -68,73 +68,78 @@ function CustomizeDesign() {
   const requiredGroups = groups.filter((group) => group.required);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-8">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.22em] text-thy-brand font-semibold">Stitch your outfit</p>
-          <h1
-            className="mt-1 text-3xl sm:text-4xl leading-none"
-            style={{ fontFamily: 'var(--font-cormorant), serif' }}
-          >
-            Customize Your Design
-          </h1>
-          <p className="mt-1.5 text-sm text-thy-muted">Choose one option in each required section.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link href="/stitch-your-outfit" className="text-sm text-thy-ink">
-            ← Back
-          </Link>
-          <button
-            type="button"
-            disabled={!ready}
-            onClick={generate}
-            className="hero-leather-btn min-h-11 px-4 text-[11px] uppercase tracking-[0.16em] disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Generate Design →
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        <aside className="thy-card p-3.5 space-y-3 lg:col-span-4">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[17rem_minmax(0,1fr)_15.5rem] gap-4 items-stretch">
+        <aside className="thy-card p-3.5 flex flex-col gap-3 h-full">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.18em] text-thy-brand font-semibold">Selected outfit</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-thy-brand font-bold">Selected outfit</p>
             <h2 className="mt-1 text-2xl leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
               {audienceLabel} · {preset.garment}
             </h2>
           </div>
-          <div className="overflow-hidden border border-thy-ink/10 bg-thy-mist">
-            <img src={garment?.fabricImage || preset.fabricImage} alt={preset.garment} className="h-36 w-full object-cover object-top" />
+          <div className="overflow-hidden border border-thy-ink/10 bg-thy-mist flex-1 min-h-48">
+            <img src={garment?.fabricImage || preset.fabricImage} alt={preset.garment} className="h-full w-full object-cover object-top" />
           </div>
           <div className="border border-thy-brand/20 bg-thy-mist/70 px-3 py-2.5 space-y-1.5">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-thy-brand font-semibold">Current design summary</p>
+            <p className="text-xs uppercase tracking-[0.14em] text-thy-brand font-bold">Current design summary</p>
             <SummaryRow label="Garment" value={preset.garment} />
             <SummaryRow label="Progress" value={ready ? 'Complete' : `${done} of ${required}`} emphasis={!ready} />
           </div>
         </aside>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4 content-start lg:col-span-8">
-          {requiredGroups.map((group) => (
-            <OptionGroup
-              key={group.id}
-              title={group.title}
-              hint={group.hint}
-              options={group.options}
-              selected={details[group.id]}
-              onSelect={(value) => choose(group.id, value)}
-            />
-          ))}
-          {specific.map((group) => (
-            <OptionGroup
-              key={group.id}
-              title={group.title}
-              hint={group.hint}
-              options={group.options}
-              selected={details[group.id]}
-              onSelect={(value) => choose(group.id, value)}
-            />
-          ))}
+        <section className="flex flex-col gap-4 min-w-0">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.22em] text-thy-brand font-bold">Stitch your outfit</p>
+              <h1 className="mt-1 text-3xl leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+                Customize Your Design
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link href="/stitch-your-outfit" className="text-sm font-medium text-thy-ink">
+                ← Back
+              </Link>
+              <button
+                type="button"
+                disabled={!ready}
+                onClick={generate}
+                className="hero-leather-btn min-h-11 px-4 text-[11px] uppercase tracking-[0.16em] disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Generate Design →
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+            {requiredGroups.map((group) => (
+              <OptionGroup
+                key={group.id}
+                title={group.title}
+                hint={group.hint}
+                options={group.options}
+                selected={details[group.id]}
+                onSelect={(value) => choose(group.id, value)}
+              />
+            ))}
+          </div>
         </section>
+
+        <aside className="flex flex-col gap-4">
+          <p className="text-xs uppercase tracking-[0.14em] text-thy-ink font-bold">Additional details</p>
+          {specific.length > 0 ? (
+            specific.map((group) => (
+              <OptionGroup
+                key={group.id}
+                title={group.title}
+                hint={group.hint}
+                options={group.options}
+                selected={details[group.id]}
+                onSelect={(value) => choose(group.id, value)}
+              />
+            ))
+          ) : (
+            <p className="text-sm text-thy-muted">No extra details for this garment.</p>
+          )}
+        </aside>
       </div>
     </main>
   );
@@ -164,7 +169,7 @@ function OptionGroup({
 }) {
   return (
     <div>
-      <h3 className="text-[11px] uppercase tracking-[0.16em] text-thy-ink font-semibold">{title}</h3>
+      <h3 className="text-sm font-bold tracking-[0.04em] text-thy-ink">{title}</h3>
       <p className="mt-0.5 text-xs text-thy-muted">{hint}</p>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {options.map((option) => {
