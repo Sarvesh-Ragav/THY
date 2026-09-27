@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": ">=20"
+    "node": "22.x"
+  },
+  "allowScripts": {
+    "@google/genai@2.22.0": true,
+    "protobufjs@7.6.6": true,
+    "unrs-resolver@1.12.2": true
   },
   "scripts": {
     "dev": "next dev",
