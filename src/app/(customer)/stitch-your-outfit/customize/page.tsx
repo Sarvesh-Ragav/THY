@@ -11,7 +11,7 @@ import {
   requiredCustomizationCount,
 } from '@/lib/garment-customization';
 import { getStudioGarment } from '@/lib/design-studio';
-import { findKurtiDesign, isKurtiOptionAvailable, type KurtiMatchField } from '@/lib/kurti-catalogue';
+import { bestKurtiDesign, findKurtiDesign, isKurtiOptionAvailable, type KurtiMatchField } from '@/lib/kurti-catalogue';
 import { patchStudioDraft, readStudioDraft, type GarmentCustomizationDetails } from '@/lib/studio-draft';
 import { useKurtiCatalogue } from '@/lib/use-kurti-catalogue';
 
@@ -42,6 +42,7 @@ function CustomizeDesign() {
   const isKurti = categoryId === 'kurti';
   const catalogue = useKurtiCatalogue(isKurti);
   const matchedDress = isKurti ? findKurtiDesign(catalogue.designs, details) : null;
+  const shownDress = isKurti ? bestKurtiDesign(catalogue.designs, details) : null;
 
   useEffect(() => {
     const draft = readStudioDraft(categoryId);
@@ -52,12 +53,26 @@ function CustomizeDesign() {
 
   useEffect(() => {
     if (!isKurti || catalogue.status !== 'ready') return;
-    const match = findKurtiDesign(catalogue.designs, detailsRef.current);
+    const current = { ...detailsRef.current };
+    let changed = false;
+    for (const group of groups) {
+      const value = current[group.id];
+      if (value && !group.options.includes(value)) {
+        delete current[group.id];
+        changed = true;
+      }
+    }
+    if (changed) {
+      detailsRef.current = current;
+      setDetails(current);
+    }
+    const match = bestKurtiDesign(catalogue.designs, changed ? current : detailsRef.current);
     patchStudioDraft(preset.categoryId, {
+      customization: changed ? current : detailsRef.current,
       patternImage: match?.imageUrl ?? '',
       patternLabel: match?.title ?? '',
     });
-  }, [isKurti, catalogue.status, catalogue.designs, preset.categoryId, details]);
+  }, [isKurti, catalogue.status, catalogue.designs, preset.categoryId, details, groups]);
 
   const done = completedCustomizationCount(groups, details);
   const ready = isKurti ? Boolean(matchedDress) : done >= required;
@@ -67,7 +82,7 @@ function CustomizeDesign() {
     const next = { ...detailsRef.current, garment: preset.garment, [id]: value };
     detailsRef.current = next;
     setDetails(next);
-    const match = isKurti ? findKurtiDesign(catalogue.designs, next) : null;
+    const match = isKurti ? bestKurtiDesign(catalogue.designs, next) : null;
     patchStudioDraft(preset.categoryId, {
       fabricImage: readStudioDraft(preset.categoryId)?.fabricImage || preset.fabricImage,
       customization: next,
@@ -90,16 +105,16 @@ function CustomizeDesign() {
         <aside className="lg:sticky lg:top-0 lg:h-full">
           <figure className="relative h-80 overflow-hidden border border-thy-ink/10 bg-thy-mist lg:h-full">
             <img
-              src={matchedDress?.imageUrl || garment?.fabricImage || preset.fabricImage}
-              alt={matchedDress?.title || `${audienceLabel} ${preset.garment}`}
-              className={`absolute inset-0 h-full w-full ${matchedDress ? 'object-contain bg-white' : 'object-cover object-top'}`}
+              src={shownDress?.imageUrl || garment?.fabricImage || preset.fabricImage}
+              alt={shownDress?.title || `${audienceLabel} ${preset.garment}`}
+              className={`absolute inset-0 h-full w-full ${shownDress ? 'object-contain bg-white' : 'object-cover object-top'}`}
             />
             <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-thy-deep/80 to-transparent px-5 pb-5 pt-16">
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
-                {matchedDress ? 'Catalogue dress' : 'Selected outfit'}
+                {matchedDress ? 'Catalogue dress' : shownDress ? 'Closest catalogue dress' : 'Selected outfit'}
               </p>
               <p className="mt-1 text-3xl text-white" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-                {matchedDress ? matchedDress.title : `${audienceLabel} · ${preset.garment}`}
+                {shownDress ? shownDress.title : `${audienceLabel} · ${preset.garment}`}
               </p>
             </figcaption>
           </figure>
@@ -136,9 +151,9 @@ function CustomizeDesign() {
                   ? 'The dress catalogue could not be loaded. Try again in a moment.'
                   : matchedDress
                     ? 'This combination matches a catalogue dress. Generate Design uses that dress as the visualization reference.'
-                    : done >= required
-                      ? 'No catalogue dress matches this combination. Choose a highlighted option.'
-                      : 'Options that cannot match a catalogue dress stay unavailable.'}
+                    : shownDress
+                      ? `Visualization is using ${shownDress.title}. Finish the remaining choices for an exact catalogue match.`
+                      : 'Each choice updates the dress used in the visualization.'}
             </p>
           )}
 

@@ -4,7 +4,7 @@ import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, ImagePlus, Sparkles, Upload, X } from 'lucide-react';
 import { getStudioGarment } from '@/lib/design-studio';
-import { findKurtiDesign } from '@/lib/kurti-catalogue';
+import { bestKurtiDesign, findKurtiDesign, isDefaultPattern } from '@/lib/kurti-catalogue';
 import { useKurtiCatalogue } from '@/lib/use-kurti-catalogue';
 import {
   patchStudioDraft,
@@ -68,14 +68,22 @@ function DesignPreviewContent() {
   const isKurti = preset.categoryId === 'kurti';
   const catalogue = useKurtiCatalogue(isKurti);
   const catalogueMatch = isKurti ? findKurtiDesign(catalogue.designs, customization) : null;
+  const catalogueDress = isKurti ? bestKurtiDesign(catalogue.designs, customization) : null;
   const isUploadedPattern = Boolean(patternImage && (patternImage.startsWith('data:') || patternImage.startsWith('blob:')));
+  const storedPattern = patternImage && !isDefaultPattern(patternImage) ? patternImage : null;
   const currentPatternImage = isUploadedPattern
     ? patternImage!
-    : catalogueMatch?.imageUrl || patternImage || DEFAULT_PATTERN_IMAGE;
+    : catalogueDress?.imageUrl || storedPattern || DEFAULT_PATTERN_IMAGE;
   const currentPatternLabel = isUploadedPattern
     ? patternLabel || 'Uploaded pattern'
-    : catalogueMatch?.title || patternLabel || DEFAULT_PATTERN_LABEL;
-  const patternKind = isUploadedPattern ? 'Uploaded pattern' : catalogueMatch ? 'Catalogue dress' : 'Default pattern';
+    : catalogueDress?.title || (storedPattern ? patternLabel : null) || DEFAULT_PATTERN_LABEL;
+  const patternKind = isUploadedPattern
+    ? 'Uploaded pattern'
+    : catalogueMatch
+      ? 'Catalogue dress'
+      : catalogueDress
+        ? 'Closest catalogue dress'
+        : 'Default pattern';
   const hasUserFabric = isUploadedFabric(fabricImage);
   const query = `?category=${encodeURIComponent(preset.categoryId)}`;
 
@@ -421,7 +429,7 @@ function DesignPreviewContent() {
                   onClick={onRemovePattern}
                   className="text-[10px] uppercase tracking-[0.14em] text-thy-subtle hover:text-thy-deep underline transition-colors cursor-pointer"
                 >
-                  {catalogueMatch ? 'Use catalogue dress' : 'Reset to default'}
+                  {catalogueDress ? 'Use catalogue dress' : 'Reset to default'}
                 </button>
               )}
             </div>
@@ -429,7 +437,7 @@ function DesignPreviewContent() {
               <button
                 type="button"
                 onClick={() => setPatternModalOpen(true)}
-                className="relative group h-14 w-14 shrink-0 overflow-hidden border border-thy-ink/15 cursor-pointer bg-white text-left flex items-center justify-center p-1"
+                className="relative group h-36 w-28 shrink-0 overflow-hidden border border-thy-ink/15 cursor-pointer bg-white text-left flex items-center justify-center p-1"
                 title="Click to preview pattern"
               >
                 <img

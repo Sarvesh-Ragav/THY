@@ -17,8 +17,47 @@ export interface KurtiCatalogueDesign {
 const MATCH_FIELDS = ['neckline', 'sleeves', 'silhouette', 'length'] as const;
 export type KurtiMatchField = (typeof MATCH_FIELDS)[number];
 
+const DEFAULT_PATTERN_PATH = '/preview/Roundneck_sleeveless_A-line_calflength.png';
+
+const VALUE_ALIASES: Record<KurtiMatchField, Record<string, string>> = {
+  neckline: {
+    square: 'Square Neck',
+    collar: 'Collar Neck',
+  },
+  sleeves: {
+    'half sleeve': 'Short Sleeve',
+    'three-quarter': '3/4th Sleeve',
+    'three quarter': '3/4th Sleeve',
+    'cap sleeve': 'Short Sleeve',
+  },
+  silhouette: {
+    relaxed: 'Straight',
+    fitted: 'Straight',
+    flared: 'A-Line',
+    'fit and flare': 'A-Line',
+  },
+  length: {
+    'above knee': 'Short',
+    'ankle length': 'Full Length',
+    crop: 'Short',
+    waist: 'Short',
+    hip: 'Knee Length',
+    long: 'Full Length',
+  },
+};
+
 function same(left: string, right: string) {
   return left.trim().toLowerCase() === right.trim().toLowerCase();
+}
+
+export function canonicalKurtiValue(field: KurtiMatchField, value: string) {
+  const trimmed = value.trim();
+  return VALUE_ALIASES[field][trimmed.toLowerCase()] ?? trimmed;
+}
+
+export function isDefaultPattern(source?: string | null) {
+  if (!source) return true;
+  return source === DEFAULT_PATTERN_PATH || source.endsWith('Roundneck_sleeveless_A-line_calflength.png');
 }
 
 export function normalizeNeckline(raw: string): string {
@@ -112,6 +151,12 @@ export function parseKurtiFilename(fileName: string): KurtiCatalogueDesign | nul
   };
 }
 
+function selectedKurtiValue(details: GarmentCustomizationDetails | null | undefined, field: KurtiMatchField) {
+  const raw = details?.[field];
+  if (!raw) return '';
+  return canonicalKurtiValue(field, raw);
+}
+
 export function findKurtiDesign(
   designs: KurtiCatalogueDesign[],
   details: GarmentCustomizationDetails | null | undefined
@@ -119,9 +164,38 @@ export function findKurtiDesign(
   if (!details?.neckline || !details.sleeves || !details.silhouette || !details.length) return null;
   return (
     designs.find((design) =>
-      MATCH_FIELDS.every((field) => same(design.attributes[field], details[field] || ''))
+      MATCH_FIELDS.every((field) => same(design.attributes[field], selectedKurtiValue(details, field)))
     ) ?? null
   );
+}
+
+/** Exact catalogue row when one exists, otherwise the dress that shares the most selected attributes. */
+export function bestKurtiDesign(
+  designs: KurtiCatalogueDesign[],
+  details: GarmentCustomizationDetails | null | undefined
+): KurtiCatalogueDesign | null {
+  const exact = findKurtiDesign(designs, details);
+  if (exact) return exact;
+
+  let best: { design: KurtiCatalogueDesign; score: number } | null = null;
+  let selectedCount = 0;
+  for (const field of MATCH_FIELDS) {
+    if (selectedKurtiValue(details, field)) selectedCount += 1;
+  }
+  if (selectedCount === 0) return null;
+
+  for (const design of designs) {
+    let score = 0;
+    for (const field of MATCH_FIELDS) {
+      const wanted = selectedKurtiValue(details, field);
+      if (wanted && same(design.attributes[field], wanted)) score += 1;
+    }
+    if (score === 0) continue;
+    if (!best || score > best.score || (score === best.score && design.imageUrl < best.design.imageUrl)) {
+      best = { design, score };
+    }
+  }
+  return best?.design ?? null;
 }
 
 export function isKurtiOptionAvailable(
@@ -133,7 +207,7 @@ export function isKurtiOptionAvailable(
   if (designs.length === 0) return true;
   return designs.some((design) =>
     MATCH_FIELDS.every((key) => {
-      const selected = key === field ? option : details[key];
+      const selected = key === field ? option : selectedKurtiValue(details, key);
       if (!selected) return true;
       return same(design.attributes[key], selected);
     })

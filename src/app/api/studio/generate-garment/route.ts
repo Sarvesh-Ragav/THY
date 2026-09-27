@@ -5,6 +5,7 @@ import fsSync from "fs";
 import path from "path";
 
 import { type GarmentCustomizationDetails } from "@/lib/studio-draft";
+import { bestKurtiDesign, isDefaultPattern, parseKurtiFilename, type KurtiCatalogueDesign } from "@/lib/kurti-catalogue";
 
 const DEFAULT_PATTERN = "/preview/Roundneck_sleeveless_A-line_calflength.png";
 
@@ -225,6 +226,33 @@ OUTPUT
 Generate one complete, photorealistic ${garmentType} product visualization suitable for an online fashion catalog. The final image should look like a professionally photographed garment made from the uploaded fabric, not an illustration or digitally painted design.`;
 }
 
+async function loadKurtiCatalogue(): Promise<KurtiCatalogueDesign[]> {
+  const dir = path.join(process.cwd(), "public", "stylecraftdb", "Kurti");
+  const files = await fs.readdir(dir);
+  return files
+    .map((file) => parseKurtiFilename(file))
+    .filter((item): item is KurtiCatalogueDesign => Boolean(item));
+}
+
+async function resolvePatternSource(body: GenerateRequestBody) {
+  if (body.patternImage && (body.patternImage.startsWith("data:") || body.patternImage.startsWith("blob:"))) {
+    return body.patternImage;
+  }
+
+  const garment = (body.customization?.garment || body.garment || "").toLowerCase();
+  if (garment.includes("kurti") && body.customization) {
+    try {
+      const match = bestKurtiDesign(await loadKurtiCatalogue(), body.customization);
+      if (match) return match.imageUrl;
+    } catch {
+      // The client pattern is still available when the catalogue folder cannot be read.
+    }
+  }
+
+  if (body.patternImage && !isDefaultPattern(body.patternImage)) return body.patternImage;
+  return DEFAULT_PATTERN;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body: GenerateRequestBody = await req.json();
@@ -237,7 +265,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ai = getGenAIClient();
-    const patternSource = body.patternImage || DEFAULT_PATTERN;
+    const patternSource = await resolvePatternSource(body);
 
     const [fabricPart, patternPart] = await Promise.all([
       resolveImagePart(body.fabricImage),
