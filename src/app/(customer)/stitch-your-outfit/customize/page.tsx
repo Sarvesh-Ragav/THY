@@ -69,16 +69,16 @@ function CustomizeDesign() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
-      <div className="grid grid-cols-1 lg:grid-cols-[17rem_minmax(0,1fr)_15.5rem] gap-4 items-stretch">
-        <aside className="thy-card p-3.5 flex flex-col gap-3 h-full">
+      <div className="grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)_16rem] gap-6 lg:gap-8 items-start">
+        <aside className="thy-card p-4 flex flex-col gap-3">
           <div>
             <p className="text-xs uppercase tracking-[0.16em] text-thy-brand font-bold">Selected outfit</p>
             <h2 className="mt-1 text-2xl leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
               {audienceLabel} · {preset.garment}
             </h2>
           </div>
-          <div className="overflow-hidden border border-thy-ink/10 bg-thy-mist flex-1 min-h-48">
-            <img src={garment?.fabricImage || preset.fabricImage} alt={preset.garment} className="h-full w-full object-cover object-top" />
+          <div className="overflow-hidden border border-thy-ink/10 bg-thy-mist">
+            <img src={garment?.fabricImage || preset.fabricImage} alt={preset.garment} className="h-56 w-full object-cover object-top" />
           </div>
           <div className="border border-thy-brand/20 bg-thy-mist/70 px-3 py-2.5 space-y-1.5">
             <p className="text-xs uppercase tracking-[0.14em] text-thy-brand font-bold">Current design summary</p>
@@ -87,7 +87,7 @@ function CustomizeDesign() {
           </div>
         </aside>
 
-        <section className="flex flex-col gap-4 min-w-0">
+        <section className="flex flex-col gap-5 min-w-0">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-[11px] uppercase tracking-[0.22em] text-thy-brand font-bold">Stitch your outfit</p>
@@ -109,7 +109,7 @@ function CustomizeDesign() {
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
             {requiredGroups.map((group) => (
               <OptionGroup
                 key={group.id}
@@ -123,7 +123,7 @@ function CustomizeDesign() {
           </div>
         </section>
 
-        <aside className="flex flex-col gap-4">
+        <aside className="flex flex-col gap-5 lg:pt-1">
           <p className="text-xs uppercase tracking-[0.14em] text-thy-ink font-bold">Additional details</p>
           {specific.length > 0 ? (
             specific.map((group) => (
@@ -169,9 +169,9 @@ function OptionGroup({
 }) {
   return (
     <div>
-      <h3 className="text-sm font-bold tracking-[0.04em] text-thy-ink">{title}</h3>
-      <p className="mt-0.5 text-xs text-thy-muted">{hint}</p>
-      <div className="mt-2 flex flex-wrap gap-1.5">
+      <h3 className="text-sm font-bold text-thy-ink">{title}</h3>
+      <p className="mt-1 text-xs text-thy-muted">{hint}</p>
+      <div className="mt-2.5 flex flex-wrap gap-2">
         {options.map((option) => {
           const active = selected === option;
           return (
@@ -179,7 +179,7 @@ function OptionGroup({
               key={option}
               type="button"
               onClick={() => onSelect(option)}
-              className={`inline-flex flex-1 min-w-[7.25rem] items-center justify-center gap-1.5 min-h-9 px-2 text-sm border text-center ${
+              className={`inline-flex items-center justify-center gap-1.5 min-h-10 px-3 text-sm border ${
                 active
                   ? 'border-thy-brand bg-thy-mist text-thy-brand'
                   : 'border-thy-ink/15 bg-thy-surface text-thy-ink hover:border-thy-brand/40'
