@@ -68,48 +68,48 @@ function CustomizeDesign() {
   const requiredGroups = groups.filter((group) => group.required);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
-      <div className="grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)_16rem] gap-6 lg:gap-8 items-start">
-        <aside className="thy-card p-4 flex flex-col gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.16em] text-thy-brand font-bold">Selected outfit</p>
-            <h2 className="mt-1 text-2xl leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-              {audienceLabel} · {preset.garment}
-            </h2>
-          </div>
-          <div className="overflow-hidden border border-thy-ink/10 bg-thy-mist">
-            <img src={garment?.fabricImage || preset.fabricImage} alt={preset.garment} className="h-56 w-full object-cover object-top" />
-          </div>
-          <div className="border border-thy-brand/20 bg-thy-mist/70 px-3 py-2.5 space-y-1.5">
-            <p className="text-xs uppercase tracking-[0.14em] text-thy-brand font-bold">Current design summary</p>
-            <SummaryRow label="Garment" value={preset.garment} />
-            <SummaryRow label="Progress" value={ready ? 'Complete' : `${done} of ${required}`} emphasis={!ready} />
-          </div>
+    <main className="mx-auto w-full max-w-[90rem] px-4 sm:px-6 lg:h-[calc(100dvh-7.25rem)] lg:overflow-hidden lg:px-8">
+      <div className="grid grid-cols-1 gap-6 py-4 lg:h-full lg:grid-cols-[minmax(18rem,38%)_minmax(0,1fr)] lg:gap-8 lg:py-5">
+        <aside className="lg:sticky lg:top-0 lg:h-full">
+          <figure className="relative h-80 overflow-hidden border border-thy-ink/10 bg-thy-mist lg:h-full">
+            <img
+              src={garment?.fabricImage || preset.fabricImage}
+              alt={`${audienceLabel} ${preset.garment}`}
+              className="absolute inset-0 h-full w-full object-cover object-top"
+            />
+            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-thy-deep/80 to-transparent px-5 pb-5 pt-16">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">Selected outfit</p>
+              <p className="mt-1 text-3xl text-white" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+                {audienceLabel} · {preset.garment}
+              </p>
+            </figcaption>
+          </figure>
         </aside>
 
-        <section className="flex flex-col gap-5 min-w-0">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+        <section className="min-w-0 lg:h-full lg:overflow-y-auto lg:pr-2">
+          <div className="sticky top-0 z-10 flex flex-wrap items-end justify-between gap-4 bg-thy-cream/95 pb-4 backdrop-blur-sm">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-thy-brand font-bold">Stitch your outfit</p>
-              <h1 className="mt-1 text-3xl leading-none" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-thy-brand">Stitch your outfit</p>
+              <h1 className="mt-1 text-3xl leading-none sm:text-4xl" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
                 Customize Your Design
               </h1>
             </div>
-            <div className="flex items-center gap-3">
-              <Link href="/stitch-your-outfit" className="text-sm font-medium text-thy-ink">
+            <div className="flex items-center gap-4">
+              <Link href="/stitch-your-outfit" className="text-sm font-semibold text-thy-ink">
                 ← Back
               </Link>
               <button
                 type="button"
                 disabled={!ready}
                 onClick={generate}
-                className="hero-leather-btn min-h-11 px-4 text-[11px] uppercase tracking-[0.16em] disabled:opacity-40 disabled:cursor-not-allowed"
+                className="hero-leather-btn min-h-12 px-5 text-xs uppercase tracking-[0.14em] disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Generate Design →
               </button>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+
+          <div className="space-y-8 pb-10 pt-2">
             {requiredGroups.map((group) => (
               <OptionGroup
                 key={group.id}
@@ -120,37 +120,25 @@ function CustomizeDesign() {
                 onSelect={(value) => choose(group.id, value)}
               />
             ))}
+            {specific.length > 0 && (
+              <div className="space-y-8 border-t border-thy-ink/10 pt-8">
+                <h2 className="text-lg font-bold text-thy-ink">Additional details</h2>
+                {specific.map((group) => (
+                  <OptionGroup
+                    key={group.id}
+                    title={group.title}
+                    hint={group.hint}
+                    options={group.options}
+                    selected={details[group.id]}
+                    onSelect={(value) => choose(group.id, value)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </section>
-
-        <aside className="flex flex-col gap-5 lg:pt-1">
-          <p className="text-xs uppercase tracking-[0.14em] text-thy-ink font-bold">Additional details</p>
-          {specific.length > 0 ? (
-            specific.map((group) => (
-              <OptionGroup
-                key={group.id}
-                title={group.title}
-                hint={group.hint}
-                options={group.options}
-                selected={details[group.id]}
-                onSelect={(value) => choose(group.id, value)}
-              />
-            ))
-          ) : (
-            <p className="text-sm text-thy-muted">No extra details for this garment.</p>
-          )}
-        </aside>
       </div>
     </main>
-  );
-}
-
-function SummaryRow({ label, value, emphasis }: { label: string; value: string; emphasis?: boolean }) {
-  return (
-    <div className="flex items-center justify-between gap-3 text-sm">
-      <span className="text-thy-muted">{label}</span>
-      <span className={emphasis ? 'font-semibold text-thy-brand' : 'font-medium text-thy-ink'}>{value}</span>
-    </div>
   );
 }
 
@@ -169,9 +157,9 @@ function OptionGroup({
 }) {
   return (
     <div>
-      <h3 className="text-sm font-bold text-thy-ink">{title}</h3>
-      <p className="mt-1 text-xs text-thy-muted">{hint}</p>
-      <div className="mt-2.5 flex flex-wrap gap-2">
+      <h3 className="text-lg font-bold text-thy-ink">{title}</h3>
+      <p className="mt-1 text-sm text-thy-muted">{hint}</p>
+      <div className="mt-3 flex flex-wrap gap-3">
         {options.map((option) => {
           const active = selected === option;
           return (
@@ -179,14 +167,14 @@ function OptionGroup({
               key={option}
               type="button"
               onClick={() => onSelect(option)}
-              className={`inline-flex items-center justify-center gap-1.5 min-h-10 px-3 text-sm border ${
+              className={`inline-flex items-center justify-center gap-2 min-h-12 px-4 text-base border-2 ${
                 active
-                  ? 'border-thy-brand bg-thy-mist text-thy-brand'
-                  : 'border-thy-ink/15 bg-thy-surface text-thy-ink hover:border-thy-brand/40'
+                  ? 'border-thy-brand bg-thy-mist text-thy-brand font-semibold'
+                  : 'border-thy-ink/30 bg-thy-surface text-thy-ink hover:border-thy-brand'
               }`}
             >
               {option}
-              {active ? <Check size={14} /> : null}
+              {active ? <Check size={16} /> : null}
             </button>
           );
         })}
