@@ -11,7 +11,9 @@ import {
   requiredCustomizationCount,
 } from '@/lib/garment-customization';
 import { getStudioGarment } from '@/lib/design-studio';
+import { findKurtiDesign, isKurtiOptionAvailable, type KurtiMatchField } from '@/lib/kurti-catalogue';
 import { patchStudioDraft, readStudioDraft, type GarmentCustomizationDetails } from '@/lib/studio-draft';
+import { useKurtiCatalogue } from '@/lib/use-kurti-catalogue';
 
 export default function CustomizeDesignPage() {
   return (
@@ -37,6 +39,9 @@ function CustomizeDesign() {
 
   const [details, setDetails] = useState<GarmentCustomizationDetails>({});
   const detailsRef = useRef(details);
+  const isKurti = categoryId === 'kurti';
+  const catalogue = useKurtiCatalogue(isKurti);
+  const matchedDress = isKurti ? findKurtiDesign(catalogue.designs, details) : null;
 
   useEffect(() => {
     const draft = readStudioDraft(categoryId);
@@ -45,17 +50,29 @@ function CustomizeDesign() {
     setDetails(next);
   }, [categoryId, preset.garment]);
 
+  useEffect(() => {
+    if (!isKurti || catalogue.status !== 'ready') return;
+    const match = findKurtiDesign(catalogue.designs, detailsRef.current);
+    patchStudioDraft(preset.categoryId, {
+      patternImage: match?.imageUrl ?? '',
+      patternLabel: match?.title ?? '',
+    });
+  }, [isKurti, catalogue.status, catalogue.designs, preset.categoryId, details]);
+
   const done = completedCustomizationCount(groups, details);
-  const ready = done >= required;
+  const ready = isKurti ? Boolean(matchedDress) : done >= required;
   const specific = groups.filter((group) => !group.required);
 
   const choose = (id: keyof GarmentCustomizationDetails, value: string) => {
     const next = { ...detailsRef.current, garment: preset.garment, [id]: value };
     detailsRef.current = next;
     setDetails(next);
+    const match = isKurti ? findKurtiDesign(catalogue.designs, next) : null;
     patchStudioDraft(preset.categoryId, {
       fabricImage: readStudioDraft(preset.categoryId)?.fabricImage || preset.fabricImage,
       customization: next,
+      patternImage: isKurti ? (match?.imageUrl ?? '') : undefined,
+      patternLabel: isKurti ? (match?.title ?? '') : undefined,
     });
   };
 
@@ -73,14 +90,16 @@ function CustomizeDesign() {
         <aside className="lg:sticky lg:top-0 lg:h-full">
           <figure className="relative h-80 overflow-hidden border border-thy-ink/10 bg-thy-mist lg:h-full">
             <img
-              src={garment?.fabricImage || preset.fabricImage}
-              alt={`${audienceLabel} ${preset.garment}`}
-              className="absolute inset-0 h-full w-full object-cover object-top"
+              src={matchedDress?.imageUrl || garment?.fabricImage || preset.fabricImage}
+              alt={matchedDress?.title || `${audienceLabel} ${preset.garment}`}
+              className={`absolute inset-0 h-full w-full ${matchedDress ? 'object-contain bg-white' : 'object-cover object-top'}`}
             />
             <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-thy-deep/80 to-transparent px-5 pb-5 pt-16">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">Selected outfit</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-white/80">
+                {matchedDress ? 'Catalogue dress' : 'Selected outfit'}
+              </p>
               <p className="mt-1 text-3xl text-white" style={{ fontFamily: 'var(--font-cormorant), serif' }}>
-                {audienceLabel} · {preset.garment}
+                {matchedDress ? matchedDress.title : `${audienceLabel} · ${preset.garment}`}
               </p>
             </figcaption>
           </figure>
@@ -109,6 +128,20 @@ function CustomizeDesign() {
             </div>
           </div>
 
+          {isKurti && (
+            <p className="pb-2 text-sm text-thy-muted">
+              {catalogue.status === 'loading'
+                ? 'Loading catalogue dresses...'
+                : catalogue.status === 'error'
+                  ? 'The dress catalogue could not be loaded. Try again in a moment.'
+                  : matchedDress
+                    ? 'This combination matches a catalogue dress. Generate Design uses that dress as the visualization reference.'
+                    : done >= required
+                      ? 'No catalogue dress matches this combination. Choose a highlighted option.'
+                      : 'Options that cannot match a catalogue dress stay unavailable.'}
+            </p>
+          )}
+
           <div className="space-y-8 pb-10 pt-2">
             {requiredGroups.map((group) => (
               <OptionGroup
@@ -116,6 +149,19 @@ function CustomizeDesign() {
                 title={group.title}
                 hint={group.hint}
                 options={group.options}
+                disabledOptions={
+                  isKurti
+                    ? group.options.filter(
+                        (option) =>
+                          !isKurtiOptionAvailable(
+                            catalogue.designs,
+                            details,
+                            group.id as KurtiMatchField,
+                            option
+                          )
+                      )
+                    : []
+                }
                 selected={details[group.id]}
                 onSelect={(value) => choose(group.id, value)}
               />
@@ -146,12 +192,14 @@ function OptionGroup({
   title,
   hint,
   options,
+  disabledOptions = [],
   selected,
   onSelect,
 }: {
   title: string;
   hint: string;
   options: string[];
+  disabledOptions?: string[];
   selected?: string;
   onSelect: (value: string) => void;
 }) {
@@ -162,12 +210,14 @@ function OptionGroup({
       <div className="mt-3 flex flex-wrap gap-3">
         {options.map((option) => {
           const active = selected === option;
+          const disabled = disabledOptions.includes(option);
           return (
             <button
               key={option}
               type="button"
+              disabled={disabled}
               onClick={() => onSelect(option)}
-              className={`inline-flex items-center justify-center gap-2 min-h-12 px-4 text-base border-2 ${
+              className={`inline-flex items-center justify-center gap-2 min-h-12 px-4 text-base border-2 disabled:cursor-not-allowed disabled:opacity-35 ${
                 active
                   ? 'border-thy-brand bg-thy-mist text-thy-brand font-semibold'
                   : 'border-thy-ink/30 bg-thy-surface text-thy-ink hover:border-thy-brand'

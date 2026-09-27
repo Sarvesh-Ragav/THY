@@ -14,14 +14,14 @@ const kurtiGroups: CustomOptionGroup[] = [
     title: 'Neckline',
     hint: 'Select one neckline for the kurti.',
     required: true,
-    options: ['Round Neck', 'V-Neck', 'Boat Neck', 'Square', 'Collar'],
+    options: ['Round Neck', 'V-Neck'],
   },
   {
     id: 'sleeves',
     title: 'Sleeves',
     hint: 'Select one sleeve style.',
     required: true,
-    options: ['Sleeveless', 'Short Sleeve', 'Elbow Sleeve', 'Full Sleeve'],
+    options: ['Sleeveless', 'Short Sleeve', 'Elbow Sleeve', '3/4th Sleeve', 'Full Sleeve'],
   },
   {
     id: 'length',
@@ -35,7 +35,7 @@ const kurtiGroups: CustomOptionGroup[] = [
     title: 'Fit & silhouette',
     hint: 'Choose how the kurti should fall.',
     required: true,
-    options: ['Straight', 'A-Line', 'Flared', 'Relaxed', 'Fitted'],
+    options: ['Straight', 'A-Line', 'Anarkali', 'Princess Cut'],
   },
   {
     id: 'sideSlit',

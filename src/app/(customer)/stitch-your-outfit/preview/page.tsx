@@ -4,6 +4,8 @@ import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, ImagePlus, Sparkles, Upload, X } from 'lucide-react';
 import { getStudioGarment } from '@/lib/design-studio';
+import { findKurtiDesign } from '@/lib/kurti-catalogue';
+import { useKurtiCatalogue } from '@/lib/use-kurti-catalogue';
 import {
   patchStudioDraft,
   readFileAsDataUrl,
@@ -63,9 +65,17 @@ function DesignPreviewContent() {
   const [customization, setCustomization] = useState<GarmentCustomizationDetails | undefined>(undefined);
   const [dragActive, setDragActive] = useState(false);
 
-  const currentPatternImage = patternImage || DEFAULT_PATTERN_IMAGE;
-  const currentPatternLabel = patternLabel || DEFAULT_PATTERN_LABEL;
-  const hasCustomPattern = Boolean(patternImage);
+  const isKurti = preset.categoryId === 'kurti';
+  const catalogue = useKurtiCatalogue(isKurti);
+  const catalogueMatch = isKurti ? findKurtiDesign(catalogue.designs, customization) : null;
+  const isUploadedPattern = Boolean(patternImage && (patternImage.startsWith('data:') || patternImage.startsWith('blob:')));
+  const currentPatternImage = isUploadedPattern
+    ? patternImage!
+    : catalogueMatch?.imageUrl || patternImage || DEFAULT_PATTERN_IMAGE;
+  const currentPatternLabel = isUploadedPattern
+    ? patternLabel || 'Uploaded pattern'
+    : catalogueMatch?.title || patternLabel || DEFAULT_PATTERN_LABEL;
+  const patternKind = isUploadedPattern ? 'Uploaded pattern' : catalogueMatch ? 'Catalogue dress' : 'Default pattern';
   const hasUserFabric = isUploadedFabric(fabricImage);
   const query = `?category=${encodeURIComponent(preset.categoryId)}`;
 
@@ -405,13 +415,13 @@ function DesignPreviewContent() {
           <div className="bg-thy-mist/90 border border-thy-ink/10 p-4 space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-[11px] uppercase tracking-[0.18em] text-thy-subtle">Dress pattern</p>
-              {hasCustomPattern && (
+              {isUploadedPattern && (
                 <button
                   type="button"
                   onClick={onRemovePattern}
                   className="text-[10px] uppercase tracking-[0.14em] text-thy-subtle hover:text-thy-deep underline transition-colors cursor-pointer"
                 >
-                  Reset to default
+                  {catalogueMatch ? 'Use catalogue dress' : 'Reset to default'}
                 </button>
               )}
             </div>
@@ -436,7 +446,7 @@ function DesignPreviewContent() {
                   {currentPatternLabel}
                 </p>
                 <p className="text-xs text-thy-brand font-semibold uppercase tracking-[0.12em]">
-                  {hasCustomPattern ? 'Custom uploaded' : 'Default pattern'}
+                  {patternKind}
                 </p>
               </div>
               <button
@@ -460,7 +470,7 @@ function DesignPreviewContent() {
               onClick={() => patternFileRef.current?.click()}
               className={`${ghostBtn} w-full`}
             >
-              {hasCustomPattern ? 'Change pattern photo' : 'Upload dress pattern'}
+              {isUploadedPattern ? 'Change pattern photo' : 'Upload dress pattern'}
             </button>
           </div>
 
@@ -506,7 +516,7 @@ function DesignPreviewContent() {
             <div className="flex items-center justify-between gap-3 border-b border-thy-ink/10 pb-3">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.18em] text-thy-brand font-semibold">
-                  {hasCustomPattern ? 'Attached Reference' : 'Default Pattern Reference'}
+                  {patternKind}
                 </p>
                 <h3 className="text-lg font-serif text-thy-ink mt-0.5 truncate max-w-xs">
                   {currentPatternLabel}
@@ -534,7 +544,7 @@ function DesignPreviewContent() {
                 onClick={() => patternFileRef.current?.click()}
                 className="text-xs text-thy-brand hover:underline font-medium cursor-pointer"
               >
-                {hasCustomPattern ? 'Upload different photo' : 'Upload custom pattern'}
+                {isUploadedPattern ? 'Upload different photo' : 'Upload custom pattern'}
               </button>
               <button
                 type="button"

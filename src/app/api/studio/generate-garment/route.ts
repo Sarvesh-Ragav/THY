@@ -161,8 +161,11 @@ Use the uploaded fabric image as the primary and authoritative reference for the
 The fabric pattern must be naturally wrapped and mapped onto the generated garment. Do not redesign, simplify, replace, recolor, or invent a different textile pattern.
 If the uploaded fabric contains a repeating pattern, intelligently repeat it across the garment while maintaining realistic scale, orientation, and continuity.
 
+CONSTRUCTION REFERENCE
+The second image is the catalogue dress matched to the customer's neckline, sleeves, silhouette, and length. Reproduce that garment's cut: neckline shape, sleeve shape and length, silhouette, and hem length. Do not copy the second image's color, print, or fabric. Those come only from the first image.
+
 GARMENT CONSTRUCTION
-Construct the garment accurately according to the specified attributes. The generated garment must have:
+Construct the garment accurately according to the specified attributes and the catalogue dress. The generated garment must have:
 • Realistic seams and stitching
 • Natural fabric folds and wrinkles, consistent with the fabric's apparent weight and stiffness
 • Physically plausible draping
