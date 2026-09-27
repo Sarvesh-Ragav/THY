@@ -9,3 +9,5 @@ export * from './Chat.js';
 export * from './ChatMedia.js';
 export * from './Notification.js';
 export * from './Order.js';
+export * from './KurtiDesign.js';
+

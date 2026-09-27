@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "migrate": "tsx src/db/migrate.ts",
     "seed:mongo": "tsx src/db/seed-mongo.ts",
+    "seed:kurti": "tsx src/db/seed-kurti.ts",
     "test": "tsx --test tests/*.test.ts",
     "build": "echo Nothing to build"
   },

@@ -1,5 +1,6 @@
 import { pool } from '../db/pool.js';
 import { ApiError } from '../utils/api-error.js';
+import { KurtiDesign } from '../models/KurtiDesign.js';
 
 type CatalogueQuery = { category?: string; q?: string; trending?: boolean; popular?: boolean; page: number; limit: number };
 type TailorDirectoryQuery = { city?: string; q?: string; page: number; limit: number };
@@ -76,4 +77,46 @@ export async function getTailor(publicId: string) {
   const row = result.rows[0];
   const portfolio = await pool.query<PortfolioRow>('SELECT id, title, image_url, display_order FROM tailor_portfolio_assets WHERE tailor_user_id = $1 AND is_active = TRUE ORDER BY display_order, title', [row.user_id]);
   return { ...toTailor(row), portfolio: portfolio.rows.map((item) => ({ id: item.id, title: item.title, imageUrl: item.image_url, displayOrder: item.display_order })) };
+}
+
+export type KurtiQuery = {
+  neckline?: string;
+  sleeves?: string;
+  silhouette?: string;
+  length?: string;
+  q?: string;
+  page: number;
+  limit: number;
+};
+
+export async function listKurtiDesigns(query: KurtiQuery) {
+  const filter: Record<string, any> = { isActive: true };
+
+  if (query.neckline) {
+    filter['attributes.neckline'] = new RegExp(`^${query.neckline.trim()}$`, 'i');
+  }
+  if (query.sleeves) {
+    filter['attributes.sleeves'] = new RegExp(`^${query.sleeves.trim()}$`, 'i');
+  }
+  if (query.silhouette) {
+    filter['attributes.silhouette'] = new RegExp(`^${query.silhouette.trim()}$`, 'i');
+  }
+  if (query.length) {
+    filter['attributes.length'] = new RegExp(`^${query.length.trim()}$`, 'i');
+  }
+  if (query.q) {
+    const searchRegex = new RegExp(query.q.trim(), 'i');
+    filter.$or = [{ title: searchRegex }, { tags: searchRegex }, { designCode: searchRegex }];
+  }
+
+  const skip = (query.page - 1) * query.limit;
+  const [items, total] = await Promise.all([
+    KurtiDesign.find(filter).sort({ displayOrder: 1, title: 1 }).skip(skip).limit(query.limit).lean(),
+    KurtiDesign.countDocuments(filter),
+  ]);
+
+  return {
+    items,
+    pagination: pagination(query.page, query.limit, total),
+  };
 }

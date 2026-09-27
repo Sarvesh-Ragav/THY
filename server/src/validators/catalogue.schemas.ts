@@ -23,3 +23,12 @@ export const tailorDirectoryQuerySchema = paginationSchema.extend({
 
 export const categorySlugSchema = z.object({ slug: z.string().trim().regex(/^[a-z0-9-]+$/).max(80) });
 export const tailorPublicIdSchema = z.object({ id: z.string().trim().regex(/^[A-Za-z0-9_-]+$/).max(64) });
+
+export const kurtiDesignQuerySchema = paginationSchema.extend({
+  neckline: optionalText(80),
+  sleeves: optionalText(80),
+  silhouette: optionalText(80),
+  length: optionalText(80),
+  q: optionalText(120),
+  limit: z.coerce.number().int().min(1).max(100).default(100),
+});
